@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-13-15 JChoy static dataPath. 4 tabs.
+//5-13-15 JChoy try using getDownloadCacheDirectory
 //todo: read/write file that manages how many tabs, and what appears in each tab
 //      Context.getExternalFilesDir(s);
 
@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		wifiName = getWifiName(this);
-        dataPath = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath();
+        dataPath = getDownloadCacheDirectory().getAbsolutePath();
         //wifiName = "call getWifiName to get SSID";
     }
 
