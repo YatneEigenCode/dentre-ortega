@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-12-15 JChoy Show wifi name in tab2. include android.grpahics
+//5-13-15 JChoy Call javaid.DevBed.foo()
 //todo: read/write file that manages how many tabs, and what appears in each tab
 //      Context.getExternalFilesDir(s);
 
@@ -7,6 +7,7 @@
 
 package com.ok88.andydev.rogherdy_h;
 
+import com.ok88.andydev.javaid.*;
 import java.util.Locale;
 
 import android.support.v7.app.ActionBarActivity;
@@ -178,7 +179,7 @@ public class MainActivity extends ActionBarActivity {
             tv.setTextColor(Color.parseColor("#000000"));
             int n = getArguments().getInt(ARG_SECTION_NUMBER);
             if (n==1) tv.setText(getString(R.string.title_section1));
-            if (n==3) tv.setText(getString(R.string.title_section3));
+            if (n==3) tv.setText(DevBed.foo());
             if (n==2) tv.setText(wifiName);
             return rootView;
         }
