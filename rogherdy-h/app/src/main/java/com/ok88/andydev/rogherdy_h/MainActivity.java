@@ -31,7 +31,7 @@ import android.net.NetworkInfo.*;
 import android.content.Context;
 import android.util.TypedValue;
 import android.graphics.*;
-import android.os.*;
+import java.io.File;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -78,8 +78,8 @@ public class MainActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		File fi = getDir( "rogherdy", MODE_WORLD_WRITEABLE );
-        wifiName = getWifiName(this);
+		wifiName = getWifiName(this);
+        wifiName = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath()
         //wifiName = "call getWifiName to get SSID";
     }
 
