@@ -56,7 +56,7 @@ public class DevBed extends Object {
 			fop.flush();
 			fop.close();
 		} catch (Exception e) {
-			Log.w("File write failed.");
+			Log.w("File write failed.",e);
 		}
 	}
 
