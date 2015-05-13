@@ -7,17 +7,17 @@ import java.io.*;
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-
+import android.content.Context;
 
 
 //
-// AppAid
+// DevAid
 //
 public class DevAid extends Object {
 	//
 	// getAssetTextData
 	//
-	public static String[] getAssetTextData(Context ctx, String filename)
+	public static String getAssetTextData(Context ctx, String filename)
 	throws IOException
 	{
 		InputStream input = ctx.getAssets().open(filename,1);
