@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-13-15 JChoy Call javaid.DevBed.foo()
+//5-13-15 JChoy Call Context.getDir();
 //todo: read/write file that manages how many tabs, and what appears in each tab
 //      Context.getExternalFilesDir(s);
 
@@ -78,6 +78,7 @@ public class MainActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		File fi = getDir( "rogherdy", 0 );
         wifiName = getWifiName(this);
         //wifiName = "call getWifiName to get SSID";
     }

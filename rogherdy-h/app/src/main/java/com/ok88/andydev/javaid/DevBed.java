@@ -27,7 +27,7 @@ public class DevBed extends Object {
 	//
 	// foo - returns any string
 	//
-	public static String foo(Context ctx)
+	public static String foo()
 	{
 		return "foo-"+ Environment.getExternalStorageDirectory().getAbsolutePath();
 	}
