@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import android.content.Context;
 import android.os.*;
+import android.util.*;
 
 //
 // DevBed
@@ -48,8 +49,8 @@ public class DevBed extends Object {
 		try {
 			File file = new File( filepath, filename );
 			FileOutputStream fop = new FileOutputStream( file );
-			if (!fop.exists()) {
-				fop.createNewFile();
+			if (!file.exists()) {
+				file.createNewFile();
 			}
 			fop.write( foo().getBytes() );
 			fop.flush();
