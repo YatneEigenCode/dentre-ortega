@@ -1,12 +1,13 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-13-15  JChoy foo()
+//5-13-15  JChoy foow()
 
 package com.ok88.andydev.javaid;
 
 import java.io.*;
 import java.io.InputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import android.content.Context;
 import android.os.*;
@@ -30,6 +31,32 @@ public class DevBed extends Object {
 	public static String foo()
 	{
 		return "foo-"+ Environment.getExternalStorageDirectory().getAbsolutePath();
+	}
+
+	//
+	// foow - write foo string to a specified file.
+	//
+	public static void foow( String filename )
+	{
+		foow( filename, Environment.getExternalStorageDirectory() );
+	}
+	//
+	// foow - write foo string to a specified file at a specified path.
+	//
+	public static void foow( String filename, File filepath )
+	{
+		try {
+			File file = new File( filepath, filename );
+			FileOutputStream fop = new FileOutputStream( file );
+			if (!fop.exists()) {
+				fop.createNewFile();
+			}
+			fop.write( foo().getBytes() );
+			fop.flush();
+			fop.close();
+		} catch (Exception e) {
+			Log.w("File write failed.");
+		}
 	}
 
 	//
