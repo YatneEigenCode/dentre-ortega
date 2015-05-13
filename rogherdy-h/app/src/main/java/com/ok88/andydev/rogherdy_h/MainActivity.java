@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-13-15 JChoy Call Context.getDir();
+//5-13-15 JChoy static dataPath. 4 tabs.
 //todo: read/write file that manages how many tabs, and what appears in each tab
 //      Context.getExternalFilesDir(s);
 
@@ -50,6 +50,7 @@ public class MainActivity extends ActionBarActivity {
      */
     ViewPager mViewPager;
     public static String wifiName;
+    public static String dataPath;
 
     public String getWifiName(Context context) {
         WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -79,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		wifiName = getWifiName(this);
-        wifiName = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath()
+        dataPath = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath();
         //wifiName = "call getWifiName to get SSID";
     }
 
@@ -127,7 +128,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
@@ -182,6 +183,7 @@ public class MainActivity extends ActionBarActivity {
             if (n==1) tv.setText(getString(R.string.title_section1));
             if (n==3) tv.setText(DevBed.foo());
             if (n==2) tv.setText(wifiName);
+            if (n==4) tv.setText(dataPath);
             return rootView;
         }
     }//class PlaceholderFragment
