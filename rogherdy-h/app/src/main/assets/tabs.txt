@@ -1,0 +1,11 @@
+Section 1
+@$WIFINAME
+@$ENVFOLDER
+@$DATAFOLDER
+@/http://dl.dropboxusercontent.com/u/28448395/FogPumpData/hello.txt
+
+@$BATTERY
+@$HELP
+This configuration info is in tabs.txt file.
+User can modify tabs.txt or delete it to reset to apk default.
+Each line in tabs.txt will go into its own swipe-tab.
