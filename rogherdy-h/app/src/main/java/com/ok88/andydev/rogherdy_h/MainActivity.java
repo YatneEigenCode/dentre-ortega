@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-13-15 JChoy write to rogherdy-a13.txt
+//5-13-15 JChoy write to rogherdy-b13.txt
 //todo: read/write file that manages how many tabs, and what appears in each tab
 //      Context.getExternalFilesDir(s);
 
@@ -80,8 +80,9 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		wifiName = getWifiName(this);
-        dataPath = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath();
-        DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );
+        //dataPath = getDir( "rogherdy", MODE_WORLD_WRITEABLE ).getAbsolutePath();
+        dataPath = getExternalFilesDir(null).getAbsolutePath();
+        DevBed.foow( "rogherdy-b13.txt", getExternalFilesDir(null) );
         //wifiName = "call getWifiName to get SSID";
     }
 
