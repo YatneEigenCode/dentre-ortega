@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-14-15 JChoy Moved getWifiName to DevBed
+//5-14-15 JChoy Test javaid.LootBag
 //todo: read/write file that manages how many tabs, and what appears in each tab
 
 //Remember to refresh build after adding uses-permission Manifest
@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
     ViewPager mViewPager;
     public static String wifiName;
     public static String dataPath;
-
+	public static LootBag mLoot;
 
 
     @Override
@@ -65,6 +65,8 @@ public class MainActivity extends ActionBarActivity {
         dataPath = getExternalFilesDir(null).getAbsolutePath();
         DevBed.foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
         //DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
+        mLoot = new LootBag();
+        mLoot.mBundle.putCharSequence("item_1","foogoo");
     }
 
 
@@ -114,35 +116,34 @@ public class MainActivity extends ActionBarActivity {
             return 4;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            Locale l = Locale.getDefault();
-            switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-            }
-            return null;
-        }
-    }//class SectionsPagerAdapter
+        //never used
+        //@Override
+        //public CharSequence getPageTitle(int position) {
+        //    Locale l = Locale.getDefault();
+        //    switch (position) {
+        //        case 0:
+        //            return getString(R.string.title_section1).toUpperCase(l);
+        //        case 1:
+        //            return getString(R.string.title_section2).toUpperCase(l);
+        //        case 2:
+        //            return getString(R.string.title_section3).toUpperCase(l);
+        //    }
+        //    return null;
+        //}
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+    }//inner class
+
+    //
+    // * A placeholder fragment containing a simple view.
+    // Being an inner static class, the instances will have access to static variables
+    //
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+        //
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
+        //
+        // * Returns a new instance of this fragment for the given section number
+        //
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -151,6 +152,7 @@ public class MainActivity extends ActionBarActivity {
             return fragment;
         }
 
+		// instance constructor
         public PlaceholderFragment() {
         }
 
@@ -166,9 +168,10 @@ public class MainActivity extends ActionBarActivity {
             if (n==1) tv.setText(getString(R.string.title_section1));
             if (n==3) tv.setText(DevBed.foo());
             if (n==2) tv.setText(wifiName);
-            if (n==4) tv.setText(dataPath);
+            //if (n==4) tv.setText(dataPath);
+            if (n==4) tv.setText(mLoot.getText(1));
             return rootView;
         }
-    }//class PlaceholderFragment
+    }//inner static class
 
 }//MainActivity

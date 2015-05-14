@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy getWifiName() moved here from MainActivity.
+//5-14-15  JChoy Added LootBat
 
 package com.ok88.andydev.javaid;
 
@@ -16,7 +16,7 @@ import android.net.wifi.*;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.*;
 import android.content.Context;
-//import android.util.TypedValue;
+import android.os.Bundle;
 
 
 //
@@ -105,3 +105,17 @@ public class DevBed extends Object {
 
 }//class
 
+//
+// LootBag
+//
+public class LootBag extends Object {
+	public Bundle mBundle;
+
+	//
+	// getText
+	//
+	public String getText( int n ) {
+		String key = String.format( "item_%d", n );
+		return mBundle.getCharSequence(key);
+	}
+}//class
