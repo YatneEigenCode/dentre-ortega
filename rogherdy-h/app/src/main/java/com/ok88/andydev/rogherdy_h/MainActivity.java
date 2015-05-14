@@ -1,6 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-13-15 JChoy Context.getExternalFilesDir(null) works if a write action is performed
-//		runtime created folder /storage/emulated/0/Android/data/com.ok88.andydev.rogherdy_h/files/
+//5-14-15 JChoy Moved getWifiName to DevBed
 //todo: read/write file that manages how many tabs, and what appears in each tab
 
 //Remember to refresh build after adding uses-permission Manifest
@@ -25,9 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.net.wifi.*;
-import android.net.NetworkInfo;
-import android.net.NetworkInfo.*;
 import android.content.Context;
 import android.util.TypedValue;
 import android.graphics.*;
@@ -45,26 +41,12 @@ public class MainActivity extends ActionBarActivity {
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    //The {@link ViewPager} that will host the section contents.
     ViewPager mViewPager;
     public static String wifiName;
     public static String dataPath;
 
-    public String getWifiName(Context context) {
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (manager.isWifiEnabled()) {
-           WifiInfo wifiInfo = manager.getConnectionInfo();
-           if (wifiInfo != null) {
-              DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-              if (state == DetailedState.CONNECTED || state == DetailedState.OBTAINING_IPADDR) {
-                  return wifiInfo.getSSID();
-              }
-           }
-        }
-        return null;
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		wifiName = getWifiName(this);
+		wifiName = DevBed.getWifiName(this);
         dataPath = getExternalFilesDir(null).getAbsolutePath();
         DevBed.foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
         //DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
@@ -109,10 +91,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
+    //
+    // * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+    // * one of the sections/tabs/pages.
+    //
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {

@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-13-15  JChoy foow()
+//5-14-15  JChoy getWifiName() moved here from MainActivity.
 
 package com.ok88.andydev.javaid;
 
@@ -12,6 +12,12 @@ import java.io.IOException;
 import android.content.Context;
 import android.os.*;
 import android.util.*;
+import android.net.wifi.*;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.*;
+import android.content.Context;
+//import android.util.TypedValue;
+
 
 //
 // DevBed
@@ -79,6 +85,23 @@ public class DevBed extends Object {
 		}
 		return null;
 	}//method
+
+	//
+	// getWifiName
+	//
+    public static String getWifiName(Context context) {
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (manager.isWifiEnabled()) {
+           WifiInfo wifiInfo = manager.getConnectionInfo();
+           if (wifiInfo != null) {
+              DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
+              if (state == DetailedState.CONNECTED || state == DetailedState.OBTAINING_IPADDR) {
+                  return wifiInfo.getSSID();
+              }
+           }
+        }
+        return null;
+    }//method
 
 }//class
 
