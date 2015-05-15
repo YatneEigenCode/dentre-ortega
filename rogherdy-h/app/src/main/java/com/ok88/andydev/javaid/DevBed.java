@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Added LootBat
+//5-14-15  JChoy make LootBag an inner class.
 
 package com.ok88.andydev.javaid;
 
@@ -103,19 +103,25 @@ public class DevBed extends Object {
         return null;
     }//method
 
+	//
+	// LootBag
+	//
+	public static class LootBag extends Object {
+		public Bundle mBundle;
+
+		public LootBag(){
+			mBundle = new Bundle();
+	        mBundle.putCharSequence("item_1","foogoo");
+		}
+
+		//
+		// getText
+		//
+		public String getText( int n ) {
+			String key = String.format( "item_%d", n );
+			return mBundle.getCharSequence(key);
+		}
+	}//inner static class
+
 }//class
 
-//
-// LootBag
-//
-public class LootBag extends Object {
-	public Bundle mBundle;
-
-	//
-	// getText
-	//
-	public String getText( int n ) {
-		String key = String.format( "item_%d", n );
-		return mBundle.getCharSequence(key);
-	}
-}//class

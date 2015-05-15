@@ -1,5 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-14-15 JChoy Test javaid.LootBag
+//5-14-15 JChoy Test javaid.DevBed.LootBag
 //todo: read/write file that manages how many tabs, and what appears in each tab
 
 //Remember to refresh build after adding uses-permission Manifest
@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
     ViewPager mViewPager;
     public static String wifiName;
     public static String dataPath;
-	public static LootBag mLoot;
+	public static DevBed.LootBag mLoot;
 
 
     @Override
@@ -65,8 +65,7 @@ public class MainActivity extends ActionBarActivity {
         dataPath = getExternalFilesDir(null).getAbsolutePath();
         DevBed.foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
         //DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
-        mLoot = new LootBag();
-        mLoot.mBundle.putCharSequence("item_1","foogoo");
+        mLoot = new DevBed.LootBag();
     }
 
 
@@ -168,8 +167,8 @@ public class MainActivity extends ActionBarActivity {
             if (n==1) tv.setText(getString(R.string.title_section1));
             if (n==3) tv.setText(DevBed.foo());
             if (n==2) tv.setText(wifiName);
-            //if (n==4) tv.setText(dataPath);
-            if (n==4) tv.setText(mLoot.getText(1));
+            if (n==4) tv.setText(dataPath);
+            //if (n==4) tv.setText(mLoot.getText(1));
             return rootView;
         }
     }//inner static class
