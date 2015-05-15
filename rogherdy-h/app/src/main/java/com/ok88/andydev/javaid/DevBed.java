@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Use try-catch in getAssetTextData.
+//5-14-15  JChoy Call exposeAsset with context.
 
 package com.ok88.andydev.javaid;
 
@@ -77,7 +77,6 @@ public class DevBed extends Object {
 	//
 	// getAssetTextData
 	public static String getAssetTextData(Context ctx, String filename)
-	throws IOException
 	{
 		try {
 			InputStream input = ctx.getAssets().open(filename,1);
@@ -144,7 +143,7 @@ public class DevBed extends Object {
 	        	mBundle.putCharSequence("item_3", xfd.getAbsolutePath());
 	        	mBundle.putCharSequence("item_4", foo());
 	        	
-	        	exposeAsset("tabs.txt");
+	        	exposeAsset(context, "tabs.txt");
 	        	foow( "rogherdy-b13.txt", xfd);	//this works
         		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
