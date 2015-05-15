@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Refix syntax getStrmTextData() to read from user modifiable version of config.
+//5-14-15  JChoy Use switch-case for auto handling of string comparisons. 
 
 package com.ok88.andydev.javaid;
 
@@ -211,19 +211,20 @@ public class DevBed extends Object {
 		public String fcnup( String s ) 
 		throws Exception
 		{
-			String s9 = s.substring(0,9);
-			if ((s9 == "@/http://") || (s9 == "@/https:/")){
-				URL ucl = new URL(s.substring(2));
-				return getStrmTextData(mContext, ucl.openStream() );
-				/*
-			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
-			
-			        String inputLine, res="";
-			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
-			            res += inputLine;
-			        in.close();
-				return res;
-				*/
+			switch (s.substring(0,9)) {
+				case "@/http://":
+				case "@/https:/":
+					URL ucl = new URL(s.substring(2));
+					return getStrmTextData(mContext, ucl.openStream() );
+					/*
+				        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
+				
+				        String inputLine, res="";
+				        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
+				            res += inputLine;
+				        in.close();
+					return res;
+					*/
 			}
 			return s;
 		}
