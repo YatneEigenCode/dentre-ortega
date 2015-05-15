@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Incorporate ExternalFilesDir functionality into LootBag.
+//5-14-15  JChoy Add exposeAsset(), niceTextView(), and overload foow()
 
 package com.ok88.andydev.javaid;
 
@@ -53,13 +53,20 @@ public class DevBed extends Object {
 	// foow - write foo string to a specified file at a specified path.
 	public static void foow( String filename, File filepath )
 	{
+		foow( filename, filepath, foo() );
+	}
+	
+	//
+	// foow - write given string to a specified file at a specified path.
+	public static void foow( String filename, File filepath, String val )
+	{
 		try {
 			File file = new File( filepath, filename );
 			FileOutputStream fop = new FileOutputStream( file );
 			if (!file.exists()) {
 				file.createNewFile();
 			}
-			fop.write( foo().getBytes() );
+			fop.write( val.getBytes() );
 			fop.flush();
 			fop.close();
 		} catch (Exception e) {
@@ -110,6 +117,13 @@ public class DevBed extends Object {
 	}//method
 
 	//
+	// exposeAsset
+	public static void exposeAsset(Context context, String filename){
+		File xfd = context.getExternalFilesDir(null);
+		foow( "rogherdy-b14.txt", xfd, getAssetTextData(context,filename) );
+	}
+	
+	//
 	// LootBag
 	//
 	public static class LootBag extends Object {
@@ -123,8 +137,11 @@ public class DevBed extends Object {
 	        	mBundle.putCharSequence("item_2",getWifiName(context));
 	        	
 	                File xfd = context.getExternalFilesDir(null);
-	        	mBundle.putCharSequence("item_4", xfd.getAbsolutePath());
-	        	foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
+	        	mBundle.putCharSequence("item_3", xfd.getAbsolutePath());
+	        	mBundle.putCharSequence("item_4", foo());
+	        	
+	        	exposeAsset("tabs.txt");
+	        	foow( "rogherdy-b13.txt", xfd);	//this works
         		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
 
