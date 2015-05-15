@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Fix syntax getStrmTextData() to read from user modifiable version of config.
+//5-14-15  JChoy Refix syntax getStrmTextData() to read from user modifiable version of config.
 
 package com.ok88.andydev.javaid;
 
@@ -81,10 +81,10 @@ public class DevBed extends Object {
 	{
 		try {
 			InputStream input = ctx.getAssets().open(filename,1);
+			return getStrmTextData( ctx, input );
 		} catch (Exception e) {
 			return null;
 		}
-		return getStrmTextData( ctx, input );
 	}
 
 	//
