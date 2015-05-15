@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Use getStrmTextData() to read from user modifiable version of config.
+//5-14-15  JChoy Fix syntax getStrmTextData() to read from user modifiable version of config.
 
 package com.ok88.andydev.javaid;
 
@@ -79,7 +79,11 @@ public class DevBed extends Object {
 	// getAssetTextData
 	public static String getAssetTextData(Context ctx, String filename)
 	{
-		InputStream input = ctx.getAssets().open(filename,1);
+		try {
+			InputStream input = ctx.getAssets().open(filename,1);
+		} catch (Exception e) {
+			return null;
+		}
 		return getStrmTextData( ctx, input );
 	}
 
@@ -87,8 +91,12 @@ public class DevBed extends Object {
 	// getLocalTextData
 	public static String getLocalTextData(Context ctx, String filename)
 	{
-		File = new File( ctx.getExternalFilesDir(null), filename );
-		FileInputStream input = new FileInputStream( file );
+		try {
+			File = new File( ctx.getExternalFilesDir(null), filename );
+			FileInputStream input = new FileInputStream( file );
+		} catch (Exception e) {
+			return null;
+		}
 		return getStrmTextData( ctx, (InputStream)input );
 	}
 
@@ -206,7 +214,7 @@ public class DevBed extends Object {
 			String s9 = s.substring(0,9);
 			if ((s9 == "@/http://") || (s9 == "@/https:/")){
 				URL ucl = new URL(s.substring(2));
-				return getStrmTextData() url.openStream() );
+				return getStrmTextData(mContext, ucl.openStream() );
 				/*
 			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
 			
