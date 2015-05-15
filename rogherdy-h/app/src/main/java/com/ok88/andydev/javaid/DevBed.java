@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Fix syntax errors in fcnea(), fcnup()
+//5-14-15  JChoy Use getStrmTextData() to read from user modifiable version of config.
 
 package com.ok88.andydev.javaid;
 
@@ -79,8 +79,24 @@ public class DevBed extends Object {
 	// getAssetTextData
 	public static String getAssetTextData(Context ctx, String filename)
 	{
+		InputStream input = ctx.getAssets().open(filename,1);
+		return getStrmTextData( ctx, input );
+	}
+
+	//
+	// getLocalTextData
+	public static String getLocalTextData(Context ctx, String filename)
+	{
+		File = new File( ctx.getExternalFilesDir(null), filename );
+		FileInputStream input = new FileInputStream( file );
+		return getStrmTextData( ctx, (InputStream)input );
+	}
+
+	//
+	// getStrmTextData
+	public static String getStrmTextData(Context ctx, InputStream input)
+	{
 		try {
-			InputStream input = ctx.getAssets().open(filename,1);
 			int size = input.available();
 	
 			if (size>0){
@@ -124,7 +140,8 @@ public class DevBed extends Object {
 	// exposeAsset
 	public static void exposeAsset(Context context, String filename){
 		File xfd = context.getExternalFilesDir(null);
-		foow( "rogherdy-b14.txt", xfd, getAssetTextData(context,filename) );
+		File xfdf = new File( xfd, filename );
+		if (!xfdf.exists()) foow( filename, xfd, getAssetTextData(context,filename) );
 	}
 	
 	//
@@ -146,14 +163,16 @@ public class DevBed extends Object {
 			initTabs( "tabs.txt" );
 	        	
 	        	//exposeAsset(context, "tabs.txt");
-	        	foow( "rogherdy-b13.txt", xfd);	//this works
+	        	//foow( "rogherdy-b13.txt", xfd);	//this works
         		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
 
 		//
 		// initTabs
 		public void initTabs(String filename) {
-			String[] at = getAssetTextData(mContext,filename).split("\n");
+	        	exposeAsset(mContext, filename);
+			//String[] at = getAssetTextData(mContext,filename).split("\n");
+			String[] at = getLocalTextData(mContext,filename).split("\n");
 			mItemCount = at.length;
 			for (int i=0; i<at.length; i++){
 				String key = String.format( "item_%d", i+1 );
@@ -165,6 +184,7 @@ public class DevBed extends Object {
 		// fcnea
 		public String fcnea( String s ) {
 			if (s.charAt(0) != '@') return s;
+			s = s.replace("\r","");
 	                File xfd = mContext.getExternalFilesDir(null);
 			switch (s.substring(1)) {
 				case "$DATAFOLDER" : return xfd.getAbsolutePath();
@@ -186,6 +206,8 @@ public class DevBed extends Object {
 			String s9 = s.substring(0,9);
 			if ((s9 == "@/http://") || (s9 == "@/https:/")){
 				URL ucl = new URL(s.substring(2));
+				return getStrmTextData() url.openStream() );
+				/*
 			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
 			
 			        String inputLine, res="";
@@ -193,6 +215,7 @@ public class DevBed extends Object {
 			            res += inputLine;
 			        in.close();
 				return res;
+				*/
 			}
 			return s;
 		}
