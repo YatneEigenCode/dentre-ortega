@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Add exposeAsset(), niceTextView(), and overload foow()
+//5-14-15  JChoy Use try-catch in getAssetTextData.
 
 package com.ok88.andydev.javaid;
 
@@ -79,16 +79,20 @@ public class DevBed extends Object {
 	public static String getAssetTextData(Context ctx, String filename)
 	throws IOException
 	{
-		InputStream input = ctx.getAssets().open(filename,1);
-		int size = input.available();
-
-		if (size>0){
-			byte[] buffer = new byte[size];
-			input.read(buffer);
-			input.close();
-
-			String text = new String(buffer);
-			return text;
+		try {
+			InputStream input = ctx.getAssets().open(filename,1);
+			int size = input.available();
+	
+			if (size>0){
+				byte[] buffer = new byte[size];
+				input.read(buffer);
+				input.close();
+	
+				String text = new String(buffer);
+				return text;
+			}
+		} catch (IOException e){
+			Log.w("File read failed.",e);
 		}
 		return null;
 	}//method
