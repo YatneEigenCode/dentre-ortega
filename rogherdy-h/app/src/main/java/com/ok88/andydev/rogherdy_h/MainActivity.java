@@ -65,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
         dataPath = getExternalFilesDir(null).getAbsolutePath();
         DevBed.foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
         //DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
-        mLoot = new DevBed.LootBag();
+        mLoot = new DevBed.LootBag(this);
     }
 
 
@@ -164,11 +164,10 @@ public class MainActivity extends ActionBarActivity {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
             tv.setTextColor(Color.parseColor("#000000"));
             int n = getArguments().getInt(ARG_SECTION_NUMBER);
+            tv.setText(mLoot.getText(n));
             if (n==1) tv.setText(getString(R.string.title_section1));
-            if (n==3) tv.setText(DevBed.foo());
-            if (n==2) tv.setText(wifiName);
+            //if (n==3) tv.setText(DevBed.foo());
             if (n==4) tv.setText(dataPath);
-            //if (n==4) tv.setText(mLoot.getText(1));
             return rootView;
         }
     }//inner static class

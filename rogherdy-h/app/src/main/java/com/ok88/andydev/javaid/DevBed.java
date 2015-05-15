@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy make LootBag an inner class.
+//5-14-15  JChoy Make LootBag(context) an inner class taht internall sets wifiname.
 
 package com.ok88.andydev.javaid;
 
@@ -108,10 +108,13 @@ public class DevBed extends Object {
 	//
 	public static class LootBag extends Object {
 		public Bundle mBundle;
+		public Context mContext;
 
-		public LootBag(){
+		public LootBag(Context context){
+			mContext = context;
 			mBundle = new Bundle();
-	        mBundle.putCharSequence("item_1","foogoo");
+	        mBundle.putCharSequence("item_1","fooGoo");
+	        mBundle.putCharSequence("item_2",getWifiName(context));
 		}
 
 		//
@@ -119,7 +122,8 @@ public class DevBed extends Object {
 		//
 		public String getText( int n ) {
 			String key = String.format( "item_%d", n );
-			return mBundle.getCharSequence(key);
+			String res = (String) mBundle.getCharSequence(key);
+			return (res==null) ? key : res;
 		}
 	}//inner static class
 
