@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Use switch-case for auto handling of string comparisons. 
+//5-14-15  JChoy Trying to get url streams to work. URLConnection.getContentLength
 
 package com.ok88.andydev.javaid;
 
@@ -49,14 +49,14 @@ public class DevBed extends Object {
 	{
 		foow( filename, Environment.getExternalStorageDirectory() );
 	}
-	
+
 	//
 	// foow - write foo string to a specified file at a specified path.
 	public static void foow( String filename, File filepath )
 	{
 		foow( filename, filepath, foo() );
 	}
-	
+
 	//
 	// foow - write given string to a specified file at a specified path.
 	public static void foow( String filename, File filepath, String val )
@@ -106,12 +106,12 @@ public class DevBed extends Object {
 	{
 		try {
 			int size = input.available();
-	
+
 			if (size>0){
 				byte[] buffer = new byte[size];
 				input.read(buffer);
 				input.close();
-	
+
 				String text = new String(buffer);
 				return text;
 			}
@@ -136,7 +136,7 @@ public class DevBed extends Object {
 	        }
 	        return null;
 	}//method
-	
+
 	//
 	// niceTextView
 	public static void niceTextView(TextView tv) {
@@ -151,7 +151,7 @@ public class DevBed extends Object {
 		File xfdf = new File( xfd, filename );
 		if (!xfdf.exists()) foow( filename, xfd, getAssetTextData(context,filename) );
 	}
-	
+
 	//
 	// LootBag
 	//
@@ -163,13 +163,13 @@ public class DevBed extends Object {
 		public LootBag(Context context){
 			mContext = context;
 			mBundle = new Bundle();
-	        	
+
 	                File xfd = context.getExternalFilesDir(null);
 	        	mBundle.putCharSequence("$DATAFOLDER", xfd.getAbsolutePath());
 	        	mBundle.putCharSequence("$ENVFOLDER", foo());
 	        	mBundle.putCharSequence("$WIFINAME",getWifiName(context));
 			initTabs( "tabs.txt" );
-	        	
+
 	        	//exposeAsset(context, "tabs.txt");
 	        	//foow( "rogherdy-b13.txt", xfd);	//this works
         		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
@@ -208,17 +208,19 @@ public class DevBed extends Object {
 
 		//
 		// fcnup
-		public String fcnup( String s ) 
+		public String fcnup( String s )
 		throws Exception
 		{
 			switch (s.substring(0,9)) {
 				case "@/http://":
 				case "@/https:/":
 					URL ucl = new URL(s.substring(2));
+					URLConnection uc = url.openConnection();
+					return String.format( "ContentLength %d", uc.getContentLength() );
 					return getStrmTextData(mContext, ucl.openStream() );
 					/*
 				        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
-				
+
 				        String inputLine, res="";
 				        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
 				            res += inputLine;
