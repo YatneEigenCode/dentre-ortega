@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Make LootBag(context) an inner class taht internall sets wifiname.
+//5-14-15  JChoy Incorporate ExternalFilesDir functionality into LootBag.
 
 package com.ok88.andydev.javaid;
 
@@ -17,6 +17,10 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.*;
 import android.content.Context;
 import android.os.Bundle;
+import android.widget.TextView;
+import android.util.TypedValue;
+import android.graphics.*;
+
 
 
 //
@@ -26,7 +30,6 @@ public class DevBed extends Object {
 
 	//
 	// rpt - repeat the string with separator
-	//
 	public static String rpt(String s, String sep)
 	{
 		return s+sep+s;
@@ -34,7 +37,6 @@ public class DevBed extends Object {
 
 	//
 	// foo - returns any string
-	//
 	public static String foo()
 	{
 		return "foo-"+ Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -42,14 +44,13 @@ public class DevBed extends Object {
 
 	//
 	// foow - write foo string to a specified file.
-	//
 	public static void foow( String filename )
 	{
 		foow( filename, Environment.getExternalStorageDirectory() );
 	}
+	
 	//
 	// foow - write foo string to a specified file at a specified path.
-	//
 	public static void foow( String filename, File filepath )
 	{
 		try {
@@ -68,7 +69,6 @@ public class DevBed extends Object {
 
 	//
 	// getAssetTextData
-	//
 	public static String getAssetTextData(Context ctx, String filename)
 	throws IOException
 	{
@@ -88,20 +88,26 @@ public class DevBed extends Object {
 
 	//
 	// getWifiName
+	public static String getWifiName(Context context) {
+	        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+	        if (manager.isWifiEnabled()) {
+	           WifiInfo wifiInfo = manager.getConnectionInfo();
+	           if (wifiInfo != null) {
+	              DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
+	              if (state == DetailedState.CONNECTED || state == DetailedState.OBTAINING_IPADDR) {
+	                  return wifiInfo.getSSID();
+	              }
+	           }
+	        }
+	        return null;
+	}//method
+	
 	//
-    public static String getWifiName(Context context) {
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (manager.isWifiEnabled()) {
-           WifiInfo wifiInfo = manager.getConnectionInfo();
-           if (wifiInfo != null) {
-              DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-              if (state == DetailedState.CONNECTED || state == DetailedState.OBTAINING_IPADDR) {
-                  return wifiInfo.getSSID();
-              }
-           }
-        }
-        return null;
-    }//method
+	// niceTextView
+	public static void niceTextView(TextView tv) {
+        	tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
+        	tv.setTextColor(Color.parseColor("#000000"));
+	}//method
 
 	//
 	// LootBag
@@ -113,8 +119,13 @@ public class DevBed extends Object {
 		public LootBag(Context context){
 			mContext = context;
 			mBundle = new Bundle();
-	        mBundle.putCharSequence("item_1","fooGoo");
-	        mBundle.putCharSequence("item_2",getWifiName(context));
+	        	mBundle.putCharSequence("item_1","fooGoo");
+	        	mBundle.putCharSequence("item_2",getWifiName(context));
+	        	
+	                File xfd = context.getExternalFilesDir(null);
+	        	mBundle.putCharSequence("item_4", xfd.getAbsolutePath());
+	        	foow( "rogherdy-b13.txt", getExternalFilesDir(null) );	//this works
+        		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
 
 		//
