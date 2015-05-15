@@ -1,6 +1,5 @@
 //5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-14-15 JChoy Use javaid.DevBed.LootBag and DevBed.niceTextView
-//todo: read/write file that manages how many tabs, and what appears in each tab
+//5-14-15 JChoy Use mLoot.mItemCount
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -52,6 +51,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mLoot = new DevBed.LootBag(this);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -59,8 +60,6 @@ public class MainActivity extends ActionBarActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        mLoot = new DevBed.LootBag(this);
     }
 
 
@@ -107,7 +106,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return mLoot.mItemCount;
         }
 
         //never used
