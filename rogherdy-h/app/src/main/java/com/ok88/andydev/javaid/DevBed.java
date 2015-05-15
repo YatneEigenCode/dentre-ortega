@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Call exposeAsset with context.
+//5-14-15  JChoy initTabs()
 
 package com.ok88.andydev.javaid;
 
@@ -142,15 +142,25 @@ public class DevBed extends Object {
 	                File xfd = context.getExternalFilesDir(null);
 	        	mBundle.putCharSequence("item_3", xfd.getAbsolutePath());
 	        	mBundle.putCharSequence("item_4", foo());
+			initTabs( "tabs.txt" );
 	        	
-	        	exposeAsset(context, "tabs.txt");
+	        	//exposeAsset(context, "tabs.txt");
 	        	foow( "rogherdy-b13.txt", xfd);	//this works
         		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
 
 		//
-		// getText
+		// initTabs
+		public String initTabs(String filename) {
+			String[] at = getAssetTextData(context,filename).split("\n");
+			for (int i=0; i<at.length; i++){
+				String key = String.format( "item_%d", n+1 );
+				mBundle.putCharSequence(key, at[i]);
+			}
+		}
+
 		//
+		// getText
 		public String getText( int n ) {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
