@@ -92,12 +92,12 @@ public class DevBed extends Object {
 	public static String getLocalTextData(Context ctx, String filename)
 	{
 		try {
-			File = new File( ctx.getExternalFilesDir(null), filename );
-			FileInputStream input = new FileInputStream( file );
+			File fi = new File( ctx.getExternalFilesDir(null), filename );
+			FileInputStream input = new FileInputStream( fi );
+			return getStrmTextData( ctx, (InputStream)input );
 		} catch (Exception e) {
 			return null;
 		}
-		return getStrmTextData( ctx, (InputStream)input );
 	}
 
 	//
