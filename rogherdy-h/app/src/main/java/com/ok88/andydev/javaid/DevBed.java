@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy initTabs()
+//5-14-15  JChoy LootBag.mItemCount, .fcnea(), fcnup()
 
 package com.ok88.andydev.javaid;
 
@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.util.TypedValue;
 import android.graphics.*;
+import java.net.*;
 
 
 
@@ -132,16 +133,16 @@ public class DevBed extends Object {
 	public static class LootBag extends Object {
 		public Bundle mBundle;
 		public Context mContext;
+		public int mItemCount;
 
 		public LootBag(Context context){
 			mContext = context;
 			mBundle = new Bundle();
-	        	mBundle.putCharSequence("item_1","fooGoo");
-	        	mBundle.putCharSequence("item_2",getWifiName(context));
 	        	
 	                File xfd = context.getExternalFilesDir(null);
-	        	mBundle.putCharSequence("item_3", xfd.getAbsolutePath());
-	        	mBundle.putCharSequence("item_4", foo());
+	        	mBundle.putCharSequence("$DATAFOLDER", xfd.getAbsolutePath());
+	        	mBundle.putCharSequence("$ENVFOLDER", foo());
+	        	mBundle.putCharSequence("$WIFINAME",getWifiName(context));
 			initTabs( "tabs.txt" );
 	        	
 	        	//exposeAsset(context, "tabs.txt");
@@ -151,12 +152,43 @@ public class DevBed extends Object {
 
 		//
 		// initTabs
-		public String initTabs(String filename) {
-			String[] at = getAssetTextData(context,filename).split("\n");
+		public void initTabs(String filename) {
+			String[] at = getAssetTextData(mContext,filename).split("\n");
+			mItemCount = at.length;
 			for (int i=0; i<at.length; i++){
-				String key = String.format( "item_%d", n+1 );
+				String key = String.format( "item_%d", i+1 );
 				mBundle.putCharSequence(key, at[i]);
 			}
+		}
+
+		//
+		// fcnea
+		public String fcnea( String s ) {
+			if (s.charAt(0) != '@') return s;
+	                File xfd = context.getExternalFilesDir(null);
+			switch s.substring(1) {
+				case "$DATAFOLDER" : return xfd.getAbsolutePath();
+				case "$ENVFOLDER" : return foo();
+				case "$WIFINAME" : return getWifiName(mContext);
+			}
+			return fcnup(s);
+		}
+
+		//
+		// fcnup
+		public String fcnup( String s ) {
+			String s9 = s.substring(0,9);
+			if ((s9 == "@/http://") || (s9 == "@/https:/")){
+				URL ucl = new URL(s.substring(2));
+			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
+			
+			        String inputLine, res;
+			        for (int i=0; (inputLine = in.readLine()) != null) && (i<100); i++)
+			            res += inputLine;
+			        in.close();
+				return res;
+			}
+			return s;
 		}
 
 		//
@@ -164,7 +196,7 @@ public class DevBed extends Object {
 		public String getText( int n ) {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
-			return (res==null) ? key : res;
+			return (res==null) ? key : fcnea(res);
 		}
 	}//inner static class
 
