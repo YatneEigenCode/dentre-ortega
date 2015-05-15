@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy LootBag.mItemCount, .fcnea(), fcnup()
+//5-14-15  JChoy Fix syntax errors in fcnea(), fcnup()
 
 package com.ok88.andydev.javaid;
 
@@ -165,25 +165,31 @@ public class DevBed extends Object {
 		// fcnea
 		public String fcnea( String s ) {
 			if (s.charAt(0) != '@') return s;
-	                File xfd = context.getExternalFilesDir(null);
-			switch s.substring(1) {
+	                File xfd = mContext.getExternalFilesDir(null);
+			switch (s.substring(1)) {
 				case "$DATAFOLDER" : return xfd.getAbsolutePath();
 				case "$ENVFOLDER" : return foo();
 				case "$WIFINAME" : return getWifiName(mContext);
 			}
-			return fcnup(s);
+			try {
+				return fcnup(s);
+			} catch (Exception e) {
+				return "Load failed: "+s;
+			}
 		}
 
 		//
 		// fcnup
-		public String fcnup( String s ) {
+		public String fcnup( String s ) 
+		throws Exception
+		{
 			String s9 = s.substring(0,9);
 			if ((s9 == "@/http://") || (s9 == "@/https:/")){
 				URL ucl = new URL(s.substring(2));
 			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
 			
-			        String inputLine, res;
-			        for (int i=0; (inputLine = in.readLine()) != null) && (i<100); i++)
+			        String inputLine, res="";
+			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
 			            res += inputLine;
 			        in.close();
 				return res;
