@@ -226,27 +226,18 @@ public class DevBed extends Object {
 			    case "@/http://":
 			    case "@/https:/":
 				String s2= s.substring(2);
-				if (busyUrl == null) {
+				String uc= (String)mBundle.getCharSequence(s2);
+				if (uc != null){
+				    return uc;
+				} if (busyUrl == null) {
 				    new DownloadTask(this).execute(s2);
 				} else if (s2.equals(busyUrl)) {
+				    String res= (String)mBundle.getCharSequence("onPostExecute");
+				    mBundle.putCharSequence( s2, res );
 				    mBundle.putCharSequence("downloadUrl",null);
-				    return (String)mBundle.getCharSequence("onPostExecute");
+				    return res;
+				} else {
 				}
-				//URL ucl = new URL(s.substring(2));
-				//HttpURLConnection uc = (HttpURLConnection)ucl.openConnection();
-				//return String.format( "ContentLength %d", uc.getContentLength() );
-				//return String.format( "uc %d", uc.connected );
-				//InputStream in = new BufferedInputStream(uc.getInputStream());
-				//return "cx"; //getStrmTextData(mContext, ucl.openStream() );
-				/*
-			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
-
-			        String inputLine, res="";
-			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
-			            res += inputLine;
-			        in.close();
-				return res;
-				*/
 				return "Loading..."+s;
 			}
 			return s;
