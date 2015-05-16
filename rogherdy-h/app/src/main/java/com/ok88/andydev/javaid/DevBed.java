@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-15-15  JChoy Trying3 get url streams to work. url.openConnection(); uc.getInputStream();
+//5-15-15  JChoy Use DownloadTask extends AsyncTask to run url.openConnection(); 
 
 package com.ok88.andydev.javaid;
 
@@ -21,7 +21,7 @@ import android.widget.TextView;
 import android.util.TypedValue;
 import android.graphics.*;
 import java.net.*;
-
+import android.os.AsyncTask;
 
 
 //
@@ -104,6 +104,13 @@ public class DevBed extends Object {
 	// getStrmTextData
 	public static String getStrmTextData(Context ctx, InputStream input)
 	{
+		return getStrmTextData( input );
+	}
+
+	//
+	// getStrmTextData
+	public static String getStrmTextData(InputStream input)
+	{
 		try {
 			int size = input.available();
 
@@ -159,6 +166,7 @@ public class DevBed extends Object {
 		public Bundle mBundle;
 		public Context mContext;
 		public int mItemCount;
+		public String mDownloadUrl;
 
 		public LootBag(Context context){
 			mContext = context;
@@ -211,15 +219,25 @@ public class DevBed extends Object {
 		public String fcnup( String s )
 		throws Exception
 		{
+			if (s.length<9) return s;
+			String busyUrl = (String) mBundle.getCharSequence("downloadUrl");
+
 			switch (s.substring(0,9)) {
 			    case "@/http://":
 			    case "@/https:/":
-				URL ucl = new URL(s.substring(2));
-				HttpURLConnection uc = (HttpURLConnection)ucl.openConnection();
+				String s2= s.substring(2);
+				if (busyUrl == null) {
+				    new DownloadTask(this).execute(s2);
+				} else if (s2.equals(busyUrl)) {
+				    mBundle.putCharSequence("downloadUrl",null);
+				    return (String)mBundle.getCharSequence("onPostExecute",res);
+				}
+				//URL ucl = new URL(s.substring(2));
+				//HttpURLConnection uc = (HttpURLConnection)ucl.openConnection();
 				//return String.format( "ContentLength %d", uc.getContentLength() );
 				//return String.format( "uc %d", uc.connected );
-				InputStream in = new BufferedInputStream(uc.getInputStream());
-				return "cx"; //getStrmTextData(mContext, ucl.openStream() );
+				//InputStream in = new BufferedInputStream(uc.getInputStream());
+				//return "cx"; //getStrmTextData(mContext, ucl.openStream() );
 				/*
 			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
 
@@ -229,6 +247,7 @@ public class DevBed extends Object {
 			        in.close();
 				return res;
 				*/
+				return "Loading..."+s;
 			}
 			return s;
 		}
@@ -239,6 +258,31 @@ public class DevBed extends Object {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
 			return (res==null) ? key : fcnea(res);
+		}
+	}//inner static class
+
+	//
+	// DownloadTask
+	//
+	public static class DownloadTask extends AsyncTask<String, Void, String> {
+
+		private LootBag mLoot;
+
+		public DownloadTask(LootBag loot) {
+			mLoot = loot;
+		}
+
+		@override
+		protected String doInBackground(String... url) {
+			mLoot.mBundle.putCharSequence("downloadUrl",url[0]);
+			URL ucl = new URL(url[0]);
+			//URLConnection uc = ucl.openConnection();
+			return getStrmTextData( ucl.openStream() );
+		}
+
+		@Override
+		protected void onPostExecute(String res) {
+			mLoot.mBundle.putCharSequence("onPostExecute",res);
 		}
 	}//inner static class
 
