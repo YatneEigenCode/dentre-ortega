@@ -219,7 +219,7 @@ public class DevBed extends Object {
 		public String fcnup( String s )
 		throws Exception
 		{
-			if (s.length<9) return s;
+			if (s.length()<9) return s;
 			String busyUrl = (String) mBundle.getCharSequence("downloadUrl");
 
 			switch (s.substring(0,9)) {
@@ -230,7 +230,7 @@ public class DevBed extends Object {
 				    new DownloadTask(this).execute(s2);
 				} else if (s2.equals(busyUrl)) {
 				    mBundle.putCharSequence("downloadUrl",null);
-				    return (String)mBundle.getCharSequence("onPostExecute",res);
+				    return (String)mBundle.getCharSequence("onPostExecute");
 				}
 				//URL ucl = new URL(s.substring(2));
 				//HttpURLConnection uc = (HttpURLConnection)ucl.openConnection();
@@ -272,12 +272,16 @@ public class DevBed extends Object {
 			mLoot = loot;
 		}
 
-		@override
+		@Override
 		protected String doInBackground(String... url) {
 			mLoot.mBundle.putCharSequence("downloadUrl",url[0]);
-			URL ucl = new URL(url[0]);
-			//URLConnection uc = ucl.openConnection();
-			return getStrmTextData( ucl.openStream() );
+			try {
+			    URL ucl = new URL(url[0]);
+			    //URLConnection uc = ucl.openConnection();
+			    return getStrmTextData( ucl.openStream() );
+			} catch (Exception e) {
+				Log.w("Download failed.",e);
+			}
 		}
 
 		@Override
