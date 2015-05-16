@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-15-15  JChoy Trying2 get url streams to work. url.openConnection(); uc.getInputStream();
+//5-15-15  JChoy Trying3 get url streams to work. url.openConnection(); uc.getInputStream();
 
 package com.ok88.andydev.javaid;
 
@@ -215,10 +215,10 @@ public class DevBed extends Object {
 			    case "@/http://":
 			    case "@/https:/":
 				URL ucl = new URL(s.substring(2));
-				URLConnection uc = ucl.openConnection();
+				HttpURLConnection uc = (HttpURLConnection)ucl.openConnection();
 				//return String.format( "ContentLength %d", uc.getContentLength() );
-				return String.format( "uc %d", uc.connected );
-				//BufferedInputStream in = new BufferedInputStream(uc.getInputStream());
+				//return String.format( "uc %d", uc.connected );
+				InputStream in = new BufferedInputStream(uc.getInputStream());
 				return "cx"; //getStrmTextData(mContext, ucl.openStream() );
 				/*
 			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
