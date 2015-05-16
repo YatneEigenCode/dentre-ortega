@@ -282,6 +282,7 @@ public class DevBed extends Object {
 			} catch (Exception e) {
 				Log.w("Download failed.",e);
 			}
+			return "Download failed";
 		}
 
 		@Override
