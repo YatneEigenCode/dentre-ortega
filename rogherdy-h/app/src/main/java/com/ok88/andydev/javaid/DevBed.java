@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-14-15  JChoy Trying to get url streams to work. URLConnection.getContentLength
+//5-15-15  JChoy Trying to get url streams to work. url.openConnection(); uc.getInputStream();
 
 package com.ok88.andydev.javaid;
 
@@ -212,21 +212,22 @@ public class DevBed extends Object {
 		throws Exception
 		{
 			switch (s.substring(0,9)) {
-				case "@/http://":
-				case "@/https:/":
-					URL ucl = new URL(s.substring(2));
-					URLConnection uc = url.openConnection();
-					return String.format( "ContentLength %d", uc.getContentLength() );
-					return getStrmTextData(mContext, ucl.openStream() );
-					/*
-				        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
+			    case "@/http://":
+			    case "@/https:/":
+				URL ucl = new URL(s.substring(2));
+				URLConnection uc = ucl.openConnection();
+				//return String.format( "ContentLength %d", uc.getContentLength() );
+				InputStream in = new BufferedInputStream(uc.getInputStream());
+				return "cx"; //getStrmTextData(mContext, ucl.openStream() );
+				/*
+			        BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
 
-				        String inputLine, res="";
-				        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
-				            res += inputLine;
-				        in.close();
-					return res;
-					*/
+			        String inputLine, res="";
+			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
+			            res += inputLine;
+			        in.close();
+				return res;
+				*/
 			}
 			return s;
 		}
