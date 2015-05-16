@@ -231,14 +231,16 @@ public class DevBed extends Object {
 				    return uc;
 				} if (busyUrl == null) {
 				    new DownloadTask(this).execute(s2);
+				    return "Loading..."+s;
 				} else if (s2.equals(busyUrl)) {
 				    String res= (String)mBundle.getCharSequence("onPostExecute");
 				    mBundle.putCharSequence( s2, res );
 				    mBundle.putCharSequence("downloadUrl",null);
 				    return res;
 				} else {
+				    return s;
 				}
-				return "Loading..."+s;
+				return "???";
 			}
 			return s;
 		}
