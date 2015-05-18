@@ -1,6 +1,8 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy Use BufferedReader in DownloadTask;
+//5-18-15  JChoy Successful use BufferedReader; Same speed as getStrmTextData but more reliable for different sources.
+//
+//TODO: read from asset file.
 
 package com.ok88.andydev.javaid;
 
@@ -82,7 +84,7 @@ public class DevBed extends Object {
 	{
 		try {
 			InputStream input = ctx.getAssets().open(filename,1);
-			return getStrmTextData( ctx, input );
+			return getStrmTextData( input );
 		} catch (Exception e) {
 			return null;
 		}
@@ -95,7 +97,7 @@ public class DevBed extends Object {
 		try {
 			File fi = new File( ctx.getExternalFilesDir(null), filename );
 			FileInputStream input = new FileInputStream( fi );
-			return getStrmTextData( ctx, (InputStream)input );
+			return getStrmTextData( (InputStream)input );
 		} catch (Exception e) {
 			return null;
 		}
@@ -103,10 +105,10 @@ public class DevBed extends Object {
 
 	//
 	// getStrmTextData
-	public static String getStrmTextData(Context ctx, InputStream input)
-	{
-		return getStrmTextData( input );
-	}
+	//public static String getStrmTextData(Context ctx, InputStream input)
+	//{
+	//	return getStrmTextData( input );
+	//}
 
 	//
 	// getStrmTextData
@@ -224,8 +226,8 @@ public class DevBed extends Object {
 			String busyUrl = (String) mBundle.getCharSequence("downloadUrl");
 
 			switch (s.substring(0,9)) {
-			    case "@/http://":
-			    case "@/https:/":
+			  case "@/http://":
+			  case "@/https:/":
 				String s2= s.substring(2);
 				String uc= (String)mBundle.getCharSequence(s2);
 				if (uc != null){
@@ -241,6 +243,10 @@ public class DevBed extends Object {
 				} else {
 				    return s;
 				}
+				break;
+			  case "@/asset:/":
+				//initTabs(s.substring(2));
+				return "dev in progress...";
 			}
 			return s;
 		}
@@ -274,7 +280,7 @@ public class DevBed extends Object {
 			        String inputLine, res="";
 			        for (int i=0; ((inputLine = inbr.readLine()) != null) && (i<100); i++)
 			            res += inputLine;
-			        in.close();
+			        inbr.close();
 				return res;
 			} catch (Exception e) {
 				Log.w("Download failed.",e);
