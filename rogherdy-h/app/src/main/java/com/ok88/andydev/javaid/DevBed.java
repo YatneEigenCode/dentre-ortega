@@ -276,7 +276,7 @@ public class DevBed extends Object {
 				BufferedReader inbr = new BufferedReader(new InputStreamReader(ucl.openStream()));
 			        String inputLine, res="";
 			        for (int i=0; ((inputLine = inbr.readLine()) != null) && (i<100); i++)
-			            res += inputLine + "\r";
+			            res += inputLine + "\n";
 			        inbr.close();
 				return res;
 			} catch (Exception e) {
@@ -288,8 +288,8 @@ public class DevBed extends Object {
 		@Override
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
-			Toast.makeText(mLoot.mContext, "download done", Toast.LENGTH_SHORT).show();
 			if (mLoot.mDownloadTextView != null) {
+				Toast.makeText(mLoot.mContext, "Download Done", Toast.LENGTH_SHORT).show();
 				mLoot.mDownloadTextView.setText(res);
 				mLoot.mDownloadTextView = null;
 			}
