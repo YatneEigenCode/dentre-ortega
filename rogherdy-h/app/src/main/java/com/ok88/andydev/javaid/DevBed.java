@@ -6,6 +6,7 @@ package com.ok88.andydev.javaid;
 
 import java.io.*;
 import java.io.InputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -240,7 +241,6 @@ public class DevBed extends Object {
 				} else {
 				    return s;
 				}
-				return "???";
 			}
 			return s;
 		}
@@ -270,12 +270,12 @@ public class DevBed extends Object {
 			mLoot.mBundle.putCharSequence("downloadUrl",url[0]);
 			try {
 			    URL ucl = new URL(url[0]);
-+				BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
-+			        String inputLine, res="";
-+			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
-+			            res += inputLine;
-+			        in.close();
-+				return res;
+				BufferedReader inbr = new BufferedReader(new InputStreamReader(ucl.openStream()));
+			        String inputLine, res="";
+			        for (int i=0; ((inputLine = inbr.readLine()) != null) && (i<100); i++)
+			            res += inputLine;
+			        in.close();
+				return res;
 			} catch (Exception e) {
 				Log.w("Download failed.",e);
 			}
