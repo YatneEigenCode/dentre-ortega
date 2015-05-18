@@ -106,13 +106,6 @@ public class DevBed extends Object {
 
 	//
 	// getStrmTextData
-	//public static String getStrmTextData(Context ctx, InputStream input)
-	//{
-	//	return getStrmTextData( input );
-	//}
-
-	//
-	// getStrmTextData
 	public static String getStrmTextData(InputStream input)
 	{
 		try {
@@ -173,7 +166,7 @@ public class DevBed extends Object {
 		public String mCfgFilename;
 
 		public String mDownloadUrl;
-		public String mDownloadTextView;
+		public TextView mDownloadTextView;
 
 		public LootBag(Context context){
 			mContext = context;
@@ -253,13 +246,13 @@ public class DevBed extends Object {
 
 		//
 		// getText
-		public String getText( int n, TextView tv ) {
+		public void getText( int n, TextView tv ) {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
 			res = (res==null) ? key : fcnea(res);
 			if ((mDownloadUrl != null) && (mDownloadTextView == null))
 				mDownloadTextView = tv;
-			return res;
+			tv.setText( res );
 		}
 	}//inner static class
 
@@ -296,9 +289,9 @@ public class DevBed extends Object {
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
 			Toast.makeText(mLoot.mContext, "download done", Toast.LENGTH_SHORT).show();
-			if (mDownloadTextView != null) {
-				mDownloadTextView.setText(res);
-				mDownloadTextView = null;
+			if (mLoot.mDownloadTextView != null) {
+				mLoot.mDownloadTextView.setText(res);
+				mLoot.mDownloadTextView = null;
 			}
 		}
 	}//inner static class
