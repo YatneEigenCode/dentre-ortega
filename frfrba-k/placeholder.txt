@@ -1,0 +1,1 @@
+empty directories are not supported in git - this file is a workaround.
