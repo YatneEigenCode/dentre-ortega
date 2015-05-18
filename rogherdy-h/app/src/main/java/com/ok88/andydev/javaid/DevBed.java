@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy User should use menu to reload config mCfgFilename.
+//5-18-15  JChoy Toast when download is done.
 //
 //TODO: scrollview
 
@@ -241,7 +241,7 @@ public class DevBed extends Object {
 				}
 			  case "@/asset:/":
 				mCfgFilename = s.substring(10);
-				return "Use menu to load "+ mCfgFilename);
+				return "Use menu to load "+ mCfgFilename;
 			}
 			return s;
 		}
@@ -286,6 +286,7 @@ public class DevBed extends Object {
 		@Override
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
+			Toast.makeText(mLoot.mContext, "download done", Toast.LENGTH_SHORT).show();
 		}
 	}//inner static class
 

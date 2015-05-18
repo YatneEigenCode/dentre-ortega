@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-18-15 JChoy Use Menu item to reload config.
+//5-18-15 JChoy Use Menu item to reload config. Call mViewPager.setAdapter() on reload cfg.
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -81,7 +81,8 @@ public class MainActivity extends ActionBarActivity {
         }
 
         if (id == R.id.action_reload) {
-			mLoot.initTab( mLoot.mCfgFilename );
+			mLoot.initTabs( mLoot.mCfgFilename );
+			mViewPager.setAdapter(mSectionsPagerAdapter);
             return true;
         }
         return super.onOptionsItemSelected(item);
