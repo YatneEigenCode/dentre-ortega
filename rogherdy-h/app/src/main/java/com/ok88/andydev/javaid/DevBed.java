@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-15-15  JChoy Use DownloadTask extends AsyncTask to run url.openConnection(); 
+//5-18-15  JChoy Use BufferedReader in DownloadTask;
 
 package com.ok88.andydev.javaid;
 
@@ -270,8 +270,12 @@ public class DevBed extends Object {
 			mLoot.mBundle.putCharSequence("downloadUrl",url[0]);
 			try {
 			    URL ucl = new URL(url[0]);
-			    //URLConnection uc = ucl.openConnection();
-			    return getStrmTextData( ucl.openStream() );
++				BufferedReader in = new BufferedReader(new InputStreamReader(ucl.openStream()));
++			        String inputLine, res="";
++			        for (int i=0; ((inputLine = in.readLine()) != null) && (i<100); i++)
++			            res += inputLine;
++			        in.close();
++				return res;
 			} catch (Exception e) {
 				Log.w("Download failed.",e);
 			}
