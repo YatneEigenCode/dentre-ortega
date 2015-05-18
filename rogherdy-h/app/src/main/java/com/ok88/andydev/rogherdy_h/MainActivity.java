@@ -144,7 +144,8 @@ public class MainActivity extends ActionBarActivity {
             TextView tv = (TextView) rootView.findViewById(R.id.section_label);
             DevBed.niceTextView( tv );
             int n = getArguments().getInt(ARG_SECTION_NUMBER);
-            tv.setText(mLoot.getText(n));
+            //tv.setText(mLoot.getText(n));
+            mLoot.getText(n, tv);
             return rootView;
         }
     }//inner static class
