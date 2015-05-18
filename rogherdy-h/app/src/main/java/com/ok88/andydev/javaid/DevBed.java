@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy Successful use BufferedReader; Same speed as getStrmTextData but more reliable for different sources.
+//5-18-15  JChoy Reload config using tabs02.txt
 //
 //TODO: read from asset file.
 
@@ -180,17 +180,12 @@ public class DevBed extends Object {
 	        	mBundle.putCharSequence("$ENVFOLDER", foo());
 	        	mBundle.putCharSequence("$WIFINAME",getWifiName(context));
 			initTabs( "tabs.txt" );
-
-	        	//exposeAsset(context, "tabs.txt");
-	        	//foow( "rogherdy-b13.txt", xfd);	//this works
-        		//DevBed.foow( "rogherdy-a13.txt", getDir( "rogherdy", MODE_WORLD_WRITEABLE ) );	//this fails
 		}
 
 		//
 		// initTabs
 		public void initTabs(String filename) {
 	        	exposeAsset(mContext, filename);
-			//String[] at = getAssetTextData(mContext,filename).split("\n");
 			String[] at = getLocalTextData(mContext,filename).split("\n");
 			mItemCount = at.length;
 			for (int i=0; i<at.length; i++){
@@ -243,9 +238,8 @@ public class DevBed extends Object {
 				} else {
 				    return s;
 				}
-				break;
 			  case "@/asset:/":
-				//initTabs(s.substring(2));
+				initTabs(s.substring(2));
 				return "dev in progress...";
 			}
 			return s;
