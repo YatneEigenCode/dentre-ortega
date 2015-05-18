@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy Toast when download is done.
+//5-18-15  JChoy Toast when download is done. Check null in initTabs.
 //
 //TODO: scrollview
 
@@ -25,6 +25,7 @@ import android.util.TypedValue;
 import android.graphics.*;
 import java.net.*;
 import android.os.AsyncTask;
+import android.widget.*;
 
 
 //
@@ -186,8 +187,10 @@ public class DevBed extends Object {
 		//
 		// initTabs
 		public void initTabs(String filename) {
-	        	exposeAsset(mContext, filename);
-			String[] at = getLocalTextData(mContext,filename).split("\n");
+	    	exposeAsset(mContext, filename);
+			String st = getLocalTextData(mContext,filename);
+			if (st == null) return;
+			String[] at = st.split("\n");
 			mItemCount = at.length;
 			for (int i=0; i<at.length; i++){
 				String key = String.format( "item_%d", i+1 );
