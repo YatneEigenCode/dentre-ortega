@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy mDownloadTextView.setText(res) when download is done.
+//5-18-15  JChoy mDownloadTextView.setText(res) when download (bundle value) is done.
 //
 //TODO: scrollview
 
@@ -165,7 +165,7 @@ public class DevBed extends Object {
 		public int mItemCount;
 		public String mCfgFilename;
 
-		public String mDownloadUrl;
+		//public String mDownloadUrl;
 		public TextView mDownloadTextView;
 
 		public LootBag(Context context){
@@ -250,7 +250,7 @@ public class DevBed extends Object {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
 			res = (res==null) ? key : fcnea(res);
-			if ((mDownloadUrl != null) && (mDownloadTextView == null))
+			if ((mBundle.getCharSequence("downloadUrl") != null) && (mDownloadTextView == null))
 				mDownloadTextView = tv;
 			tv.setText( res );
 		}
