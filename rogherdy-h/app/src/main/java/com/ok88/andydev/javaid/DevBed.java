@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy Toast when download is done. Check null in initTabs.
+//5-18-15  JChoy mDownloadTextView.setText(res) when download is done.
 //
 //TODO: scrollview
 
@@ -170,8 +170,10 @@ public class DevBed extends Object {
 		public Bundle mBundle;
 		public Context mContext;
 		public int mItemCount;
-		public String mDownloadUrl;
 		public String mCfgFilename;
+
+		public String mDownloadUrl;
+		public String mDownloadTextView;
 
 		public LootBag(Context context){
 			mContext = context;
@@ -251,10 +253,13 @@ public class DevBed extends Object {
 
 		//
 		// getText
-		public String getText( int n ) {
+		public String getText( int n, TextView tv ) {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
-			return (res==null) ? key : fcnea(res);
+			res = (res==null) ? key : fcnea(res);
+			if ((mDownloadUrl != null) && (mDownloadTextView == null))
+				mDownloadTextView = tv;
+			return res;
 		}
 	}//inner static class
 
@@ -264,6 +269,7 @@ public class DevBed extends Object {
 	public static class DownloadTask extends AsyncTask<String, Void, String> {
 
 		private LootBag mLoot;
+		//limit to 100 lines;
 
 		public DownloadTask(LootBag loot) {
 			mLoot = loot;
@@ -277,7 +283,7 @@ public class DevBed extends Object {
 				BufferedReader inbr = new BufferedReader(new InputStreamReader(ucl.openStream()));
 			        String inputLine, res="";
 			        for (int i=0; ((inputLine = inbr.readLine()) != null) && (i<100); i++)
-			            res += inputLine;
+			            res += inputLine + "\r";
 			        inbr.close();
 				return res;
 			} catch (Exception e) {
@@ -290,6 +296,10 @@ public class DevBed extends Object {
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
 			Toast.makeText(mLoot.mContext, "download done", Toast.LENGTH_SHORT).show();
+			if (mDownloadTextView != null) {
+				mDownloadTextView.setText(res);
+				mDownloadTextView = null;
+			}
 		}
 	}//inner static class
 
