@@ -1,7 +1,7 @@
 @$WIFINAME
-@/http://dl.dropboxusercontent.com/u/28448395/FogPumpData/hello.txt
-@/http://dl.dropboxusercontent.com/u/28448395/FogPumpData/plan.txt
-@/http://dl.dropboxusercontent.com/u/28448395/FogPumpData/translate.txt
+@/https://dl.dropboxusercontent.com/u/28448395/FogPumpData/hello.txt
+@/https://dl.dropboxusercontent.com/u/28448395/FogPumpData/plan.txt
+@/https://dl.dropboxusercontent.com/u/28448395/FogPumpData/translate.txt
 @/asset://tabs02.txt
 @$ENVFOLDER
 @$DATAFOLDER

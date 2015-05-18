@@ -1,8 +1,8 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy Reload config using tabs02.txt
+//5-18-15  JChoy User should tap to reload config using tabs02.txt
 //
-//TODO: read from asset file.
+//TODO: scrollview
 
 package com.ok88.andydev.javaid;
 
@@ -239,8 +239,8 @@ public class DevBed extends Object {
 				    return s;
 				}
 			  case "@/asset:/":
-				initTabs(s.substring(2));
-				return "dev in progress...";
+				initTabs(s.substring(10));
+				return "Tap here to load "+ s.substring(10);
 			}
 			return s;
 		}

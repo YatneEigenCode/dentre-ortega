@@ -1,6 +1,6 @@
 Second config file
 @$WIFINAME
-@/http://dl.dropboxusercontent.com/u/28448395/FogPumpData/translate.txt
+@/https://dl.dropboxusercontent.com/u/28448395/FogPumpData/translate.txt
 @/asset://tabs.txt
 This second configuration info is in tabs02.txt file.
 Reload new config file using the @/assets:// directive.
