@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy User should tap to reload config using tabs02.txt
+//5-18-15  JChoy User should use menu to reload config mCfgFilename.
 //
 //TODO: scrollview
 
@@ -170,6 +170,7 @@ public class DevBed extends Object {
 		public Context mContext;
 		public int mItemCount;
 		public String mDownloadUrl;
+		public String mCfgFilename;
 
 		public LootBag(Context context){
 			mContext = context;
@@ -179,7 +180,7 @@ public class DevBed extends Object {
 	        	mBundle.putCharSequence("$DATAFOLDER", xfd.getAbsolutePath());
 	        	mBundle.putCharSequence("$ENVFOLDER", foo());
 	        	mBundle.putCharSequence("$WIFINAME",getWifiName(context));
-			initTabs( "tabs.txt" );
+			initTabs( mCfgFilename="tabs.txt" );
 		}
 
 		//
@@ -239,8 +240,8 @@ public class DevBed extends Object {
 				    return s;
 				}
 			  case "@/asset:/":
-				initTabs(s.substring(10));
-				return "Tap here to load "+ s.substring(10);
+				mCfgFilename = s.substring(10);
+				return "Use menu to load "+ mCfgFilename);
 			}
 			return s;
 		}

@@ -1,5 +1,5 @@
-//5-7-15  JChoy Empty tab app created using Android Studio on PC
-//5-14-15 JChoy Use mLoot.mItemCount
+//5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
+//5-18-15 JChoy Use Menu item to reload config.
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -24,25 +24,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.content.Context;
-//import android.util.TypedValue;
-//import android.graphics.*;
 import java.io.File;
 
 public class MainActivity extends ActionBarActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+    //
+    // * The {@link android.support.v4.view.PagerAdapter} that will provide
+    // * fragments for each of the sections. We use a
+    // * {@link FragmentPagerAdapter} derivative, which will keep every
+    // * loaded fragment in memory. If this becomes too memory intensive, it
+    // * may be best to switch to a
+    // * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+    //
     SectionsPagerAdapter mSectionsPagerAdapter;
 
     //The {@link ViewPager} that will host the section contents.
     ViewPager mViewPager;
-    //public static String dataPath;
     public static DevBed.LootBag mLoot;
 
 
@@ -79,9 +76,14 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //if (n==1) tv.setText(getString(R.string.title_section1));
             return true;
         }
 
+        if (id == R.id.action_reload) {
+			mLoot.initTab( mLoot.mCfgFilename );
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -109,21 +111,6 @@ public class MainActivity extends ActionBarActivity {
             return mLoot.mItemCount;
         }
 
-        //never used
-        //@Override
-        //public CharSequence getPageTitle(int position) {
-        //    Locale l = Locale.getDefault();
-        //    switch (position) {
-        //        case 0:
-        //            return getString(R.string.title_section1).toUpperCase(l);
-        //        case 1:
-        //            return getString(R.string.title_section2).toUpperCase(l);
-        //        case 2:
-        //            return getString(R.string.title_section3).toUpperCase(l);
-        //    }
-        //    return null;
-        //}
-
     }//inner class
 
     //
@@ -131,7 +118,6 @@ public class MainActivity extends ActionBarActivity {
     // Being an inner static class, the instances will have access to static variables
     //
     public static class PlaceholderFragment extends Fragment {
-        //
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         //
@@ -145,7 +131,7 @@ public class MainActivity extends ActionBarActivity {
             return fragment;
         }
 
-	// instance constructor
+        // instance constructor
         public PlaceholderFragment() {
         }
 
@@ -155,12 +141,9 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             TextView tv = (TextView) rootView.findViewById(R.id.section_label);
-            //tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
-            //tv.setTextColor(Color.parseColor("#000000"));
             DevBed.niceTextView( tv );
             int n = getArguments().getInt(ARG_SECTION_NUMBER);
             tv.setText(mLoot.getText(n));
-            //if (n==1) tv.setText(getString(R.string.title_section1));
             return rootView;
         }
     }//inner static class
