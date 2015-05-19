@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-18-15 JChoy Use Menu item to reload config. Call mViewPager.setAdapter() on reload cfg.
+//5-18-15 JChoy Call context.refreshPagerAdapter() to sync UI timing with download.
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -59,6 +59,11 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
+	//
+	// refreshPagerAdapter
+	public void refreshPagerAdapter(){
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
