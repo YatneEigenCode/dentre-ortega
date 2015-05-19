@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-18-15  JChoy mDownloadTextView.setText(res) when download (bundle value) is done.
+//5-19-15  JChoy Debug download timing vs UI timing using sleep.
 //
 //TODO: scrollview
 
@@ -271,6 +271,9 @@ public class DevBed extends Object {
 		@Override
 		protected String doInBackground(String... url) {
 			mLoot.mBundle.putCharSequence("downloadUrl",url[0]);
+			Thread.sleep( 1000 );
+			Toast.makeText(mLoot.mContext, "Start Download", Toast.LENGTH_SHORT).show();
+			mLoot.mDownloadTextView.setText( "Download Started" );
 			try {
 			    URL ucl = new URL(url[0]);
 				BufferedReader inbr = new BufferedReader(new InputStreamReader(ucl.openStream()));
