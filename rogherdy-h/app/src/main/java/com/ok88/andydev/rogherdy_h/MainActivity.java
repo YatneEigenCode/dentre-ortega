@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-18-15 JChoy Call context.refreshPagerAdapter() to sync UI timing with download.
+//5-19-15 JChoy Call context.refreshPagerAdapter() onDestroy.
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -59,10 +59,16 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
+	@Override
+	protected void onDestroy() {
+		mLoot = null;
+	}
+
 	//
 	// refreshPagerAdapter
 	public void refreshPagerAdapter(){
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+		mLoot.initTabs( mLoot.mCfgFilename );	//this will nav to pg1, address that later
+		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 
     @Override

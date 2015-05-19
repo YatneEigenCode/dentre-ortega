@@ -296,7 +296,7 @@ public class DevBed extends Object {
 				Toast.makeText(mLoot.mContext, "Download Done", Toast.LENGTH_SHORT).show();
 				mLoot.mDownloadTextView.setText(res);
 				mLoot.mDownloadTextView = null;
-				mLoot.mContext.refreshPagerAdapter();
+				((MainActivity)mLoot.mContext).refreshPagerAdapter();
 			}
 		}
 	}//inner static class
