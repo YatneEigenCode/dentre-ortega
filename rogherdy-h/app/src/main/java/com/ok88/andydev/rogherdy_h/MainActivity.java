@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-21-15 JChoy Call mSectionsPagerAdapter.notifyDataSetChanged.
+//5-21-15 JChoy Call call super.onDestroy().
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -62,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onDestroy() {
 		mLoot = null;
+		super.onDestroy();
 	}
 
 	//

@@ -293,7 +293,8 @@ public class DevBed extends Object {
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
 			if (mLoot.mDownloadTextView != null) {
-				Toast.makeText(mLoot.mContext, "Download Done", Toast.LENGTH_SHORT).show();
+				String toastMsg = "DL done-"+(String)mLoot.mBundle.getCharSequence("downloadUrl");
+				Toast.makeText(mLoot.mContext, toastMsg, Toast.LENGTH_SHORT).show();
 				mLoot.mDownloadTextView.setText(res);
 				mLoot.mDownloadTextView = null;
 				((MainActivity)mLoot.mContext).refreshPagerAdapter();
