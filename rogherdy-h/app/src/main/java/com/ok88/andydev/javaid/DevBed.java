@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-21-15  JChoy Use LootBag.mCurrentItemNo member;
+//5-21-15  JChoy Call mLoot.useDownloadResult().
 //
 //TODO: scrollview
 
@@ -231,9 +231,10 @@ public class DevBed extends Object {
 				    new DownloadTask(this).execute(s2);
 				    return "Loading..."+s;
 				} else if (s2.equals(busyUrl)) {
-				    String res= (String)mBundle.getCharSequence("onPostExecute");
-				    mBundle.putCharSequence( s2, res );
-				    mBundle.putCharSequence("downloadUrl",null);
+					useDownloadResult( s2, res );
+				    //String res= (String)mBundle.getCharSequence("onPostExecute");
+				    //mBundle.putCharSequence( s2, res );
+				    //mBundle.putCharSequence("downloadUrl",null);
 				    return res;
 				} else {
 				    return s;
@@ -256,6 +257,14 @@ public class DevBed extends Object {
 				mCurrentItemNo = n;
 			}
 			tv.setText( res );
+		}
+
+		//
+		// useDownloadResult
+		public void useDownloadResult(String url, String res){
+		    String res= (String)mBundle.getCharSequence("onPostExecute");
+		    mBundle.putCharSequence( url, res );
+		    mBundle.putCharSequence("downloadUrl",null);
 		}
 	}//inner static class
 
@@ -296,10 +305,11 @@ public class DevBed extends Object {
 		protected void onPostExecute(String res) {
 			mLoot.mBundle.putCharSequence("onPostExecute",res);
 			if (mLoot.mDownloadTextView != null) {
-				String toastMsg = "DL done-"+(String)mLoot.mBundle.getCharSequence("downloadUrl");
-				Toast.makeText(mLoot.mContext, toastMsg, Toast.LENGTH_SHORT).show();
-				mLoot.mDownloadTextView.setText(res);
+				String busyUrl = (String)mLoot.mBundle.getCharSequence("downloadUrl");
+				Toast.makeText(mLoot.mContext, "dl done-"+busyUrl, Toast.LENGTH_SHORT).show();
+				//mLoot.mDownloadTextView.setText(res);	//adapter will overwrite this
 				mLoot.mDownloadTextView = null;
+				mLoot.useDownloadResult( busyUrl, res );
 				((MainActivity)mLoot.mContext).refreshPagerAdapter();
 			}
 		}
