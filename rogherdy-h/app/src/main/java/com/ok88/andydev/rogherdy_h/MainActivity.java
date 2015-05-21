@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-19-15 JChoy Call context.refreshPagerAdapter() onDestroy.
+//5-21-15 JChoy Call mSectionsPagerAdapter.notifyDataSetChanged.
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -68,7 +68,8 @@ public class MainActivity extends ActionBarActivity {
 	// refreshPagerAdapter
 	public void refreshPagerAdapter(){
 		mLoot.initTabs( mLoot.mCfgFilename );	//this will nav to pg1, address that later
-		mViewPager.setAdapter(mSectionsPagerAdapter);
+		//mViewPager.setAdapter(mSectionsPagerAdapter);
+        mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
     @Override
