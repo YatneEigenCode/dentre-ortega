@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-21-15 JChoy Call ViewPager.setCurrentItem().
+//5-21-15 JChoy Use LootBag.mCurrentItemNo member;
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -68,11 +68,10 @@ public class MainActivity extends ActionBarActivity {
 	//
 	// refreshPagerAdapter
 	public void refreshPagerAdapter(){
-		//mLoot.initTabs( mLoot.mCfgFilename );
-		int cur = mViewPager.getCurrentItem();
+		int cur = mLoot.mCurrentItemNo;
 		mViewPager.setAdapter(mSectionsPagerAdapter);	//this will nav to pg1, address that later
 		if (mSectionsPagerAdapter.getCount() > cur)
-			mViewPager.setCurrentItem();
+			mViewPager.setCurrentItem(cur);
 		//mSectionsPagerAdapter.notifyDataSetChanged();	//doesn't do much
 	}
 

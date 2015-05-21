@@ -1,6 +1,6 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-19-15  JChoy Call context.refreshPagerAdapter() to sync UI timing with download.
+//5-21-15  JChoy Use LootBag.mCurrentItemNo member;
 //
 //TODO: scrollview
 
@@ -163,6 +163,7 @@ public class DevBed extends Object {
 		public Bundle mBundle;
 		public Context mContext;
 		public int mItemCount;
+		public int mCurrentItemNo = 1;
 		public String mCfgFilename;
 
 		//public String mDownloadUrl;
@@ -250,8 +251,10 @@ public class DevBed extends Object {
 			String key = String.format( "item_%d", n );
 			String res = (String) mBundle.getCharSequence(key);
 			res = (res==null) ? key : fcnea(res);
-			if ((mBundle.getCharSequence("downloadUrl") != null) && (mDownloadTextView == null))
+			if ((mBundle.getCharSequence("downloadUrl") != null) && (mDownloadTextView == null)) {
 				mDownloadTextView = tv;
+				mCurrentItemNo = n;
+			}
 			tv.setText( res );
 		}
 	}//inner static class
