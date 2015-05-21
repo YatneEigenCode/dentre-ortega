@@ -1,5 +1,5 @@
 //5-7-15  JChoy Main Activity for empty tab app created using Android Studio on PC
-//5-21-15 JChoy Call call super.onDestroy().
+//5-21-15 JChoy Call ViewPager.setCurrentItem().
 
 //Remember to refresh build after adding uses-permission Manifest
 
@@ -68,9 +68,12 @@ public class MainActivity extends ActionBarActivity {
 	//
 	// refreshPagerAdapter
 	public void refreshPagerAdapter(){
-		mLoot.initTabs( mLoot.mCfgFilename );	//this will nav to pg1, address that later
-		//mViewPager.setAdapter(mSectionsPagerAdapter);
-        mSectionsPagerAdapter.notifyDataSetChanged();
+		//mLoot.initTabs( mLoot.mCfgFilename );
+		int cur = mViewPager.getCurrentItem();
+		mViewPager.setAdapter(mSectionsPagerAdapter);	//this will nav to pg1, address that later
+		if (mSectionsPagerAdapter.getCount() > cur)
+			mViewPager.setCurrentItem();
+		//mSectionsPagerAdapter.notifyDataSetChanged();	//doesn't do much
 	}
 
     @Override
