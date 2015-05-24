@@ -1,7 +1,8 @@
 //5-13-15  JChoy Support classes in separate folder
 //	This allows code to be copied into projects asis without refactoring the package name.
-//5-21-15  JChoy Call mLoot.useDownloadResult().
-//
+//5-23-15  JChoy Call mLoot.useDownloadResult().
+
+//
 //TODO: scrollview
 
 package com.ok88.andydev.javaid;
@@ -231,9 +232,9 @@ public class DevBed extends Object {
 				    new DownloadTask(this).execute(s2);
 				    return "Loading..."+s;
 				} else if (s2.equals(busyUrl)) {
-					useDownloadResult( s2, res );
-				    //String res= (String)mBundle.getCharSequence("onPostExecute");
-				    //mBundle.putCharSequence( s2, res );
+					String res= (String)mBundle.getCharSequence("onPostExecute");
+                    useDownloadResult( s2, res );
+                    //mBundle.putCharSequence( s2, res );
 				    //mBundle.putCharSequence("downloadUrl",null);
 				    return res;
 				} else {
@@ -262,7 +263,7 @@ public class DevBed extends Object {
 		//
 		// useDownloadResult
 		public void useDownloadResult(String url, String res){
-		    String res= (String)mBundle.getCharSequence("onPostExecute");
+		    //String res= (String)mBundle.getCharSequence("onPostExecute");
 		    mBundle.putCharSequence( url, res );
 		    mBundle.putCharSequence("downloadUrl",null);
 		}
