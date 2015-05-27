@@ -1,9 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <!-- Mac Android Studio barfs on this -->
-    <!-- style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar" -->
+    <!-- Mac Android Studio barfs on this. -->
+    <!-- Fix by adding to dependencies in build.gradle
+        compile 'com.android.support:appcompat-v7:19.1.+'  -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-    <!-- /style -->
+    </style>
 
 </resources>
