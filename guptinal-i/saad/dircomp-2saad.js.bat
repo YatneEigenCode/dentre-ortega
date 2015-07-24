@@ -58,7 +58,7 @@ function SaadMozTable1(){
     }
 }
 //---spit out SAAD document
-WScript.echo("<body><table border=1>");
+WScript.echo("<body><table border=1 cellspacing=0>");
 var f2t= new Fcout2Table();
 while (!WScript.StdIn.AtEndOfStream) 
 	WScript.echo( f2t.doLine(WScript.StdIn.ReadLine()) );
