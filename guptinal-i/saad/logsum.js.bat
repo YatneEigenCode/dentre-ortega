@@ -32,9 +32,9 @@ function ParserWig( fn ){
     this.keyRetCd= "log_run is:";
     this.rek2= "BODY starting at";
     this.keys= [
-	{mark:"Processing ", value:"unkown"},
-	{mark:"err is:", value:"unkown"},
-	{mark:"BODY starting at ", value:"unkown"}
+	{mark:"Processing ", value:"unknown"},
+	{mark:"err is:", value:"unknown"},
+	{mark:"BODY starting at ", value:"unknown"}
 	]
     this.parse= function( cline ){
 	for (var i=0; i<this.keys.length; i++)
@@ -82,23 +82,51 @@ function SaadFactory(startCmd){
 }
 //-----
 SaadMozDiv=function SaadMozDiv(){
+  this.ver= "v0.1.112";
+  this.delim= "|";
   this.setupDivs= function(){
 	var d$= document;
 	this.dataDiv= d$.getElementsByTagName("div")[0];
 	this.uiDiv= d$.body.appendChild(d$.createElement("div"));
-	this.uiDiv.innerHTML= "Welcome";
+	this.writeUI( "LogSum "+this.ver )
 	this.dataDiv.style.display= "none";
+  }
+  this.setupData= function(){
+	this.data= [];
+	var at= this.dataDiv.innerHTML.split("\n");
+	for (var i=0; i<at.length; i++)
+	    if (at[i] != "")
+		this.data.push(at[i].split(this.delim));
+  }
+  this.writeUI= function(s){
+	var res= this.uiDiv.appendChild(document.createElement("div"));
+	res.innerHTML= s;
   }
 }
 //Jobs, errors, last10, search, count, range
+//-----
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
+  this.ver= "v0.2.113";
   this.start= function(){
 	this.setupDivs();
+	this.setupData();
+	this.writeUI( this.countItems() );
+	this.writeUI( this.countErrs() );
+  }
+  this.countErrs= function(){
+	var res=0;
+	for (var i=0; i<this.data.length; i++)
+		if (this.data[i][2]=="'0' "){
+		} else if (this.data[i][2]=="unknown") {
+		} else res++;
+	return "Total Errors: "+res;
+  }
+  this.countItems= function(){
+	return "Total Items: "+this.data.length;
   }
 }
-
 //-----
 //for (var i=0; i<WScript.Arguments.length; i++) WScript.Echo( i+": "+WScript.Arguments(i) );
 if (WScript.Arguments.length>1) {
