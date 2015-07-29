@@ -1,6 +1,6 @@
 /*
 rem 7/28/2015 JChoy catalog new log files in folder and prep for quick viewing
-set folder=C:\abc\logs
+if (%folder%)==() set folder=C:\abc\logs
 
 if not exist %~n0.txt echo.>%~n0.txt
 set timestmp=_
@@ -107,6 +107,7 @@ SaadMozDiv=function SaadMozDiv(){
 	res.innerHTML= s;
 	if (bgColor) res.style.backgroundColor= bgColor;
 	if (color) res.style.color= color;
+	return res;
   }
 }
 //Jobs, errors, last10, search
@@ -114,7 +115,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.115";
+  this.ver= "v0.2.116";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
@@ -156,6 +157,15 @@ SaadMozDiv1=function SaadMozDiv1(){
 	for (var i=0,x=at.sort(); i<at.length; i++)
 		this.niceJob( this.groups[at[i]] );
   }
+  this.niceClickable= function( nicel, color ){
+	var el= this.writeUI( nicel.join(" * "), color);
+	el.targetRec= nicel;
+	el.onclick= this.handleClickForJob;
+  }
+  this.handleClickForJob= function( ){
+	var path="file://fccsappprdn01/d$/UC4/am8/out/";
+	window.open(path+this.targetRec[0]+".00");
+  }
   this.niceJob= function( jobRec ){
 	var ll= jobRec[jobRec.length-1];
 	var nicel= [ll[0],ll[1],ll[3]];
@@ -163,11 +173,11 @@ SaadMozDiv1=function SaadMozDiv1(){
 	if (new Date(ll[3]).valueOf()>now24) nicel[3]="new";
 	if (ll[2] != "'0' ") nicel[3]="ERR";
 	if (nicel[3]=="new")
-		this.writeUI( nicel.join(" * "),"blue");
+		this.niceClickable( nicel,"blue");
 	else if (nicel[3]=="ERR")
-		this.writeUI( nicel.join(" * "),"red");
+		this.niceClickable( nicel,"red");
 	else 
-		this.writeUI( nicel.join(" * "));
+		this.niceClickable( nicel,"black");
   }
 }
 //-----
