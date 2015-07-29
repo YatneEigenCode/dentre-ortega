@@ -103,17 +103,19 @@ SaadMozDiv=function SaadMozDiv(){
 	res.innerHTML= s;
   }
 }
-//Jobs, errors, last10, search, count, range
+//Jobs, errors, last10, search
 //-----
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.113";
+  this.ver= "v0.2.114";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
 	this.writeUI( this.countItems() );
 	this.writeUI( this.countErrs() );
+	this.showDateRange();
+	this.showJobs();
   }
   this.countErrs= function(){
 	var res=0;
@@ -125,6 +127,24 @@ SaadMozDiv1=function SaadMozDiv1(){
   }
   this.countItems= function(){
 	return "Total Items: "+this.data.length;
+  }
+  this.showDateRange= function(){
+	this.writeUI( "Date Range:" );
+	this.writeUI( this.data[0][3] );
+	this.writeUI( this.data[this.data.length-1][3] );
+  }
+  this.groupByJob= function(){
+	if (this.groups) return;
+	var gg= this.groups = {};
+	for (var i=0,td=this.data; i<td.length; i++) {
+		if (!gg[td[i][1]]) gg[td[i][1]]=new Array();
+		gg[td[i][1]].push( td[i] );
+	}
+  }
+  this.showJobs= function(){
+	this.groupByJob();
+	for (var m in this.groups)
+		this.writeUI( this.groups[m][0].join("|") );
   }
 }
 //-----
