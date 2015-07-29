@@ -1,7 +1,11 @@
 /*
 rem 7/28/2015 JChoy catalog new log files in folder and prep for quick viewing
 set folder=C:\abc\logs
+
 if not exist %~n0.txt echo.>%~n0.txt
+set timestmp=_
+for /f "tokens=2,3,4 delims=/ " %%A in ('date /t') do set timestmp=%timestmp%%%C%%A%%B
+
 echo new items>%~n0_new.txt
 for /f %%A in ('dir /b %folder%\*') do (
 	cscript //nologo //E:JScript %0 %%~nA /filter < %~n0.txt >> %~n0_new.txt
@@ -9,7 +13,7 @@ for /f %%A in ('dir /b %folder%\*') do (
 for /f %%A in (%~n0_new.txt) do (
 	type %folder%\%%A.00 | cscript //nologo //E:JScript %0 %%A /parse >> %~n0.txt
 )
-sort %~n0.txt | cscript //nologo //E:JScript %0 /saad > %~n0.html
+sort %~n0.txt | cscript //nologo //E:JScript %0 /saad > %~n0%timestmp%.html
 pause
 exit(0)
 */
@@ -98,9 +102,11 @@ SaadMozDiv=function SaadMozDiv(){
 	    if (at[i] != "")
 		this.data.push(at[i].split(this.delim));
   }
-  this.writeUI= function(s){
+  this.writeUI= function(s, color, bgColor){
 	var res= this.uiDiv.appendChild(document.createElement("div"));
 	res.innerHTML= s;
+	if (bgColor) res.style.backgroundColor= bgColor;
+	if (color) res.style.color= color;
   }
 }
 //Jobs, errors, last10, search
@@ -108,7 +114,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.114";
+  this.ver= "v0.2.115";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
@@ -143,8 +149,25 @@ SaadMozDiv1=function SaadMozDiv1(){
   }
   this.showJobs= function(){
 	this.groupByJob();
+	var at= [];
 	for (var m in this.groups)
-		this.writeUI( this.groups[m][0].join("|") );
+		at.push(m);
+	this.writeUI( "All Jobs:", "white", "gray" );
+	for (var i=0,x=at.sort(); i<at.length; i++)
+		this.niceJob( this.groups[at[i]] );
+  }
+  this.niceJob= function( jobRec ){
+	var ll= jobRec[jobRec.length-1];
+	var nicel= [ll[0],ll[1],ll[3]];
+	var now24= new Date(new Date().valueOf()-24000*3600);
+	if (new Date(ll[3]).valueOf()>now24) nicel[3]="new";
+	if (ll[2] != "'0' ") nicel[3]="ERR";
+	if (nicel[3]=="new")
+		this.writeUI( nicel.join(" * "),"blue");
+	else if (nicel[3]=="ERR")
+		this.writeUI( nicel.join(" * "),"red");
+	else 
+		this.writeUI( nicel.join(" * "));
   }
 }
 //-----
