@@ -116,7 +116,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.117";
+  this.ver= "v0.2.118";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
@@ -162,6 +162,14 @@ SaadMozDiv1=function SaadMozDiv1(){
 	var el= this.writeUI( nicel.join(" * "), color);
 	el.targetRec= nicel;
 	el.onclick= this.handleClickForJob;
+	el.onmouseover= this.onMouseOverForEl;
+	el.onmouseout= this.onMouseOutForEl;
+  }
+  this.onMouseOverForEl= function(){
+	this.style.backgroundColor="lightgray";
+  }
+  this.onMouseOutForEl= function(){
+	this.style.backgroundColor= document.body.style.backgroundColor;
   }
   this.handleClickForJob= function( ){
 	var path="file://fccsappprdn01/d$/UC4/am8/out/";
