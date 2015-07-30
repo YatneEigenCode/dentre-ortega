@@ -53,9 +53,10 @@ function ParserWig( fn ){
 	}
     }
     this.getResult= function(){
-	var res= [this.target];
+	var res= ["","DET",this.target];
 	for (var i=0; i<this.keys.length; i++)
 		res.push(this.keys[i].value);
+	res.push("");
 	return res.join("|");
     }
 }
@@ -66,7 +67,7 @@ function FilterWig( fn ){
     this.check= function( cline ){
 		var at=cline.split(this.delim);
 		if (at.length==0){
-		} else if (at[0]==this.target) this.isFound = true;
+		} else if (at[2]==this.target) this.isFound = true;
     }
     this.getResult= function(){
 		return (this.isFound)? "" : this.target;
@@ -97,7 +98,7 @@ SaadMozDiv=function SaadMozDiv(){
   }
   this.setupData= function(){
 	this.data= [];
-	var at= this.dataDiv.innerHTML.split("\n");
+	var at= this.dataDiv.innerHTML.split("|DET|");
 	for (var i=0; i<at.length; i++)
 	    if (at[i] != "")
 		this.data.push(at[i].split(this.delim));
@@ -115,7 +116,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.116";
+  this.ver= "v0.2.117";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
