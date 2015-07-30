@@ -1,6 +1,7 @@
 /*
 rem 7/28/2015 JChoy catalog new log files in folder and prep for quick viewing
-if (%folder%)==() set folder=C:\abc\logs
+set folder=C:\abc\logs
+for /f "tokens=1,2 delims==" %%A in (%~n0.config) do if not (%%A)==() set %%A=%%B
 
 if not exist %~n0.txt echo.>%~n0.txt
 set timestmp=_
@@ -100,7 +101,7 @@ SaadMozDiv=function SaadMozDiv(){
 	this.data= [];
 	var at= this.dataDiv.innerHTML.split("|DET|");
 	for (var i=0; i<at.length; i++)
-	    if (at[i] != "")
+	    if ((at[i] != "") && (at[i].indexOf("|")>0))
 		this.data.push(at[i].split(this.delim));
   }
   this.writeUI= function(s, color, bgColor){
@@ -116,7 +117,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.118";
+  this.ver= "v0.2.119";
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
@@ -178,8 +179,10 @@ SaadMozDiv1=function SaadMozDiv1(){
   this.niceJob= function( jobRec ){
 	var ll= jobRec[jobRec.length-1];
 	var nicel= [ll[0],ll[1],ll[3]];
-	var now24= new Date(new Date().valueOf()-24000*3600);
-	if (new Date(ll[3]).valueOf()>now24) nicel[3]="new";
+	var now24= new Date(new Date().valueOf()-32000*3600);
+	if (new Date(ll[3].substr(0,23)).valueOf()>now24) nicel[3]="new";
+	if (ll[1] == "unknown") 
+		return;
 	if (ll[2] != "'0' ") nicel[3]="ERR";
 	if (nicel[3]=="new")
 		this.niceClickable( nicel,"blue");
