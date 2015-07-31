@@ -14,7 +14,7 @@ for /f %%A in ('dir /b %folder%\*') do (
 for /f %%A in (%~n0_new.txt) do (
 	type %folder%\%%A.00 | cscript //nologo //E:JScript %0 %%A /parse >> %~n0.txt
 )
-sort %~n0.txt | cscript //nologo //E:JScript %0 /saad > %~n0%timestmp%.html
+sort %~n0.txt | cscript //nologo //E:JScript %0 %folder% /saad > %~n0%timestmp%.html
 pause
 exit(0)
 */
@@ -114,10 +114,11 @@ SaadMozDiv=function SaadMozDiv(){
 }
 //Jobs, errors, last10, search
 //-----
-SaadMozDiv1=function SaadMozDiv1(){
+SaadMozDiv1=function SaadMozDiv1(hpath){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.119";
+  this.ver= "v0.2.122";
+  this.hpath= hpath;
   this.start= function(){
 	this.setupDivs();
 	this.setupData();
@@ -162,9 +163,15 @@ SaadMozDiv1=function SaadMozDiv1(){
   this.niceClickable= function( nicel, color ){
 	var el= this.writeUI( nicel.join(" * "), color);
 	el.targetRec= nicel;
+	el.targetPath= this.hpath;
 	el.onclick= this.handleClickForJob;
 	el.onmouseover= this.onMouseOverForEl;
 	el.onmouseout= this.onMouseOutForEl;
+
+	if (nicel[1].indexOf("CHK_")>0) {
+	} else if (nicel[1].indexOf("CK_")>0) {
+	} else 
+		el.style.fontWeight= "bold";
   }
   this.onMouseOverForEl= function(){
 	this.style.backgroundColor="lightgray";
@@ -208,12 +215,14 @@ if (WScript.Arguments.length>1) {
 	}
     }
 }
-if (WScript.Arguments(0)=="/saad"){
+if (WScript.Arguments(1)=="/saad"){
 	WScript.echo( "<body><div>" );
 	while (!WScript.StdIn.AtEndOfStream) 
 		WScript.echo( WScript.StdIn.ReadLine() );
 	WScript.echo( "</div></body>" );
 	var cnCsv="SaadMozDiv,SaadMozDiv1"
-	WScript.echo( new SaadFactory("new SaadMozDiv1().start()").genCode(
+	var startCmd= "new SaadMozDiv1('$hpath$').start()";
+	startCmd.replace("$hpath",WScript.Arguments(0));
+	WScript.echo( new SaadFactory(startCmd).genCode(
 		["SaadMozDiv","SaadMozDiv1"]) );
 }
