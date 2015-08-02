@@ -1,7 +1,7 @@
 //8-1-15 JChoy DomSel - Selects DOM element(s) and apply changes.
 //-----
 function DomSel(){
-	this.version = "v0.1.113";
+	this.version = "v0.1.114";
 	this.set= function( ref, val ){
 		var ar= ref.split(".");
 		for (var i=0,at=this._getEls(); i<at.length; i++){
@@ -18,7 +18,21 @@ function DomSel(){
 		else if (ssp.name != "*") res= d$.getElementsByName(ssp.name)
 		else if (ssp.id != "*") res= [d$.getElementById(ssp.id)];
 		if (!res[0]) res=[];
-		//todo filter for items with attributes matching oth.
+		return this._filterByAttributes(res);
+	}
+	this._filterByAttributes= function(ad){
+if (this.selectorSpec.name != "foo") return ad;
+		var d$= document, sso= this.selectorSpec.oth, res=[];
+		var ax= new Array(ad.length);
+		for (var i=0; i<sso.length; i++)
+		    for (var j=0; j<ad.length; j++)
+			if (!ax[j]){
+				var attr= ad[j].attributes[sso[i][0]];
+				if (!attr)  ax[j]=1;
+				else if (attr.value != sso[i][1]) ax[j]=1;
+			} 
+		for (var i=0; i<ax.length; i++)
+			if (!ax[i]) res.push(ad[i]);
 		return res;
 	}
 	this._storeArgs= function(args){
@@ -28,12 +42,11 @@ function DomSel(){
 			var at= args[i].split(":");
 			if (this.selectorSpec[at[0].toLowerCase()])
 				this.selectorSpec[at[0].toLowerCase()]= at[1];
-			this.selectorSpec["oth"].push(at);
+			else this.selectorSpec["oth"].push(at);
 		}
 	}
 	this._storeArgs(arguments);
 }
-
 /*
 Examples:
 new DomSel().set( "style.backgroundColor", "lightgray" );
