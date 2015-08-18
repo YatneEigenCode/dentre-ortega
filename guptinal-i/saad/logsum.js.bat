@@ -117,7 +117,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(hpath){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.122";
+  this.ver= "v0.2.123";
   this.hpath= hpath;
   this.start= function(){
 	this.setupDivs();
@@ -164,7 +164,7 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
 	var el= this.writeUI( nicel.join(" * "), color);
 	el.targetRec= nicel;
 	el.targetPath= this.hpath;
-	el.onclick= this.handleClickForJob;
+	el.onclick= this.handleDblClickForJob;
 	el.onmouseover= this.onMouseOverForEl;
 	el.onmouseout= this.onMouseOutForEl;
 
@@ -179,12 +179,29 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
   this.onMouseOutForEl= function(){
 	this.style.backgroundColor= document.body.style.backgroundColor;
   }
+  this.handleDblClickForJob= function( ){
+	var path="file://fccsappprdn01/d$/UC4/am8/out/";
+	if (!this.firstClickTime) {
+		this.firstClickTime = new Date().valueOf();
+		return;
+	}
+	if (isNaN(this.firstClickTime)) return;
+	if (new Date().valueOf()-this.firstClickTime < 500)
+		window.open(path+this.targetRec[0]+".00");
+	this.firstClickTime = null;
+  }
   this.handleClickForJob= function( ){
 	var path="file://fccsappprdn01/d$/UC4/am8/out/";
 	window.open(path+this.targetRec[0]+".00");
   }
   this.niceJob= function( jobRec ){
-	var ll= jobRec[jobRec.length-1];
+	this.niceJob1( jobRec[jobRec.length-1] );
+	for (var ll,i=jobRec.length-2; i>=0; i--){
+		ll = jobRec[i];
+		if (ll[2] != "'0' ") this.niceJob1( ll );
+	}
+  }
+  this.niceJob1= function( ll ){
 	var nicel= [ll[0],ll[1],ll[3]];
 	var now24= new Date(new Date().valueOf()-32000*3600);
 	if (new Date(ll[3].substr(0,23)).valueOf()>now24) nicel[3]="new";
@@ -198,7 +215,7 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
 	else 
 		this.niceClickable( nicel,"black");
   }
-}
+}//class
 //-----
 //for (var i=0; i<WScript.Arguments.length; i++) WScript.Echo( i+": "+WScript.Arguments(i) );
 if (WScript.Arguments.length>1) {
