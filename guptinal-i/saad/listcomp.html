@@ -1,0 +1,120 @@
+<title>Compare 2 Lists</title>
+<form name=form1>
+<table>
+<tr>
+<td>
+List A<br>
+<textarea rows=10 name=ta1>10
+23
+63
+41
+15</textarea>
+</td>
+<td>
+List B<br>
+<textarea rows=10 name=ta2>41
+15
+63
+72
+83
+19</textarea>
+</td>
+</tr>
+<table>
+
+<br><input type=button value="Find Matches">
+&nbsp;&nbsp;&nbsp;<input type=button value="Find Diffs">
+&nbsp;&nbsp;&nbsp;<input type=button value="Dedup">
+</span>
+</form>
+
+<script>
+//8-21-15 JChoy listcomp.html - compare 2 list of values to yield either matches or difs
+//-----
+function DataPress(){
+  this.delim = "\n";
+  this.start= function( instr, sa, sb ){
+	var a1=sa.split(this.delim).sort();
+	var a2=sb.split(this.delim).sort();
+	if ( instr == "Find Matches" ) return this.findMatches(a1,a2);
+	if ( instr == "Find Diffs" ) return this.findDiffs(a1,a2);
+	if ( instr == "Dedup" ) return this.dedup(a1,a2);
+	return this.findDiffs(a1,a2);
+  }
+  this.dedupList = function( at ){
+	var res = new Array();
+	res.push( at[0] );
+	for (var i=1; i<at.length; i++)
+		if (at[i]!=at[i-1]) res.push(at[i]);
+	return res;
+  }
+  this.dedup = function( a1, a2 ){
+	var r1 = this.dedupList(a1);
+	var r2 = this.dedupList(a2);
+	return [ r1.join(this.delim),
+		 r2.join(this.delim),
+		 [a1.length, a2.length, r1.length, r2.length] ];
+  }
+  this.findDiffs = function( a1, a2 ){
+	var r1 = this.findDiffsInA(a1,a2);
+	var r2 = this.findDiffsInA(a2,a1);
+	return [ r1.join(this.delim),
+		 r2.join(this.delim),
+		 [a1.length, a2.length, r1.length, r2.length] ];
+  }
+  this.findDiffsInA = function( a1, a2 ){
+	var res= [];
+	for (var i=0,j0=0; i<a1.length; i++){
+		for (var j=j0,isBreak=false; (j<a2.length) && (!isBreak); j++){
+			if (a1[i]<=a2[j]) isBreak = true;
+			if (a1[i]==a2[j]) j0=j;
+			else if (isBreak) res.push(a1[i]);
+		}
+		if (a1[i]==a2[j0]) {
+		} else if (j0==a2.length-1) res.push(a1[i]);
+	}
+	return res;
+  }
+  this.findMatches = function( a1, a2 ){
+	var res= [];
+	for (var i=0,j0=0; i<a1.length; i++){
+		for (var j=j0,isBreak=false; (j<a2.length) && (!isBreak); j++){
+			if (a1[i]<=a2[j]) isBreak = true;
+			if (a1[i]==a2[j]) res.push(a1[i]);
+		}
+	}
+	return [res.join(this.delim),res.join(this.delim),
+		 [a1.length, a2.length, res.length, res.length] ];
+  }
+}
+//-----
+function PageApp(fm){
+  this.form= fm;
+  this.start= function(){
+	this.heatButtons();
+  }
+  this.heatButtons= function(){
+	for (var i=0; i<this.form.elements.length; i++)
+		this.heatButton( this.form.elements[i] );
+  }
+  this.heatButton= function( el ){
+	if (el.type != "button") return;
+	el.onclick= this.handleClickFcn;
+  }
+  this.handleClickFcn= function(){
+	var ares= new DataPress().start( this.value,
+		this.form.ta1.value, this.form.ta2.value );
+	var pa= new PageApp();
+	pa.write( [this.value,"between", ares[2][0],"items and",ares[2][1],
+		"items. Results have",ares[2][2],
+		"items and ",ares[2][3],"items"].join(" ") );
+	this.form.ta1.value = ares[0];
+	this.form.ta2.value = ares[1];
+  }
+  this.write= function(s){
+	var $d= document;
+	$d.body.appendChild($d.createElement("div")).innerHTML=s;
+  }
+}
+new PageApp(document.form1).start();
+</script>
