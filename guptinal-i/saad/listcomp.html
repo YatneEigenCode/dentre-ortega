@@ -1,5 +1,6 @@
-<title>Compare 2 Lists</title>
+<title>Comparing Lists</title>
 <form name=form1>
+Compare 2 lists
 <table>
 <tr>
 <td>
@@ -28,7 +29,32 @@ List B<br>
 </span>
 </form>
 
+<hr>
+<table>
+<tr>
+<td>
+<form name=form2>
+Compare multiple lists<br>
+Next List<br>
+<textarea rows=10 name=ta1>10
+24
+61
+41
+41
+85</textarea>
+</td>
+<td>
+Results<br>
+<textarea rows=10 name=ta2>
+</textarea></td>
+</tr>
+<table>
+<input type=button value="Add List">
+
+</span>
+</form>
 <script>
+//8-24-15 JChoy v0.1.114 - add feature to compare multiple lists
 //8-21-15 JChoy listcomp.html - compare 2 list of values to yield either matches or difs
 //-----
 function DataPress(){
@@ -117,4 +143,47 @@ function PageApp(fm){
   }
 }
 new PageApp(document.form1).start();
+
+//-----
+function PageApp2(fm){
+  this.constructor = PageApp;
+  this.constructor(fm);
+  this.aCombined = new Array();
+  this.marker= "A";
+  this.start= function(){
+	this.heatButtons();
+	this.form.helper = this;
+	this.form = null;
+  }
+  this.handleClickFcn= function(){
+	var ares= new DataPress().start( "Dedup",this.form.ta1.value, "" );
+	var pa= new PageApp();
+	var au= ares[0].split("\n");
+	var help= this.form.helper;
+	for (var i=0; i<au.length; i++)
+		help.aCombined.push([au[i],help.marker]);
+	help.aCombined.sort();
+	var countCommon = 0
+	for (var i=1,at=help.aCombined; i<at.length; i++){
+		if (at[i][0]==at[i-1][0]){
+			at[i-1][1]+=at[i][1];
+			at.splice(i,1);
+			countCommon++;
+		}	
+	}
+	pa.write( [this.value, ares[2][0],"items reduced to ",
+		ares[2][2],"unique items with marker", help.marker,
+		"having",countCommon,
+		"items in common with previous list. ",
+		"Cummulative list now has",help.aCombined.length,
+		"items."].join(" ") );
+	this.form.ta1.value = "";
+	this.form.ta2.value = help.aCombined.join("\n");
+	help.nextMarker();
+  }
+  this.nextMarker= function(){
+	this.marker= String.fromCharCode(this.marker.charCodeAt(0)+1);
+  }
+}
+new PageApp2(document.form2).start();
 </script>
