@@ -1,9 +1,10 @@
 Offline Page Renderer<br>
-<script src=https://dl.dropboxusercontent.com/u/28448395/projects/android/Tweetoff-code/assets/tweetoff/dbapp.js></script>
+<script xsrc=https://dl.dropboxusercontent.com/u/28448395/projects/android/Tweetoff-code/assets/tweetoff/dbapp.js></script>
 <script src=sim_remote_class.js></script>
 <script>
-//8-24-15 JChoy v0.1.118 srcAndSpawn implemented
+//8-24-15 JChoy v0.2.119 sqlDb and DbApp inline to fully work offline
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app. 
+//TODO: load DbApp and SqlDb into local storage
 //-----
 function PageOff(){
   this.showId = -1;
@@ -132,5 +133,70 @@ AppWrapper= function(name){
 	new this.ClsTmp().start();
   }
 }
+
+//------------
+//2-4-11 JChoy sqllite on iPhone
+//5-8-11 JChoy v1.121 DbTableApp
+
+function SqlDb(){
+ var $=this;
+ $.dbCfg= {name:'custom_sqlite',ver:'1.0',dispName:'ctmsql',max:1000000};
+ $.openDb=function( name, ver, dispName, max ){
+  var $=this;
+  if (max) $.dbCfg= {name:name,ver:ver,dispName:dispName,max:max};
+  $.db= openDatabase($.dbCfg.name,$.dbCfg.ver,$.dbCfg.dispName,$.dbCfg.max);
+ }
+ $.execParamSql=function(sql,aParms,callback){
+  var fcn=function(txn){ txn.executeSql(sql,aParms,callback) };
+  this.db.transaction( fcn );
+ }
+}
+ 
+function DbApp(){
+ this.version = "v1.113";
+ var $=this;
+ $.sql= {
+   savePup:"INSERT INTO pups (name) VALUES (?);"
+   ,getPups:"SELECT * FROM pups ORDER BY name ASC;"
+   ,deletePups:"DELETE FROM pups;"
+   ,initPups:"CREATE TABLE IF NOT EXISTS pups (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL);" 
+ }
+ $.init=function(dbName, firstSql){
+  var $=this;
+  $.sd= new SqlDb();
+  if (dbName) $.sd.dbCfg.name= $.sd.dbCfg.dispName= dbName;
+  $.sd.openDb();
+  var sql1= (firstSql)? firstSql : 'initPups';
+  if ( $.sql[sql1] )  $.sd.execParamSql( $.sql[sql1] );
+  for (var m in $.sql) $[m+'Db']=
+   new Function("parms","cb","this.dbAction('"+m+"',parms,cb)");
+  //note: will call cb( transaction, results );
+ }
+ $.dbAction= function( methName, parms, cb ){
+  this.sd.execParamSql( $.sql[methName], parms, cb );
+ }
+ $.enableOutput=function(cols,divName){
+  var v=document.getElementById(divName), s;
+  v.cols=cols; v.mas=this;
+  s="v.innerHTML=v.mas.renderResultsTable(tx,rs,v.cols);";
+  this['output_'+divName]=new Function("tx","rs",
+   "var v=document.getElementById('"+divName+"'); "+s);
+ }
+ $.rsToArray= function(txn, rs, cols){
+  var res=new Array();
+  for (var i=0; i<rs.rows.length; i++)
+   for (var j=0,a=res[i]=new Array(); j<cols.length; j++) 
+    res[i][j]= rs.rows.item(i)[cols[j]];
+  return res;
+ }
+ $.renderResultsTable= function(txn, rs, cols){
+  var res="<table border=1>", at=this.rsToArray(txn, rs, cols);
+  res+="<tr><th>"+cols.join("</th><th>")+"</th></tr>";
+  for (var i=0,x=res=res+'</tr>'; i<at.length; i++)
+   res+="<tr><td>"+at[i].join("</td><td>")+"</td></tr>";
+  return res+"</table>";
+ }
+}
+
 new PageOff().start();
 </script>
