@@ -1,9 +1,9 @@
 <title>Offline Page Renderer</title>
 Offline Page Renderer<br>
 <script>
-//8-25-15 JChoy v0.3.126 Fix bug in HtmlAppFactory. Minor fixes to facilitate MakerApp (external)
+//8-25-15 JChoy v1.127 showFooter() loadMore() to retrive prev data
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app. 
-//TODO: load DbApp and SqlDb into local storage
+//TODO: favorite, load using scroll
 //-----
 function PageOff(){
   this.showId = -1;
@@ -11,6 +11,23 @@ function PageOff(){
 	this.initDb();
 	if (this.loadUrl) this.srcAndSpawn();
 	this.getSpawnAppFromDb();
+	this.showFooter();
+  }
+  this.showFooter= function(){
+	var el= document.createElement("div")
+	document.body.appendChild( this.bake(el, {innerHTML:"<hr>More",pageOffFooter:1}) );
+	el.onclick= new OOcallback(this, "loadMore").fcn;
+  }
+  this.restart= function(n){
+	this.initDb();
+	document.body.innerHTML = "";
+	this.write(document.title);
+	this.getFromDb( this.showId=n, this.spawnApp );
+  }
+  this.loadMore= function(){
+	this.initDb();
+	this.write("<hr>");
+	this.getFromDb( this.showId-=1, this.spawnApp );
   }
   this.getSpawnAppFromDb= function(){
 	var $privThis = this;
@@ -21,13 +38,16 @@ function PageOff(){
 		this.storeApp( "HtmlApp", this.addHtmlApp= null );
 	}
 	this.getMaxNum( function(n){		//run latest app
-		if (n) return $privThis.getFromDb( n, $privThis.spawnApp );
+		if (n) return $privThis.getFromDb( $privThis.showId=n, $privThis.spawnApp );
 		WelcomeApp = new $privThis.HtmlAppFactory( "Welcome to PageOff" ).nuClass;
 		$privThis.storeApp( "WelcomeApp" );
 	} );
   }
   this.spawnApp= function(s){
 	new AppWrapper().deserialize( s ).spawnApp();
+	var at = document.getElementsByTagName("div");
+	for (var i=0; i<at.length; i++)
+		if (at[i].pageOffFooter) document.body.appendChild(at[i]);
   }
   this.srcAndSpawn= function(){
 	var el=document.createElement("script");
