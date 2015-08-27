@@ -1,4 +1,5 @@
 /*
+rem 8/27/2015 JChoy v0.2.127 link to next day
 rem 7/28/2015 JChoy catalog new log files in folder and prep for quick viewing
 set folder=C:\abc\logs
 for /f "tokens=1,2 delims==" %%A in (%~n0.config) do if not (%%A)==() set %%A=%%B
@@ -117,7 +118,7 @@ SaadMozDiv=function SaadMozDiv(){
 SaadMozDiv1=function SaadMozDiv1(hpath){
   this.constructor= SaadMozDiv;
   this.constructor();
-  this.ver= "v0.2.123";
+  this.ver= "v0.2.127";
   this.hpath= hpath;
   this.start= function(){
 	this.setupDivs();
@@ -142,6 +143,15 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
 	this.writeUI( "Date Range:" );
 	this.writeUI( this.data[0][3] );
 	this.writeUI( this.data[this.data.length-1][3] );
+	this.writeUI( "Next Day" ).onclick= this.loadNextDay;
+  }
+  this.loadNextDay= function(){
+	var fn=(location+"").split("/").reverse()[0];
+	var s= fn.match(/_(\d)*/)[0].substr(1);
+	var dt= new Date([s.substr(0,4),s.substr(4,2),s.substr(6)].join("/"));
+	dt.setDate( dt.getDate()+1 );
+	var res= dt.toISOString().substr(0,10).replace(/-/g,"");
+	location = fn.replace(/_(\d)*/,"_"+res);
   }
   this.groupByJob= function(){
 	if (this.groups) return;
@@ -180,7 +190,7 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
 	this.style.backgroundColor= document.body.style.backgroundColor;
   }
   this.handleDblClickForJob= function( ){
-	var path="file://fccsappprdn01/d$/UC4/am8/out/";
+	var path= this.targetPath;
 	if (!this.firstClickTime) {
 		this.firstClickTime = new Date().valueOf();
 		return;
@@ -189,10 +199,6 @@ SaadMozDiv1=function SaadMozDiv1(hpath){
 	if (new Date().valueOf()-this.firstClickTime < 500)
 		window.open(path+this.targetRec[0]+".00");
 	this.firstClickTime = null;
-  }
-  this.handleClickForJob= function( ){
-	var path="file://fccsappprdn01/d$/UC4/am8/out/";
-	window.open(path+this.targetRec[0]+".00");
   }
   this.niceJob= function( jobRec ){
 	this.niceJob1( jobRec[jobRec.length-1] );
@@ -238,8 +244,9 @@ if (WScript.Arguments(1)=="/saad"){
 		WScript.echo( WScript.StdIn.ReadLine() );
 	WScript.echo( "</div></body>" );
 	var cnCsv="SaadMozDiv,SaadMozDiv1"
-	var startCmd= "new SaadMozDiv1('$hpath$').start()";
-	startCmd.replace("$hpath",WScript.Arguments(0));
+	var startCmd= "new SaadMozDiv1('$hpath').start()";
+	var arg0 = WScript.Arguments(0).replace(/\\/g,'/');
+	startCmd= startCmd.replace("$hpath",arg0+"/");
 	WScript.echo( new SaadFactory(startCmd).genCode(
 		["SaadMozDiv","SaadMozDiv1"]) );
 }
