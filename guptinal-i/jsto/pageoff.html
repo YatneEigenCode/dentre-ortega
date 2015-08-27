@@ -2,7 +2,7 @@
 <title>Offline Page Renderer</title>
 Offline Page Renderer<hr>
 <script>
-//8-26-15 JChoy v1.129 favorite, doFooterButton
+//8-26-15 JChoy v1.131 PageOff_srcCls, initAndSrc, customizer remote customizable app, discontinue cgi, refresh after save
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app. 
 //-----
 function PageOff(){
@@ -13,6 +13,10 @@ function PageOff(){
 	if (this.loadUrl) this.srcAndSpawn();
 	this.getSpawnAppFromDb();
 	this.showFooter();
+  }
+  this.initAndSrc= function( name, url ){
+	[this.initDb(), this.loadUrl = url, this.clsName = name];
+	this.srcAndSpawn();
   }
   this.showFooter= function(){
 	var div= this.bake( document.createElement("div"), {pageOffFooter:1} );
@@ -27,16 +31,13 @@ function PageOff(){
 	if (s=="More"){
 		this.write("<hr>");
 		this.getFromDb( this.showId-=1, this.spawnApp );
+	} else if (s=="Customize"){
+		new PageOff_srcCls().start("CustomizerApp",
+			"http://rip.okdaily.com/mad/textStore.php?f=text&i=2221");
 	} else alert("Not available");
   }
   this.getSpawnAppFromDb= function(){
 	var $privThis = this;
-	if (this.showId>=0) 
-		return this.getFromDb( this.showId, this.spawnApp );
-	if (this.addHtmlApp) {
-		HtmlApp = new this.HtmlAppFactory( unescape(this.addHtmlApp) ).nuClass;
-		this.storeApp( "HtmlApp", this.addHtmlApp= null );
-	}
 	this.getMaxNum( function(n){		//run latest app
 		if (n) return $privThis.getFromDb( $privThis.showId=n, $privThis.spawnApp );
 		WelcomeApp = new $privThis.HtmlAppFactory( "Welcome to PageOff" ).nuClass;
@@ -62,9 +63,8 @@ function PageOff(){
   }
   this.HtmlAppFactory = function(s){
 	var code= "new Ooze().extend(this,PageOff_HtmlApp);\n";
-	this.nuClass = new Function( code + "this.text=" +JSON.stringify(s) ); //bug in v0.3.125
+	this.nuClass = new Function( code + "this.text=" +JSON.stringify(s) );
   } //inner class
-  this.extendClass( PageOff_ext_cgi );
   this.extendClass( PageOff_ext_sqldb );
 }
 //-----
@@ -102,7 +102,8 @@ PageOff_ext_sqldb= function(){
 	this.sd.savePupDb( [s], this.resStoreApp );
   }
   this.resStoreApp= function(){
-	new PageOff_HtmlApp().write("Item successfully saved to database.");
+	var s="Item successfully saved to database - click to refresh";
+	new PageOff_HtmlApp().write(s).onclick= function(){location.reload()};
   }
   this.getMaxNum= function( cb ){
 	this.sd.getMaxIdDb( [], function(txn, rs){
@@ -111,21 +112,20 @@ PageOff_ext_sqldb= function(){
   }
 }
 //-----
-PageOff_ext_cgi = function(){
-  this.superStart= this.start;	//consider using array
-  this.start= function(){
-	this.doCgi();
-	this.superStart();
+PageOff_srcCls= function(){
+  new Ooze().bake(this);
+  this.start= function(name,url){
+	var $privThis= this;
+	var el=document.createElement("script");
+	document.body.appendChild( this.bake(el,{src:unescape(url)},window[name]= null) );
+	var myIntv=setInterval( function(){if(window[name]) $privThis.deploy(name)}, 500 );
+ 	setTimeout(function(){ clearInterval(myIntv)},9000);
   }
-  this.cgi= function(k,def,qy){ var at=(qy+"").split(new RegExp("[\&\?]"+k+"="));
-	return (at.length==1)?def:at[1].split("&")[0]; }
-  this.doCgi= function(){
-	this.showId = this.cgi("id","-1",location);
-	this.loadUrl = this.cgi("url", "", location);
-	this.clsName = this.cgi("name", "RemCls", location);
-	this.addHtmlApp= this.cgi("addhtmlapp","", location);
+  this.deploy= function(name){
+	if (this.isDone) return; else this.isDone= true;
+	new window[name]().start(); 
   }
-} //class
+}
 //-----
 function Ooze(){	//base class primal methods
   this.bake= function( obj, oven ){
