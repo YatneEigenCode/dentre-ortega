@@ -1,0 +1,138 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1;" />
+<title>Bepagugu</title>
+*
+<script>
+//8-29-15 JChoy v0.112 Bootstrap for Extensible Page
+//	Blank page loads js for bare essentials: read db & extend, src in js
+//	Check functionality list to src in more js. The added js are then stored to db.
+//-----
+function Bepagugu(){
+  new Ooze().bake(this);
+  this.start= function(){
+	this.initDb();
+	this.getExtendFromDb();
+	//this.startUI();
+  }
+  this.startUI= function(){
+	this.write( "Welcome, let's see what we can do" );
+	try {
+		this.showScore();
+	} catch (e) {}
+	this.loadMissingFcn( "showScore", "http://rip.okdaily.com/mad/textStore.php?f=text&i=2225&a8" );
+  }
+  this.getExtendFromDb= function(){
+	var $privThis = this;
+	this.getListFromDb( function(ar) {
+		for (var i=0; i<ar.length; i= i+1) {
+			eval( "$privThis.extender =" + ar[i] );
+			$privThis.extender();
+		}
+		$privThis.startUI();
+	} );
+  }
+  this.loadMissingFcn= function( fcnName, url ){
+	if (!this[fcnName]) new SrcAndPing().start( "Bepagugu_ext", url );
+  }
+  this.extendClass( Bepagugu_ext_sqldb );
+}
+
+//-----
+Bepagugu_ext_sqldb = function(){
+  this.initDb = function(){
+	this.sd = new DbApp();
+	this.sd.init( "Bepagugu" );
+  }
+  this.getListFromDb= function(cb){
+	this.sd.getPupsDb( [], function(txn, rs){
+		if (rs.rows.length==0) return cb([]);
+		var res=new Array();
+		for (var i=0; i<rs.rows.length; i++) res.push(rs.rows.item(i)["name"]);
+		cb( res );
+	} );
+  }
+}
+//-----
+SrcAndPing= function(){
+  new Ooze().extend( this, Bepagugu );
+  this.start= function(name,url){
+	var $privThis= this;
+	var el=document.createElement("script");
+	document.body.appendChild( this.bake(el,{src:unescape(url)},window[name]= null) );
+	var myIntv=setInterval( function(){if(window[name]!=null) $privThis.deploy(name);}, 500 );
+ 	setTimeout(function(){ clearInterval(myIntv)},9000);
+  }
+  this.deploy= function(name){
+	if (this.isDone) return; else this.isDone= true;
+	if (!this.sd) this.initDb();
+	this.sd.savePupDb( [(window[name]).toString()], function(){} );
+  }
+}
+//-----
+function Ooze(){	//base class primal methods
+  this.bake= function( obj, oven ){
+	if (!oven) oven = this;
+	for (var m in oven) obj[m]=oven[m]; return obj;
+  }
+  this.extendClass = function( cls ){
+	this.extender=cls; this.extender();
+  }
+  this.extend = function( obj, cls ){
+	this.bake( obj ).extendClass( cls );
+  }
+  this.write= function(s){
+	var el =document.body.appendChild( document.createElement("div") );
+	return this.bake(el,{innerHTML:s});
+  }
+  this.buttonify= function(el){
+	el.style.backgroundColor= "lightgray";
+	el.style.margin= el.style.padding= "1 5 1 5";
+	el.onmouseover= function(){ this.style.fontWeight="bold" }
+	el.onmouseout= function(){ this.style.fontWeight="normal" }
+	return el;
+  }
+}
+
+//------------
+//2-4-11 JChoy sqllite on iPhone
+//5-8-11 JChoy v1.121 DbTableApp
+
+function SqlDb(){
+ var $=this;
+ $.dbCfg= {name:'custom_sqlite',ver:'1.0',dispName:'ctmsql',max:1000000};
+ $.openDb=function( name, ver, dispName, max ){
+  var $=this;
+  if (max) $.dbCfg= {name:name,ver:ver,dispName:dispName,max:max};
+  $.db= openDatabase($.dbCfg.name,$.dbCfg.ver,$.dbCfg.dispName,$.dbCfg.max);
+ }
+ $.execParamSql=function(sql,aParms,callback){
+  var fcn=function(txn){ txn.executeSql(sql,aParms,callback) };
+  this.db.transaction( fcn );
+ }
+}
+ 
+function DbApp(){
+ this.version = "v1.113";
+ var $=this;
+ $.sql= {
+   savePup:"INSERT INTO pups (name) VALUES (?);"
+   ,getPups:"SELECT * FROM pups ORDER BY name ASC;"
+   ,deletePups:"DELETE FROM pups;"
+   ,initPups:"CREATE TABLE IF NOT EXISTS pups (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL);" 
+ }
+ $.init=function(dbName, firstSql){
+  var $=this;
+  $.sd= new SqlDb();
+  if (dbName) $.sd.dbCfg.name= $.sd.dbCfg.dispName= dbName;
+  $.sd.openDb();
+  var sql1= (firstSql)? firstSql : 'initPups';
+  if ( $.sql[sql1] )  $.sd.execParamSql( $.sql[sql1] );
+  for (var m in $.sql) $[m+'Db']=
+   new Function("parms","cb","this.dbAction('"+m+"',parms,cb)");
+  //note: will call cb( transaction, results );
+ }
+ $.dbAction= function( methName, parms, cb ){
+  this.sd.execParamSql( $.sql[methName], parms, cb );
+ }
+}
+new Bepagugu().start();
+</script>
