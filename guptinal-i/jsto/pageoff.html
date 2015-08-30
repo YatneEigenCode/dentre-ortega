@@ -2,15 +2,14 @@
 <title>Offline Page Renderer</title>
 Offline Page Renderer<hr>
 <script>
-//8-26-15 JChoy v1.131 PageOff_srcCls, initAndSrc, customizer remote customizable app, discontinue cgi, refresh after save
+//8-29-15 JChoy v1.132 remove unused code
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app. 
 //-----
 function PageOff(){
-  this.showId = -1;
   new Ooze().bake(this);
+  this.showId= -1;
   this.start= function(){
 	this.initDb();
-	if (this.loadUrl) this.srcAndSpawn();
 	this.getSpawnAppFromDb();
 	this.showFooter();
   }
@@ -73,27 +72,12 @@ PageOff_ext_sqldb= function(){
 	this.sd = new DbApp();
 	this.sd.sql.getPupById= "SELECT name FROM pups WHERE id=?;"
 	this.sd.sql.getMaxId= "SELECT max(id) id FROM pups;"
-	this.sd.sql.getIds= "SELECT id FROM pups ORDER by id DESC;"
+	//this.sd.sql.getIds= "SELECT id FROM pups ORDER by id DESC;"
 	this.sd.init( "PageOff" );
-  }
-  this.getColNames= function( row ){
-	var res = new Array();
-	for (var m in row) res.push(m);
-	return res;
-  }
-  this.getListFromDb= function(cb){
-	this.sd.getIdsDb( [], function(txn, rs){
-		if (rs.rows.length==0) return cb([]);
-		var res=[], colName=new PageOff_ext_sqldb().getColNames(rs.rows.item(0))[0];
-		for (var i=0; i<rs.rows.length; i++) res.push(rs.rows.item(i)[colName]);
-		cb( res );
-	} );
   }
   this.getFromDb= function(i, cb){
 	this.sd.getPupByIdDb( [i], function(txn, rs){
-		if (rs.rows.length==0) return;
-		var colName= new PageOff_ext_sqldb().getColNames(rs.rows.item(0))[0];
-		cb( rs.rows.item(0)[colName] );
+		if (rs.rows.length>0) cb( rs.rows.item(0)["name"] );
 	} );
   }
   this.storeApp= function(name){
@@ -225,6 +209,5 @@ function DbApp(){
   this.sd.execParamSql( $.sql[methName], parms, cb );
  }
 }
-
 new PageOff().start();
 </script>
