@@ -1,8 +1,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1;" />
 <title>Offline Page Renderer</title>
-Offline Page Renderer<hr>
+Offline Page Renderer<div><hr></div>
 <script>
-//8-29-15 JChoy v1.135 LongPressBob
+//8-31-15 JChoy v1.136 Fav
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app.
 //-----
 function PageOff(){
@@ -20,10 +20,10 @@ function PageOff(){
   this.showFooter= function(){
 	var div= this.bake( document.createElement("div"), {pageOffFooter:1} );
 	document.body.appendChild(div).style.padding= "8 0 0 0";
-	for (var i=0,at=["More","Customize","Favorite"],$th=this; i<at.length; i++){
+	for (var i=0,at=["More","Favorites"],$th=this; i<at.length; i++){
 	  var el= this.bake( document.createElement("span"), {innerHTML:at[i]} );
 	  div.appendChild( this.buttonify(el) ).onclick= function(){$th.doFooterButton(this)}
-	  //if (this["havLongPress"]) this.havLongPress( this.createCBfunction("handleLongPress") );
+	  if (this["havLongPress"]) this.havLongPress( this.createCBfunction("handleLongPress") );
 	}
   }
   this.doFooterButton= function(el){
@@ -37,7 +37,18 @@ function PageOff(){
 	} else alert("Not available");
   }
   this.handleLongPress= function(){
-	alert("N/A");
+	this.doFooterButton( {innerHTML:"Customize"} );
+	var at=document.getElementsByTagName("hr");
+	if (!this["faveOne"]) return;
+	for (var j=this.showId,i=at.length-1; i>=0; i--,j++)
+	  if (at[i].isFavBtnAdded){
+	  } else if (at[i].getBoundingClientRect().top<0) {
+	  } else {
+		var el= this.bake( document.createElement("span"), {innerHTML:"Fav"} );
+		at[i].parentNode.appendChild(this.buttonify(el));
+		at[i].isFavBtnAdded = true;
+		el.onclick = this.createCBfunction("faveOne",j);
+	  }
   }
   this.getSpawnAppFromDb= function(){
 	var $privThis = this;
@@ -70,6 +81,7 @@ function PageOff(){
   } //inner class
   this.extendClass( PageOff_ext_sqldb );
   this.extendClass( PageOff_ext_longpress );
+  this.extendClass( PageOff_ext_favebob );
 }
 //-----
 PageOff_ext_sqldb= function(){
@@ -98,6 +110,24 @@ PageOff_ext_sqldb= function(){
 		cb( (rs.rows.length>0) ? rs.rows.item(0)['id'] : null );
 	});
   }
+}
+//-----
+PageOff_ext_favebob= function(){
+  this.faveOne= function( src, arg, a, b, c, d ){
+	src.style.display = "none";
+	this.initFavDb();
+	this.sdf.addFavDb( ["F"+arg] );
+	this.sdf.deDupDb( ["F"+arg] );
+  }
+  this.initFavDb = function(){
+	if (this.sdf) return;
+	this.sdf = new DbApp();
+	this.sdf.sql.addFav= "INSERT INTO pups (name) VALUES (?)"
+	this.sdf.sql.deDup= "DELETE FROM pups WHERE name=? AND id NOT IN (SELECT max(id) FROM pups);"
+	this.sdf.sql.delFav= "DELETE FROM pups WHERE name=?;"
+	this.sdf.init( "PageOff_Fav" );
+  }
+
 }
 //-----
 PageOff_ext_longpress= function(){
