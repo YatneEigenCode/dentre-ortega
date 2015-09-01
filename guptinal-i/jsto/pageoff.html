@@ -2,7 +2,7 @@
 <title>Offline Page Renderer</title>
 Offline Page Renderer<div><hr></div>
 <script>
-//8-31-15 JChoy v1.136 Fav
+//8-31-15 JChoy v1.137 showFavorites(), unFavOne()
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app.
 //-----
 function PageOff(){
@@ -31,13 +31,13 @@ function PageOff(){
 	if (s=="More"){
 		this.write("<hr color='"+((this.toggle("hrColor"))?"orange":"green")+"'>");
 		this.getFromDb( this.showId-=1, this.spawnApp );
-	} else if (s=="Customize"){
-		new PageOff_srcCls().start("CustomizerApp",
-			"http://rip.okdaily.com/mad/textStore.php?f=text&i=2221");
+	} else if (s=="Favorites"){
+		if (this["faveOne"]) this.showFavorites();
 	} else alert("Not available");
   }
   this.handleLongPress= function(){
-	this.doFooterButton( {innerHTML:"Customize"} );
+	new PageOff_srcCls().start("CustomizerApp",
+		"http://rip.okdaily.com/mad/textStore.php?f=text&i=2221");
 	var at=document.getElementsByTagName("hr");
 	if (!this["faveOne"]) return;
 	for (var j=this.showId,i=at.length-1; i>=0; i--,j++)
@@ -119,6 +119,10 @@ PageOff_ext_favebob= function(){
 	this.sdf.addFavDb( ["F"+arg] );
 	this.sdf.deDupDb( ["F"+arg] );
   }
+  this.unFaveOne= function( src, arg, a, b, c, d ){
+	src.style.display = "none";
+	this.sdf.delFavDb( ["F"+arg] );
+  }
   this.initFavDb = function(){
 	if (this.sdf) return;
 	this.sdf = new DbApp();
@@ -127,7 +131,22 @@ PageOff_ext_favebob= function(){
 	this.sdf.sql.delFav= "DELETE FROM pups WHERE name=?;"
 	this.sdf.init( "PageOff_Fav" );
   }
-
+  this.showFavorites= function(){
+	this.initFavDb();
+	document.body.innerHTML= "<div><hr></div>";
+	this.sdf.getPupsDb([], this.createCBfunction("showFavList") );
+  }
+  this.showFavList= function( src, arg, txn, rs ){	
+	for (var i=0; i<rs.rows.length; i++)
+		setTimeout( this.createCBfunction("showOneFav",
+			rs.rows.item(i).name.substr(1)), 300*i );
+  }
+  this.showOneFav= function( src, num ){
+	var el= this.bake( document.createElement("span"), {innerHTML:"Fav"} );
+	document.body.appendChild(this.buttonify(el));
+	el.onclick = this.createCBfunction("unFaveOne",num);
+	this.getFromDb( num, this.spawnApp );
+  }
 }
 //-----
 PageOff_ext_longpress= function(){
