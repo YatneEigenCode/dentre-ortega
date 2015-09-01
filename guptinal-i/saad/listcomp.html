@@ -24,8 +24,8 @@ List B<br>
 <table>
 
 <br><input type=button value="Find Matches">
-&nbsp;&nbsp;&nbsp;<input type=button value="Find Diffs">
-&nbsp;&nbsp;&nbsp;<input type=button value="Dedup">
+<input type=button value="Find Diffs">
+<input type=button value="Dedup">
 </span>
 </form>
 
@@ -53,6 +53,36 @@ Results<br>
 
 </span>
 </form>
+
+
+</span>
+</form>
+<hr>
+<table>
+<tr>
+<td>
+<form name=form3>
+Extract column<br>
+Next List<br>
+<textarea rows=10 name=ta1>John|33|CA|94404
+Bob|51|NY|01229
+Ann|37|NV|80918
+Vicki|29|DC|10023</textarea>
+</td>
+<td>
+<select name=sel1></select>
+</td>
+<td>
+Results<br>
+<textarea rows=10 name=ta2>
+</textarea></td>
+</tr>
+<table>
+<input type=button value="Extract">
+<input type=button value="Reorder">
+</span>
+</form>
+
 <script>
 //8-24-15 JChoy v0.1.114 - add feature to compare multiple lists
 //8-21-15 JChoy listcomp.html - compare 2 list of values to yield either matches or difs
@@ -126,6 +156,7 @@ function PageApp(fm){
   this.heatButton= function( el ){
 	if (el.type != "button") return;
 	el.onclick= this.handleClickFcn;
+	el.style.margin = "2 5 2 5";
   }
   this.handleClickFcn= function(){
 	var ares= new DataPress().start( this.value,
@@ -186,4 +217,37 @@ function PageApp2(fm){
   }
 }
 new PageApp2(document.form2).start();
+
+//-----
+function PageApp3(fm){
+  this.constructor = PageApp;
+  this.constructor(fm);
+  this.start= function(){
+	this.heatButtons();
+	this.form.helper = this;
+	this.form = null;
+  }
+  this.handleClickFcn= function(){
+	//var help= this.form.helper;
+	if (this.form.sel1.options.length==0) {
+		var row = this.form.ta1.value.split("\n")[0];
+		for (var i=0,at=row.split("|"); i<at.length; i++)
+			this.form.sel1.options[i] = new Option("Column "+(1+i));
+	}
+	var isReorder = (this.value=="Reorder");
+		var res= [], k=this.form.sel1.selectedIndex;
+		var au = this.form.ta1.value.split("\n");
+		for (var i=0; i<au.length; i++){
+			var at= au[i].split("|");
+			res[i]= (k<at.length)? at[k] : "";
+			if (isReorder) res[i]+="|"+au[i];
+		}
+		this.form.ta2.value = res.join("\n");
+  }
+  this.nextMarker= function(){
+	this.marker= String.fromCharCode(this.marker.charCodeAt(0)+1);
+  }
+}
+new PageApp3(document.form3).start();
+
 </script>
