@@ -1,8 +1,8 @@
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1;" />
-<title>Offline Page Renderer</title>
-Offline Page Renderer<div><hr></div>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
+<title>Haqabob</title>
+Haqabob<div><hr></div>
 <script>
-//8-31-15 JChoy v1.137 showFavorites(), unFavOne()
+//8-31-15 JChoy v1.138 Haqabob rename
 //8-22-15 JChoy pageoff - offline page launcher. This simple page has bootup code stored locally. It sources in cross domain source code as Javascript classes and stores those codes in sql db. Later, it can retrieve and run those source code, which effectively renders the page as an interactive app.
 //-----
 function PageOff(){
@@ -60,9 +60,9 @@ function PageOff(){
   }
   this.spawnApp= function(s){
 	new AppWrapper().deserialize( s ).spawnApp();
-	var at = document.getElementsByTagName("div");
-	for (var i=0; i<at.length; i++)
+	for (var i=0,at= document.getElementsByTagName("div"); i<at.length; i++)
 		if (at[i].pageOffFooter) document.body.appendChild(at[i]);
+	window.scrollBy(0,999);
   }
   this.srcAndSpawn= function(){
 	var el=document.createElement("script");
@@ -133,7 +133,7 @@ PageOff_ext_favebob= function(){
   }
   this.showFavorites= function(){
 	this.initFavDb();
-	document.body.innerHTML= "<div><hr></div>";
+	document.body.innerHTML= document.title+"<div><hr></div>";
 	this.sdf.getPupsDb([], this.createCBfunction("showFavList") );
   }
   this.showFavList= function( src, arg, txn, rs ){	
