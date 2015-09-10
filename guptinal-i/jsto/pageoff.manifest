@@ -1,4 +1,11 @@
 CACHE MANIFEST
-pageoff.html
+
+CACHE:
+haqabob
+
+NETWORK:
+*
+
+
 # mimeType text/cache-manifest is no longer needed according to
 # http://www.html5rocks.com/en/tutorials/appcache/beginner/
