@@ -1,0 +1,10 @@
+CACHE MANIFEST
+
+CACHE:
+
+NETWORK:
+*
+
+# this is a generic manifest that can be used where only the single main file needs to be cached
+# mimeType text/cache-manifest is no longer needed (ymmv) according to
+# http://www.html5rocks.com/en/tutorials/appcache/beginner/
