@@ -1,6 +1,8 @@
 /*
+rem 9/21/2015 JChoy v0.2.128 cutoff on oldest existing file
 rem 8/27/2015 JChoy v0.2.127 link to next day
 rem 7/28/2015 JChoy catalog new log files in folder and prep for quick viewing
+
 set folder=C:\abc\logs
 for /f "tokens=1,2 delims==" %%A in (%~n0.config) do if not (%%A)==() set %%A=%%B
 
@@ -15,7 +17,8 @@ for /f %%A in ('dir /b %folder%\*') do (
 for /f %%A in (%~n0_new.txt) do (
 	type %folder%\%%A.00 | cscript //nologo //E:JScript %0 %%A /parse >> %~n0.txt
 )
-sort %~n0.txt | cscript //nologo //E:JScript %0 %folder% /saad > %~n0%timestmp%.html
+for /f %%A in ('dir /b /o:-n %folder%\*') do set oldest=%%~nA
+sort %~n0.txt | cscript //nologo //E:JScript %0 %folder% /saad %oldest% > %~n0%timestmp%.html
 pause
 exit(0)
 */
@@ -240,8 +243,12 @@ if (WScript.Arguments.length>1) {
 }
 if (WScript.Arguments(1)=="/saad"){
 	WScript.echo( "<body><div>" );
-	while (!WScript.StdIn.AtEndOfStream) 
-		WScript.echo( WScript.StdIn.ReadLine() );
+	var cutoff = WScript.Arguments(2);
+	while (!WScript.StdIn.AtEndOfStream) {
+		var sline = WScript.StdIn.ReadLine();
+		if (sline.split("|")[2] >= cutoff)
+			WScript.echo( sline );
+	}
 	WScript.echo( "</div></body>" );
 	var cnCsv="SaadMozDiv,SaadMozDiv1"
 	var startCmd= "new SaadMozDiv1('$hpath').start()";
