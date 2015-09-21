@@ -1,4 +1,5 @@
 <title>Comparing Lists</title>
+<div style="display:none">
 <form name=form1>
 Compare 2 lists
 <table>
@@ -21,15 +22,15 @@ List B<br>
 19</textarea>
 </td>
 </tr>
-<table>
+</table>
 
 <br><input type=button value="Find Matches">
 <input type=button value="Find Diffs">
 <input type=button value="Dedup">
-</span>
 </form>
+</div>
 
-<hr>
+<div>
 <table>
 <tr>
 <td>
@@ -48,9 +49,36 @@ Results<br>
 <textarea rows=10 name=ta2>
 </textarea></td>
 </tr>
-<table>
+</table>
 <input type=button value="Add List">
 
+</form>
+</div>
+
+<hr>
+<table>
+<tr>
+<td>
+<form name=form3>
+Extract column<br>
+Next List<br>
+<textarea rows=10 name=ta1>John|33|CA|94404
+Bob|51|NY|01229
+Ann|37|NV|80918
+Vicki|29|DC|10023</textarea>
+</td>
+<td>
+<select name=sel1></select>
+</td>
+<td>
+Results<br>
+<textarea rows=10 name=ta2>
+</textarea></td>
+</tr>
+</table>
+<input type=button value="Extract">
+<input type=button value="Extract multi-columns">
+<input type=button value="Reorder to first column">
 </span>
 </form>
 
@@ -84,6 +112,7 @@ Results<br>
 </form>
 
 <script>
+//9-21-15 JChoy v0.1.131 - extract multi-columns; .write(s, sib);
 //8-24-15 JChoy v0.1.114 - add feature to compare multiple lists
 //8-21-15 JChoy listcomp.html - compare 2 list of values to yield either matches or difs
 //-----
@@ -164,16 +193,16 @@ function PageApp(fm){
 	var pa= new PageApp();
 	pa.write( [this.value,"between", ares[2][0],"items and",ares[2][1],
 		"items. Results have",ares[2][2],
-		"items and ",ares[2][3],"items"].join(" ") );
+		"items and ",ares[2][3],"items"].join(" "), this );
 	this.form.ta1.value = ares[0];
 	this.form.ta2.value = ares[1];
   }
-  this.write= function(s){
-	var $d= document;
-	$d.body.appendChild($d.createElement("div")).innerHTML=s;
+  this.write= function(s, sibling){
+	var par = (sibling)? (sibling.parentNode) : (document.body);
+	par.appendChild( document.createElement("div")).innerHTML=s;
   }
 }
-new PageApp(document.form1).start();
+//new PageApp(document.form1).start();
 
 //-----
 function PageApp2(fm){
@@ -207,9 +236,9 @@ function PageApp2(fm){
 		"having",countCommon,
 		"items in common with previous list. ",
 		"Cummulative list now has",help.aCombined.length,
-		"items."].join(" ") );
+		"items."].join(" "), this );
 	this.form.ta1.value = "";
-	this.form.ta2.value = help.aCombined.join("\n");
+	this.form.ta2.value = help.aCombined.join("\n").replace(/,/g,"|");
 	help.nextMarker();
   }
   this.nextMarker= function(){
@@ -234,15 +263,17 @@ function PageApp3(fm){
 		for (var i=0,at=row.split("|"); i<at.length; i++)
 			this.form.sel1.options[i] = new Option("Column "+(1+i));
 	}
-	var isReorder = (this.value=="Reorder");
-		var res= [], k=this.form.sel1.selectedIndex;
-		var au = this.form.ta1.value.split("\n");
+	var isReorder = (this.value=="Reorder to first column");
+	var isMulti = (this.value=="Extract multi-columns");
+	var res= [], k=this.form.sel1.selectedIndex;
+	var au = this.form.ta1.value.split("\n");
 		for (var i=0; i<au.length; i++){
 			var at= au[i].split("|");
 			res[i]= (k<at.length)? at[k] : "";
 			if (isReorder) res[i]+="|"+au[i];
+			if (isMulti) res[i]= (k<at.length)? at.splice(0,k+1).join("|") : au[i];
 		}
-		this.form.ta2.value = res.join("\n");
+	this.form.ta2.value = res.join("\n");
   }
   this.nextMarker= function(){
 	this.marker= String.fromCharCode(this.marker.charCodeAt(0)+1);
