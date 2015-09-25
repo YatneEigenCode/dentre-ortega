@@ -82,8 +82,9 @@ Results<br>
 </span>
 </form>
 <script>
+//9-25-15 JChoy v0.1.132 - reset if input is blank
 //9-21-15 JChoy v0.1.131 - extract multi-columns; .write(s, sib);
-//8-24-15 JChoy v0.1.114 - add feature to compare multiple lists
+//...
 //8-21-15 JChoy listcomp.html - compare 2 list of values to yield either matches or difs
 //-----
 function DataPress(){
@@ -147,6 +148,7 @@ function PageApp(fm){
   this.form= fm;
   this.start= function(){
 	this.heatButtons();
+	this.form = null;	//break circular object ref
   }
   this.heatButtons= function(){
 	for (var i=0; i<this.form.elements.length; i++)
@@ -183,9 +185,11 @@ function PageApp2(fm){
   this.start= function(){
 	this.heatButtons();
 	this.form.helper = this;
-	this.form = null;
+	this.form = null;	//break circular object ref
   }
   this.handleClickFcn= function(){
+	if (this.form.ta1.value == "") 
+		return (this.form.helper= new PageApp2()).write("Reset List",this);
 	var ares= new DataPress().start( "Dedup",this.form.ta1.value, "" );
 	var pa= new PageApp();
 	var au= ares[0].split("\n");
@@ -201,7 +205,7 @@ function PageApp2(fm){
 			countCommon++;
 		}	
 	}
-	pa.write( [this.value, ares[2][0],"items reduced to ",
+	pa.write( [this.value, "-", ares[2][0],"items reduced to ",
 		ares[2][2],"unique items with marker", help.marker,
 		"having",countCommon,
 		"items in common with previous list. ",
@@ -223,11 +227,11 @@ function PageApp3(fm){
   this.constructor(fm);
   this.start= function(){
 	this.heatButtons();
-	this.form.helper = this;
-	this.form = null;
+	//this.form.helper = this;
+	this.form = null;	//break circular object ref
   }
   this.handleClickFcn= function(){
-	//var help= this.form.helper;
+	if (this.form.ta1.value == "") return this.form.sel1.options.length=0;
 	if (this.form.sel1.options.length==0) {
 		var row = this.form.ta1.value.split("\n")[0];
 		for (var i=0,at=row.split("|"); i<at.length; i++)
