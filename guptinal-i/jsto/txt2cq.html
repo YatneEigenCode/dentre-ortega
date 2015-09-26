@@ -3,8 +3,12 @@
 </form>
 
 <script>
+//9-26-15 JChoy v0.113 title, readonly, cfg
 //9-25-15 JChoy txt2cq.html v0.112 convert to cq
+//TODO: cfg in cookie
+//-----
 function PageApp(){
+  this.cfg= {host:"",rid:"ed",title:""}
   this.start= function(fm){
 	fm.ta1.onchange= this.taChgFcn;
 	fm.hlpr= this;
@@ -14,16 +18,25 @@ function PageApp(){
 	alink.innerHTML= alink.href= this.form.hlpr.txt2cq(this.value);
   }
   this.txt2cq= function(s){
-	var host= "";
-	var res= "/svc/amdisk/cq/tabulofl.htm?row0=id^^va";
+	var res= "row0=id^^va";
 	for (var i=0, at=s.split("\n"); i<at.length; i++){
-	  if (at[i].startsWith("$host=")){
-		host= at[i].substr(6);
-		res+= "&row"+(i+1)+"=ed^^";
-	  } else
-		res+= "&row"+(i+1)+"=ed^^"+escape(at[i]);
+		var va= (this.doCfg(at[i]))? "":at[i];
+		res+= "&row"+(i+1)+"="+escape(this.cfg.rid+"^^"+va);
 	}
-	return host+res;
+	if (this.cfg.title)
+		res+= "&title="+escape(this.cfg.title);
+	return this.cfg.host+"/svc/amdisk/cq/tabulofl.htm?"+res;
+  }
+  this.doCfg= function(s){
+	if (s.startsWith("$host="))
+		this.cfg.host= s.substr(6);
+	else if (s.startsWith("$rowname="))
+		this.cfg.rid= s.substr(9);
+	else if (s.startsWith("$title="))
+		this.cfg.title= s.substr(7);
+	else
+		return false;
+	return true;
   }
   this.getLink= function(ta){
 	var $d= document;
