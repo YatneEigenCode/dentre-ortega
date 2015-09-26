@@ -1,0 +1,36 @@
+<form>
+<textarea name=ta1 cols=35 rows=10></textarea>
+</form>
+
+<script>
+//9-25-15 JChoy txt2cq.html v0.112 convert to cq
+function PageApp(){
+  this.start= function(fm){
+	fm.ta1.onchange= this.taChgFcn;
+	fm.hlpr= this;
+  }
+  this.taChgFcn= function(){
+	var alink= this.form.hlpr.getLink(this);
+	alink.innerHTML= alink.href= this.form.hlpr.txt2cq(this.value);
+  }
+  this.txt2cq= function(s){
+	var host= "";
+	var res= "/svc/amdisk/cq/tabulofl.htm?row0=id^^va";
+	for (var i=0, at=s.split("\n"); i<at.length; i++){
+	  if (at[i].startsWith("$host=")){
+		host= at[i].substr(6);
+		res+= "&row"+(i+1)+"=ed^^";
+	  } else
+		res+= "&row"+(i+1)+"=ed^^"+escape(at[i]);
+	}
+	return host+res;
+  }
+  this.getLink= function(ta){
+	var $d= document;
+	if ($d.links.length>0) return $d.links[0];
+	var alink= $d.body.appendChild( $d.createElement("a") );
+	return alink;
+  }
+}
+new PageApp().start( document.forms[0] );
+</script>
