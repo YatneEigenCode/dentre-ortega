@@ -3,7 +3,7 @@
 </form>
 
 <script>
-//9-26-15 JChoy v0.113 title, readonly, cfg
+//9-26-15 JChoy v0.114 show url length
 //9-25-15 JChoy txt2cq.html v0.112 convert to cq
 //TODO: cfg in cookie
 //-----
@@ -15,7 +15,8 @@ function PageApp(){
   }
   this.taChgFcn= function(){
 	var alink= this.form.hlpr.getLink(this);
-	alink.innerHTML= alink.href= this.form.hlpr.txt2cq(this.value);
+	alink.href= this.form.hlpr.txt2cq(this.value);
+	alink.innerHTML= alink.href +" ("+alink.href.length+")";
   }
   this.txt2cq= function(s){
 	var res= "row0=id^^va";
