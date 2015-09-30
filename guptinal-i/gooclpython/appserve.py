@@ -2,7 +2,7 @@ import webapp2
 import os
 from haqabob import (Haqabob, Manifest, TextStore)
 from webappWform import (HelloWebapp2, AppWform)
-from mimerelay import (MimeText,MimeText64,MimeTextSave,MimeTextSave64)
+from mimerelay import (MimeText,MimeText64,MimeTextSave,MimeTextSave64,MimeRelay)
 
 # appserve.py 9-10-2015 v0.115 JChoy use webapp2 to serve python webapp from py imports
 # this works, but you need to run "sudo easy_install webapp2" in c9 terminal once.
@@ -17,6 +17,7 @@ app = webapp2.WSGIApplication([
     ('/mb64', MimeText64),
     ('/mbs', MimeTextSave),
     ('/mbs64', MimeTextSave64),
+    ('/mimerelay', MimeRelay),
 ], debug=True)
 
 def main():
