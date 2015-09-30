@@ -1,7 +1,7 @@
 import webapp2
 import urllib2
 import base64
-# 9-29-2015 JChoy v0.122 urllib2 works; MimeRelay64
+# 9-29-2015 JChoy v0.123 replace spaces in MimeRelay64
 # mimerelay.py 9-26-2015 JChoy relay text data with specified mimetype, store locally instead of using urllib2
 
 class MimeRelay(webapp2.RequestHandler):
@@ -27,7 +27,8 @@ class MimeRelay64(webapp2.RequestHandler):
         if self.request.get('ts') != '':
             url= 'http://rip.okdaily.com/mad/textStore.php?f=text&i=%s' % self.request.get('ts')
         response = urllib2.urlopen( url )
-        self.response.write( base64.b64decode(response.read()) )
+        s = response.read().replace(" ","+")
+        self.response.write( base64.b64decode(s) )
 
 class MimeText64(webapp2.RequestHandler):
     def get(self):
