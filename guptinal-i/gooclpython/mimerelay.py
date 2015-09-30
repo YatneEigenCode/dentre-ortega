@@ -1,7 +1,7 @@
 import webapp2
 import urllib2
 import base64
-# 9-29-2015 JChoy v0.121 urllib2 works; MimeTextSave64
+# 9-29-2015 JChoy v0.122 urllib2 works; MimeRelay64
 # mimerelay.py 9-26-2015 JChoy relay text data with specified mimetype, store locally instead of using urllib2
 
 class MimeRelay(webapp2.RequestHandler):
@@ -18,6 +18,16 @@ class MimeRelay(webapp2.RequestHandler):
             url= 'http://rip.okdaily.com/mad/textStore.php?f=text&i=%s' % self.request.get('ts')
         response = urllib2.urlopen( url )
         self.response.write(response.read())
+
+class MimeRelay64(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'image/jpeg'
+
+        url= "http://127.0.0.1:8080/mb?i=9"
+        if self.request.get('ts') != '':
+            url= 'http://rip.okdaily.com/mad/textStore.php?f=text&i=%s' % self.request.get('ts')
+        response = urllib2.urlopen( url )
+        self.response.write( base64.b64decode(response.read()) )
 
 class MimeText64(webapp2.RequestHandler):
     def get(self):
