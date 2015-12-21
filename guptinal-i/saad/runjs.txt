@@ -1,0 +1,30 @@
+To avoid triggering security popups associated with batch files, 
+you can open a terminal window (cmd) to run jscript scripts 
+using cscript command. To avoid memorizing the commands, 
+put them into a text file like this and paste them into the 
+terminal window. 
+
+cd C:\Users\jchoy01\Documents\CompleteSpend\2015\CSreplace-ExpenseManager\Migration-of-HCP-HCO\HCP\output
+cscript //NoLogo groupop.js <Names-Licenses-mini.csv >junk.txt
+
+Here are other options for the the cscript command:
+----------
+Microsoft (R) Windows Script Host Version 5.8
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Usage: CScript scriptname.extension [option...] [arguments...]
+
+Options:
+ //B         Batch mode: Suppresses script errors and prompts from displaying
+ //D         Enable Active Debugging
+ //E:engine  Use engine for executing script
+ //H:CScript Changes the default script host to CScript.exe
+ //H:WScript Changes the default script host to WScript.exe (default)
+ //I         Interactive mode (default, opposite of //B)
+ //Job:xxxx  Execute a WSF job
+ //Logo      Display logo (default)
+ //Nologo    Prevent logo display: No banner will be shown at execution time
+ //S         Save current command line options for this user
+ //T:nn      Time out in seconds:  Maximum time a script is permitted to run
+ //X         Execute script in debugger
+ //U         Use Unicode for redirected I/O from the console
