@@ -1,8 +1,50 @@
 //TODO: put 23xx.txt file in tssrc folder
 
 //////////////
+//   2315   //
+//////////////
+//JsPlgd_Ml 2315 1-20-2016 JChoy DefJsPlgd
+//from 2314 TestJsPlgd
+//TODO: dynamically load other aux js classes
+
+//-----
+function DefJsPlgd(mas){
+	this.mas = mas;
+	this.render= function(div,excep){
+		at=["Write j's code for MyJsPlgd class"];
+		at.push(" - that should implement render method.");
+		at.push(" - render method will take 1 arg");
+		at.push(" - the output html element will be supplied as arg");
+		if (excep) at.push("*****<br />"+excep.toString());
+		div.innerHTML= at.join("<br />");
+	}
+}
+function JsPlgd_Ml(){
+	if (Curly) Curly.inherit_js_class( "PreviewCsds",  this );
+	this.preview=function(){
+		try {
+		  eval( this.mas.ta.value );
+		  new MyJsPlgd(this.mas).render(this.mas.div);
+		} catch (e) {
+		  new DefJsPlgd(this.mas).render(this.mas.div,e);
+		}
+		this.mas.showESbuttons();
+	}
+	this.showESbuttons= function(){
+		this.div.appendChild(this.createEl('br'));
+		var sp= this.appendSpan(' [Edit] ');
+		this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanEdit);
+//////////////
 //   2319   //
 //////////////
+		if (! this.reqKey){
+		 sp= this.appendSpan(' [Save] ');
+		 this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanSave);
+		}
+	}
+}
+Muxlink=JsPlgd_Ml;
+
 //JPFoo 1-21-2016 JChoy JPFoo
 function JPFoo(){
   this.start= function(){
