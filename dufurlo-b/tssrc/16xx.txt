@@ -1,0 +1,348 @@
+//////////////
+//   1630   //
+//VRS
+//8-17-12 JChoy 1630 Virtual Request Service using a protocol url format
+//-----
+function VRS(){
+	this.listeners= {}
+	this.cache=new Array();
+	this.listen=function(name,stop){
+		this.getManager()._listen(name,stop);
+	}
+	this.request=function(url,caller){
+		this.url=url;
+		this.caller=caller;
+		this.getManager()._request(this);
+	}
+	this.getManager=function(){
+		if (window.vrsSingleton) return window.vrsSingleton;
+		vrsSingleton = new VRS();
+		return vrsSingleton;
+	}
+	this._listen=function(name,svcObj){
+		this.listeners[name]=svcObj;
+		this.processCache();
+	}
+	this._request=function(reqObj){
+		var svcObj=this.findSvcObj(reqObj);
+		if (svcObj) svcObj.request(reqObj)
+		else this.cache[this.cache.length]=reqObj;
+	}
+	this.findSvcObj=function(reqObj){
+		if (reqObj.url.indexOf("vrs://")==0)
+			return this.listeners[reqObj.url.substr(6).split('/')[0]];
+		return null;
+	}
+	this.processCache=function(){
+		for (var i=0, rc=this.cache; i<rc.length; i++){
+			if ((rc[i]) && (this.findSvcObj(rc[i]))) {
+				this._request(rc[i]);
+				rc[i]=null;
+			} 
+		}
+		//if (rc[0]==null) remove from array;
+	}
+	this.statusCodes = {OK:200, NOTFOUND:404}
+}
+VRS.statusCode = (new VRS()).statusCodes;
+//-----
+function SampleVRS(){
+	this.request=function(req){
+		if (!req) return; 
+		if (req.caller) req.caller.vrsResponse('sample VRS',req,VRS.statusCode.OK)
+	}
+}
+function TSurlBuilder(){
+	this.tsUrl='http://rip.okdaily.com/mad/textStore.php';
+	this.request=function(req){
+		if (req.caller) req.caller.vrsResponse(this.tsUrl,req,VRS.statusCode.OK)
+	}
+}
+new VRS().listen('sample',new SampleVRS());
+new VRS().listen('tsurl',new SampleVRS());
+
+//////////////
+//   1634   //
+//////////////
+//8-19-12 JChoy 1634 AutoSave
+
+//-----
+//The contents of dataEl are autosaved.
+function AutoSave(){
+  if (Curly) Curly.inherit_js_class( "Ajax", this );
+  this.rip= "http://rip.okdaily.com/mad/textStore.php?";
+  this.init = function( dataEl ){
+	this.dataEl = dataEl;
+	this.setId();
+	this.pollingMs = 2000;
+	this.capd = new ChangeAndPauseDetection().init('',5000);
+	return this;
+  }
+  this.automate= function( frogData ){
+	this.frogData = frogData;
+	this.capd.init( this.dataEl.value+'' );
+	clearTimeout( this.timeout );
+	this.timeout = setTimeout( this.progId+'.performSave()', this.pollingMs );
+	this.writeStatus( 'Unchanged' );
+  }
+  this.writeStatus = function( sb ){
+	var s= this.frogData[0]+': '+sb;
+	this.dataEl.autoSaveStatus=s;
+	new VRS().request('vrs://status/?'+s,this);
+  }
+  this.write = function( s ){	this.writeStatus( 'Saved' );  }
+  this.performSave = function( ){
+	if (! this.capd.check(this.dataEl.value)) {
+		if (this.capd.isAnythingChanged) this.writeStatus( 'Unsaved' );
+		this.timeout = setTimeout( this.progId+'.performSave()', this.pollingMs );
+		return;
+	}
+	this.capd.init(this.dataEl.value);
+	var url=this.rip+"f=set&i=" +this.frogData[1] +"&data=" +escape(this.dataEl.value);
+	this.webPost( url, null, 'POST' );
+	this.writeStatus( 'Attempting save');
+	this.timeout = setTimeout( this.progId+'.performSave()', this.pollingMs );
+  }
+}
+
+//-----
+// Detect when user has made change and paused for x seconds
+function ChangeAndPauseDetection(){
+	this.init= function(s,lag){
+		this.mem=s;
+		if (lag) this.lagMs=lag;
+		this.isAnythingChanged = false;
+		this.timeOfLastChange = null;
+		return this;
+	}
+	this.check= function(s){
+		var isAnotherChange = (s != this.mem);
+		if (isAnotherChange) {
+			this.isAnythingChanged = true;
+			this.timeOfLastChange = new Date();
+			this.mem = s;
+		} else if (this.isAnythingChanged) {
+			return (this.lagMs<(new Date()).valueOf()-this.timeOfLastChange.valueOf());
+		}
+		return false;
+	}
+}
+
+
+//////////////
+//   1650   //
+//////////////
+//8-20-12 JChoy TS1650 TextVE, ViewRO, Admin, Status, EditRW, 
+//8-21-12 JChoy fix Admin.prepScan to include reqObj
+//8-23-12 JChoy Autolinkline cqr://
+CCTPayloadManagerBase
+
+//-----
+function TextVE(){
+	if (Curly) Curly.inherit_js_class( "Ajax",  this );
+	this.init=function(div,frogData){
+		this.div=div;
+		this.div.style.display="none";
+		this.mold( this.div.style, {overflow:'auto',width:'95%',height:'300', backgroundColor:'#FEFEF0'} );
+		this.frogData=frogData;
+		this.tsUrl= 'http://rip.okdaily.com/mad/textStore.php?f=text&i=';
+		return this;
+	}
+	this.start=function(){
+		this.webGet( this.tsUrl+this.frogData[1] );
+	}
+	this.convertToRW=function(){
+		this.div.innerHTML='';
+		this.ta=this.div.appendChild( this.createEl('textarea') );
+		this.ta.cols = 3*(this.ta.rows=15);
+		this.ta.value= this.payloadData;
+		this.autoSaver = (new AutoSave()).init(this.ta);
+		this.autoSaver.automate(this.frogData);
+	}
+	this.spanButton=function(span,overColor,outColor,clickFcn){
+		span.onmouseover = new Function("this.style.backgroundColor='"+overColor+"'");
+		span.onmouseout = new Function("this.style.backgroundColor='transparent'");
+		span.onclick=clickFcn;
+	}
+}
+//-----
+function AutoLinkLine(){
+	this.getHTML=function(sl){
+	  var proto=sl.split('://')[0];
+	  if (this['do_'+proto]) return this['do_'+proto](sl);
+	  return '';
+	}
+	this.do_cqr=function(sl){
+	  var at=sl.split('/');
+	  if ((at.length<4) || (at[0]!='cqr:')) return '';
+	  var key= '&'+at[2]+'=';
+	  var res= (location+'').replace(key,key+at[3]+'&_old=');
+	  return ' '+'[http://>]'.link(res);
+	}
+	this.do_http=function(sl){
+	  var suf= sl.substr(sl.length-4).toUpperCase()+'/';
+	  if (('.JPG/.PNG/.GIF/.JPEG/').indexOf(suf)>=0)
+		new VRS().request('vrs://img/?src='+escape(sl));
+	  return ' '+'[http://>]'.link(sl);
+	}
+}
+//-----
+function ViewRO(){
+	if (Curly) Curly.inherit_js_class( "TextVE",  this );
+	this.write=function(s){
+		this.payloadData= unescape(s);
+		var at= unescape(s).split('\n');
+		for (var i=0,al=new AutoLinkLine(); i<at.length; i++){
+//		  if (at[i].indexOf('xxhttp://')==0)
+//		    at[i]+=' '+'[http://>]'.link(at[i]);
+		  at[i]+= al.getHTML(at[i]);
+		}
+		this.div.innerHTML = at.join('<br />');
+		if (this.frogData[2])
+		  new VRS().request('vrs://admin/?prompt='+escape(this.frogData[0]),this);
+	}
+	this.vrsResponse=function(s){
+		if (this.frogData[2]==s){
+			this.convertToRW();
+			new VRS().request('vrs://status/?rw-enabled-'+escape(this.frogData[0]),this);
+			return;
+		}
+		new VRS().request('vrs://status/?incorrect-key-recd-for-'+escape(this.frogData[0]),this);
+	}
+}
+//-----
+function Admin(){
+	if (Curly) Curly.inherit_js_class( "TextVE",  this );
+	this.write=function(s){
+		new VRS().listen('admin',this);
+	}
+	this.request=function(reqObj){
+		var span=this.div.appendChild(this.createEl('span',{reqObj:reqObj}));
+		this.prepSpan(span,this.div.appendChild(this.createEl('input')));
+		this.div.appendChild(this.createEl('br'));
+	}
+	this.prepSpan=function(span,input){
+		span.input=input;
+		var vp=this.cgi('prompt','Untitled',span.reqObj.url);
+		span.innerHTML= unescape(vp)+' ';
+		this.spanButton(span,'#DDDDDD','#FFFFFF',this.spanClkFcn);
+	}
+	this.spanClkFcn=function(){
+		this.reqObj.caller.vrsResponse( this.input.value, this.reqObj,VRS.statusCode.OK);
+		this.input.value='';
+	}
+}
+//-----
+function Status(){
+	if (Curly) Curly.inherit_js_class( "TextVE",  this );
+	this.start=function(){
+		new VRS().listen('status',this)
+	}
+	this.request=function(req){
+		this.div.innerHTML+= unescape(req.url.split('?')[1])+'<br />';
+	}
+}
+//-----
+function EditRW(){
+	if (Curly) Curly.inherit_js_class( "TextVE",  this );
+	this.write=function(s){
+		this.payloadData= unescape(s);
+		this.convertToRW();
+	}
+}
+//-----
+function CCTPayloadManagerBase(){
+	this.init=function(div,frogData){
+		this.frogData=frogData;
+		var res, clsName=frogData[4];
+		if (window[clsName])
+			res=new window[clsName]().init(div,frogData);
+		else
+			res=new ViewRO().init(div,frogData);
+		res.start();
+		if (frogData[3]=='y') (new VRS()).request('vrs://title/?',res);
+		return res;
+	}
+}
+
+//////////////
+//   1655   //
+//////////////
+//8-20-12 JChoy TS1655 adapted to CSDS
+//8-21-12 JChoy subscription, addcmt, saveToSvr, title
+//8-23-12 JChoy ldd, runtsc-csds link in create
+//8-29-12 JChoy wtw
+function PageApp(){
+  this.version= '0.22';
+  this.lddVersion= 'csds-114';
+  if (Curly) Curly.inherit_js_class( "Ajax",  this );
+  if (Curly) Curly.inherit_js_class( "CqTabDobPubSubCSDS",  this );
+  this.subscribers=[];
+  this.start = function(s){
+	this.titleDiv=document.body.appendChild(this.createEl('div',{align:'center'}));
+	var clientDiv=document.body.appendChild(this.createEl('div',{cfgn:'1647'}));
+	//prod=1647 dev=1730
+	(this.cct= new CqCfgTab().init(clientDiv)).start();
+	var clientDiv=document.body.appendChild(this.createEl('div',{cfgn:'1631'}));
+	this.mold(clientDiv.style, {height:'180', overflow:'auto'});
+	new CqCfgTab().init(clientDiv).start();
+
+	var nn=this.cgi('nn','1682',location);
+	this.startCqPubSub( this.tsNum=nn );
+  }
+  this.setTitle= function(at){
+	this.titleDiv.innerHTML= document.title= at[1];
+  }
+}
+//-----
+//Gets csds data from server and handles requests on that data including subscriptions.
+//Don't know why this doesn't work as a child object, only works as a superclass
+function CqTabDobPubSubCSDS(){
+	this.startCqPubSub=function(){
+		new CqTabDob().init(this.tsNum).getFromTS(this.tsNum,this);
+	}
+  this.notify= function(cqdob){
+	this.cqdob= cqdob;
+	new VRS().listen('csds',this);
+	if (this.setTitle) this.setTitle(this.cqdob.lookUp('title'));
+  }
+  this.request=function(reqObj){
+	var f= this.cgi('f','',reqObj.url);
+	if (this['request_'+f]) this['request_'+f](reqObj);
+	if ('body/cmt/key/wtw/'.match(f+'/'))
+	  this.subscribers[this.subscribers.length]=[f,reqObj];
+	this.publishToSubscribers();
+  }
+  this.publishToSubscribers=function(){
+	var res={cmt:[]}, ok=VRS.statusCode.OK;
+	res.body=this.cqdob.lookUp('body0')[1];
+	res.key=this.cqdob.lookUp('key')[1];
+	res.wtw=this.cqdob.lookUp('wtw')[1];
+	for (var i=0,at=this.cqdob.data; i<at.length; i++)
+		if (at[i][0]=='com') res.cmt[res.cmt.length]=at[i];
+
+	for (var i=0, at=this.subscribers; i<at.length; i++)
+	  if(res[at[i][0]])
+	    at[i][1].caller.vrsResponse(res[at[i][0]],at[i][1],ok);
+  }
+  this.request_setcmt=function(reqObj){
+	this.saveToSvr(this.cqdob.data[this.cqdob.data.length]=['com',''], reqObj);
+  }
+  this.request_refresh=function(reqObj){ this.startCqPubSub();  }
+  this.request_setbody=function(reqObj){
+	this.saveToSvr(this.cqdob.lookUp('body0'), reqObj);
+  }
+  this.saveToSvr=function(at, reqObj){
+	at[1]= unescape(this.cgi('data','',reqObj.url));
+	var _c=this.cqdob, eu= escape(this.cqdob.a2cq()+'&title=CSDS');
+	this.webPost(_c.tsUrl +'?f=set&i=' +_c.num +'&data=' +eu);
+  }
+  this.write=function(s){
+	new VRS().request('vrs://status/?saved');
+  }
+}
+//-----
+function CCTPayloadManager(){
+	if (Curly) Curly.inherit_js_class( "CCTPayloadManagerBase",  this );
+}
+
