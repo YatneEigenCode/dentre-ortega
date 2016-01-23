@@ -1,0 +1,317 @@
+//////////////
+//   1704   //
+//////////////
+//8-23-12 JChoy PreviewCsds
+//8-28-12 JChoy refresh
+//8-29-12 JChoy encPW
+//9-1-12  JChoy call enc
+//-----
+function ViewCsdsBody(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.start=function(){
+		new VRS().request('vrs://csds/b/?f=body',this);
+	}
+	this.vrsResponse= function(data,req,status){
+		if (req.url.indexOf('//csds/')<0) return;
+		this.write(data);
+		this.div.appendChild(this.createEl('hr'));
+		var sp=this.div.appendChild(this.createEl('span',{innerHTML:'[refresh]'}));
+		this.spanButton(sp,'#DDDDDD','',this.refreshClick);
+	}
+	this.refreshClick= function(){
+		new VRS().request('vrs://csds/r/?f=refresh',null);
+	}
+}
+//-----
+function AddCsdsComment(){
+	if (Curly) Curly.inherit_js_class( "PreviewCsds",  this );
+	this.tym= 'Thank you. Comments are subject to moderation.'
+	this.start=function(){this.reEdit();}
+	this.spanSave=function(){
+		var ev=escape(this.mas.payloadData);
+		if (ev)
+		  new VRS().request('vrs://csds/?f=setcmt&data='+ev,null);
+		this.mas.div.innerHTML= this.mas.tym;
+	}
+}
+//-----
+function ListCsdsComments(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.start=function(){
+		new VRS().request('vrs://csds/?f=cmt',this);
+	}
+	this.vrsResponse= function(ad,req,status){
+		if (req.url.indexOf('//csds/')<0) return;
+		for (var i=0,x=this.div.innerHTML=''; i<ad.length; i++){
+			var div=this.div.appendChild(this.createEl('div',{innerHTML:ad[i][1]}));
+			div.style.borderBottom='thin solid #EEEEEE';
+		}
+	}
+}
+//-----
+//One way encryption for passwords
+function EncPW(){
+	this.init= function(seed){
+		this.version="0.13";
+		this.prepMap(this.seed=seed);
+		return this;
+	}
+	this.enc=function(s){
+		var sl=this.seed+s, res=[];
+		for (var i=0; i<sl.length; i++) {
+			res[res.length] = sl.charCodeAt(i) >> 4;
+			res[res.length] = sl.charCodeAt(i) % 16;
+		}
+		for (var i=0; i<res.length-1; i++)
+			res[i]= this.maps[(i+res[i+1]) % 5][res[i]];
+		return res.join('');
+	}
+	this.prepMap= function(st){
+		var nst= (st)? (isNaN(st)? st.length : parseInt(st)) : 0;
+		var seed='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		this.maps=[0,10,20,36,46];
+		for (var i=0,nst=nst % 9,at=this.maps,seed=seed.toLowerCase()+seed; i<at.length; i++)
+		  this.maps[i]=seed.substr(this.maps[i]+nst,16).split('');
+	}
+}
+EncPW.initCsds=function(){ return new EncPW().init('1704'); }
+//-----
+function PreviewCsds(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.payloadData='';
+	this.start=function(){
+		new VRS().request('vrs://csds/b/?f=body',this);
+		new VRS().request('vrs://csds/k/?f=key',this);
+		new VRS().request('vrs://admin/k/?prompt=RW%20key',this);
+		this.encPw = EncPW.initCsds();
+	}
+	this.vrsResponse= function(s,req,status){
+		if (req.url.indexOf('//csds/b/')>0)
+			this.reEdit(this.payloadData=s);
+		var mg='';
+		if ((req.url.indexOf('//csds/k/')>0) && (!this.isUnlocked)){
+		  this.reqKey=s;
+		  mg='readonly';
+		}
+		if (req.url.indexOf('//admin/k/')>0){
+		  if (s==this.reqKey) this.reqKey='';
+		  if (this.encPw.enc(s)==this.reqKey) this.reqKey='';
+		  mg=(this.reqKey)? 'denied':'rw-allowed';
+		  this.isUnlocked= true;
+		}
+		if (mg) new VRS().request('vrs://status/?'+mg);
+	}
+	this.appendSpan=function(s){
+		return this.div.appendChild(this.createEl('span',{innerHTML:s,mas:this}));
+	}
+	this.reEdit=function(){
+		this.convertToRW();
+		this.autoSaver.performSave=function(){};
+		this.div.appendChild(this.createEl('br'));
+		var sp= this.appendSpan('Preview');
+		this.spanButton(sp,'#DDDDDD','#FFFFFF',this.preview);
+	}
+	this.preview=function(){
+		var _m=this.mas;
+		_m.write(_m.ta.value);
+		_m.div.appendChild(_m.createEl('br'));
+		var sp= _m.appendSpan(' [Edit] ');
+		_m.spanButton(sp,'#DDDDDD','#FFFFFF',_m.spanEdit);
+		if (! _m.reqKey){
+		 sp= _m.appendSpan(' [Save] ');
+		 _m.spanButton(sp,'#DDDDDD','#FFFFFF',_m.spanSave);
+		}
+	}
+	this.spanSave=function(){
+		var ev=escape(this.mas.payloadData);
+		new VRS().request('vrs://csds/?f=setbody&data='+ev,null);
+	}
+	this.spanEdit=function(){
+		this.mas.reEdit();
+	}
+}
+
+
+//////////////
+//   1712   //
+//////////////
+//8-27-12 JChoy TS1712 ImageShow
+//8-30-12 JChoy wtw in SingleWizard ldd^^csds-114
+//9-03-12 JChoy shared wall option
+//9-5-12  JChoy workaround for IE
+//-----
+function ImageShow(){
+	if (Curly) Curly.inherit_js_class( "TextVE",  this );
+	this.imgList= [];
+	this.kwikList= [];
+	this.curIndex= 0;
+	this.start=function(){
+		var sp, mPan= this.div.appendChild(this.createEl('div',{align:'center'}));
+		sp=mPan.appendChild(this.createEl('span',{mas:this,innerHTML:'<=~ '}));
+		this.spanButton(sp,'#DDDDDD','',this.nextPic);
+		this.disp=mPan.appendChild(this.createEl('span',{innerHTML:'0/0'}));
+		sp=mPan.appendChild(this.createEl('span',
+			{mas:this,innerHTML:' ~=>',intn:55}));
+		this.spanButton(sp,'#DDDDDD','',this.nextPic);
+		new VRS().listen('img',this);
+	}
+	this.nextPic= function(){
+		var _m=this.mas, nz=this.mas.imgList.length;
+		if (nz<2) return;
+		var ni= _m.curIndex+ ((this.intn==55)? 1 : -1);
+		if (ni < 0)  ni= 0;
+		if (ni>=nz) ni=nz-1;
+		_m.disp.innerHTML = (ni+1)+'/'+nz;
+		_m.imgSpot.src= _m.imgList[_m.curIndex=ni];
+	}
+	this.request= function(reqObj){
+		this.kwikList[this.kwikList.length]= unescape(this.cgi('src','',reqObj.url));
+		var _g= this.imgList;
+		var s=  this.kwikList[this.kwikList.length-1];
+		for (var i=0; i<_g.length; i++) if (_g[i]==s) return;
+		_g[_g.length]=s;
+		if (!this.imgSpot) this.prepImgSpot();
+		if (_g.length==1) this.imgSpot.src=s; 
+		this.disp.innerHTML = (this.curIndex+1)+'/'+_g.length;
+	}
+	this.prepImgSpot= function(){
+		this.imgSpot= this.div.appendChild(this.createEl('img'));
+		this.imgSpot.style.width='98%';
+		this.imgSpot.zoom=1;
+		this.imgSpot.zoomWidths= ['','98%'];
+		this.imgSpot.onclick= function(){
+			if (++this.zoom>=this.zoomWidths.length) this.zoom=0;
+			this.style.width= this.zoomWidths[this.zoom];
+		}
+	}
+}
+//-----
+function SingleWizard(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.wtw='1723';
+	this.start=function(){
+		var sp= this.appendEl('span',{innerHTML:'title '});
+		this.inpt= this.appendEl('input',{value:'Blog C'});
+		sp= this.appendEl('span',{innerHTML:'<br>password for editing (optional) '});
+		this.inpp= this.appendEl('input');
+		sp= this.appendEl('span',{innerHTML:'<br> [create] ',mas:this});
+		this.spanButton(sp,'#EEEEEE','#FFFFFF',this.create);
+		sp= this.appendEl('span',{innerHTML:' [create with shared wall] ',mas:this});
+		this.spanButton(sp,'#EEEEEE','#FFFFFF',this.writeASpan);
+		new CqTabDob().init('1666').getFromTS('',this);
+		new VRS().request('vrs://csds/w/?f=wtw',this);
+	}
+	this.vrsResponse=function(s,req,stat){
+		if (req.url.indexOf('vrs://csds/w/')==0) this.wtw=s;
+	}
+	this.notify= function(cqdob){this.cqdob= cqdob;}
+	this.appendEl= function(tag,m){
+		return this.div.appendChild(this.createEl(tag,m));
+	}
+	this.create= function(){
+		var _m=this.mas, cfg={t:_m.inpt.value,k:_m.inpp.value};
+		_m.write= _m.writeA;
+		var url= 'tabulofl.htm?title=wtw-data&row0=id^^value';
+		_m.webGet(new CqTabDob().tsUrl +'?f=set&data='+escape(url));
+	}
+	this.writeASpan= function(){ this.mas.writeA('') }
+	this.writeA= function(s){
+		var _m=this, cfg={t:_m.inpt.value,k:_m.inpp.value}, wtw=_m.wtw;
+		if (s) wtw=this.cqdob.parseNewTSNum(s);
+		var url= 'tabulofl.htm?title=CSDS&row0=id^^value^^dt'
+			+'&row1=title^^'+cfg.t+'&row2=body0^^this is '+cfg.t
+			+'&row3=key^^' +EncPW.initCsds().enc(cfg.k)+'&row4=ldd^^csds-114'
+			+'&row5=max^^25&row6=com^^Welcome '+new Date()
+			+'&row7=wtw^^'+wtw;
+		this.write= this.writeB;
+		_m.webPost(new CqTabDob().tsUrl +'?f=set&data='+escape(url));
+	}
+	this.writeC=this.write;
+	this.writeB= function(s){
+		var _c=this.cqdob, num=this.cqdob.parseNewTSNum(s);
+		var eml= _c.lookUp('cr3')[1].replace('{0}',this.inpp.value);
+		eml= eml.replace('{1}',num).replace('{2}',this.inpt.value);
+		this.writeC( [_c.lookUp('cr1')[1], _c.lookUp('cr2')[1],
+			(location+'').split('&nn=')[0]+'&nn='+num, eml.link(eml)].join('\n') );
+	}
+}
+
+
+//////////////
+//   1729   //
+//////////////
+//8-29-12 JChoy waterwall
+//8-30-12 JChoy wtwLimit
+//9-3-12  JChoy inputWait
+//-----
+//WaterWall (ImageShow while testing)
+//todo: switching track, maxlength, limit list to 100
+function WaterWall(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.wtwLimit=100;
+	this.start=function(){
+		this.write('');
+		new VRS().request('vrs://csds/w/?f=wtw',this);
+		this.tsNum=this.cgi('nn','1682',location);
+		this.setId();
+		setInterval(this.progId+".tickle()",5000);
+	}
+	this.vrsResponse=function(s,req,stat){
+		this.tickle(this.wtw=s);
+		if (!this.inp) {
+		  this.inp=this.div.appendChild(this.createEl('input'));
+		  this.prepCmd( this.div.appendChild(this.createEl('span')) );
+		  this.innerDiv=this.div.appendChild(this.createEl('div'));
+		  this.inputWait(true);
+		}
+	}
+	this.inputWait=function(isWait){
+		this.inp.disabled=isWait;
+		if (isWait) this.inp.value= 'please wait...';
+		else if (this.inp.value=='please wait...') this.inp.value='';
+	}
+	this.tickle=function(){
+		if (this.div.style.display != "none")
+		new CqTabDob().init(this.wtw).getFromTS(this.wtw,this);
+	}
+	this.nicePost= function(dv,ac){
+		this.innerDiv.insertBefore( dv, this.innerDiv.children[0] );
+		var ltr= String.fromCharCode(65+parseInt(ac[0])%25);
+		ltr+= String.fromCharCode(65+parseInt(ac[0].split('').reverse().join(''))%26);
+		ltr= ltr.link( 'http://s.okdaily.com?csds,'+ac[0] );
+		if (ac[0]==this.tsNum) ltr="here"
+		dv.innerHTML= ltr+": "+ ac[1];
+		dv.style.borderBottom='thin dashed #DDDDDD';
+	}
+	this.notify= function(cqdob){
+		this.inputWait(false);
+		this.cqdob= cqdob;
+		var ia=0, at=this.cqdob.data;
+		if (this.lastItem) {
+			for (var i=0, zz=this.lastItem; i<at.length; i++)
+				if ((at[i][0]==zz[0]) && (at[i][1]==zz[1])) ia=i+1;
+		} else
+			this.innerDiv.appendChild(this.createEl('div'));
+
+		for (var i=ia; i<at.length; i++)
+			if (!isNaN(at[i][0])) 
+				this.nicePost(this.createEl('div'), this.lastItem=at[i]);
+	}
+	this.prepCmd= function(sp){
+		sp.innerHTML= ' [post] ';
+		sp.mas= this;
+		this.inp.size= 55;
+		this.inp.maxLength= '140';
+		this.spanButton(sp,'#DDDDDD','',this.postToWtw);
+	}
+	this.write=function(){}
+	this.postToWtw= function(){
+		var _m=this.mas, _b=this.mas.cqdob;
+		if (_b.data.length>_m.wtwLimit) _b.data.splice(0,_b.data.length-_m.wtwLimit);
+		_b.data[_b.data.length] = [_m.tsNum,_m.inp.value];
+		var eu= escape(_b.a2cq()+'&title=WTW-data');
+		_m.webPost(_b.tsUrl +'?f=set&i=' +_b.num +'&data=' +eu);
+		_m.inputWait(true);
+	}
+}
+
