@@ -1,0 +1,60 @@
+<HTA:APPLICATION border="thin" borderStyle="normal" caption="yes" icon="favicon.ico" 
+id="oHTA"
+maximizeButton="yes" minimizeButton="yes" showInTaskbar="no" windowState="normal"innerBorder="yes"
+navigable="yes" scroll="no" scrollFlat="yes" /> 
+<title>Generic HTA*</title>
+<html>
+<body style="background-color:whitesmoke">
+<form name=appForm>
+<br>Input file <input name=filename value="" size=45 maxlength=90>
+<input type=button name=recent_filename value="foo" onclick=pageApp.doButton(this)>
+</form>
+<div id=result style="overflow:scroll;height:280;background-color:lightyellow;font-family:courier"></div>
+<br><input type=button value="Open output folder" onclick=window.open('output')>
+</body>
+</html>
+
+<script>
+function PageApp(frm){
+    this.frm= frm;
+    this.doButton= function(btn){
+      alert(btn.value);
+    }
+}
+//-----
+function MSFeatures(){
+	//---- methods that rely on MS Windows ActiveX objects
+	this.fso= new ActiveXObject("Scripting.FileSystemObject");
+	this.wsh= new ActiveXObject("Wscript.Shell");
+	this.htaFolder= function(s){	//prepends folder path of hta file
+		return location.pathname+"/../"+s;
+	}
+	this.getFiles=function(folderPath){
+	 var res= new Array(), files= this.fso.GetFolder(folderPath).Files;
+	 for(var objEnum = new Enumerator(files); !objEnum.atEnd(); objEnum.moveNext())
+	  res[res.length]= this.fso.GetFile(objEnum.item());
+	 return res;
+	}
+	this.getFileNames=function(aFiles){
+	 var res= new Array();
+	 for (var i=0; i<aFiles.length; i++)
+	  res[i]= aFiles[i].Name;
+	 return res;
+	}
+	this.getFileProps=function(aFiles, aPropNames){
+	 var res= new Array();
+	 for (var i=0; i<aFiles.length; i++)
+	  for (var j=0,x=res[i]=new Array(); j<aPropNames.length; j++)
+	   x[x.length]= aFiles[i][aPropNames[j]];
+	 return res;
+	}
+	this.filterFiles=function(aFiles, fcn){
+	 var res=new Array();
+	 for (var i=0; i<aFiles.length; i++)
+	  if (fcn(aFiles[i])) res[res.length]=aFiles[i];
+	 return res;
+	}
+}
+
+pageApp = new PageApp(document forms[0]);
+</script>
