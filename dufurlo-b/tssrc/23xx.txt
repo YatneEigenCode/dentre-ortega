@@ -1,4 +1,98 @@
-//TODO: put 23xx.txt file in tssrc folder
+//////////////
+//   2312   //
+//////////////
+//AutoTsRead 2312 1-20-2016 JChoy convert 2287 from html/js to a standalone js
+//point to this using addJS param on curly page
+
+//-----
+function AutoTsRead(){
+		this.do_tsread=function(sl){
+		    var at=sl.split('/');
+		    if ((at.length<4) || (at[0]!='tsread:')) return '';
+		    var key= '&'+at[2]+'=';
+		    var res= (location+'').replace('/tsm.php?f=html&i=',
+			'/textStore.php?f=text&i='+at[3]+'&_ref=');
+		    return ' '+'[http://>]'.link(res);
+		}
+}
+//-----
+function ClassMod(){
+	this.swap= function( old, repl ){
+		var oldBase = (old + "_base_" + Math.random()).replace(".", "_");
+		window[oldBase] = window[old];
+		window[old]= function(a, b, c){
+		  Curly.inherit_js_class( oldBase, this );
+		  Curly.inherit_js_class( repl, this );
+		}
+	}
+}
+//-----
+function Muxlink(){
+	if (Curly) Curly.inherit_js_class( "PreviewCsds",  this );
+	this.start=function(){
+		new VRS().request('vrs://csds/b/?f=body',this);
+		this.reqKey = "always-locked";
+
+		new ClassMod().swap( "AutoLinkLine", "AutoTsRead" );
+	}
+
+}
+
+
+//////////////
+//   2314   //
+//////////////
+//JsPlgd_Ml 2314 1-20-2016 JChoy showESbuttons
+//from 2312 AutoTsRead
+//TODO: dynamically load other aux js classes
+
+//-----
+function TextSpinner(div){
+	this.seq= ['_____','_\\___','__|__','___/_','_____'];
+	this.cfg= [div, 0, 0];
+	this.start= function(rem){
+		this.cfg[2] = rem;
+		this.cfg[0].isGoOn = true;
+		this.intv=setInterval( new OOCallback(this,"tick").fcn, 250 );
+	}
+	this.tick= function(){
+		var cfg= this.cfg;
+		if ((--cfg[2]<0) || (!cfg[0].isGoOn)) return clearInterval(this.intv);
+		cfg[0].innerHTML = this.seq[cfg[1]++];
+		if (cfg[1]>=this.seq.length) cfg[1]=0;
+	}
+}
+function TextSpinnerTest(mas){
+	this.mas = mas;
+	this.render= function(div){
+		div.innerHTML = "You want the truth?";
+		this.dv1=div.appendChild(this.mas.createEl('div',{innerHTML:'...'}));
+		new TextSpinner(this.dv1).start(31);
+		setTimeout( new OOCallback(this, "showAnswer").fcn, 5000 );
+	}
+	this.showAnswer= function(){
+		this.dv1.isGoOn = false;
+		this.dv1.innerHTML = "You can't handle the truth";
+	}
+}
+function JsPlgd_Ml(){
+	if (Curly) Curly.inherit_js_class( "PreviewCsds",  this );
+	this.preview=function(){
+		new TextSpinnerTest(this.mas).render(this.mas.div);
+		this.mas.showESbuttons();
+	}
+	this.showESbuttons= function(){
+		this.div.appendChild(this.createEl('br'));
+		var sp= this.appendSpan(' [Edit] ');
+		this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanEdit);
+		if (! this.reqKey){
+		 sp= this.appendSpan(' [Save] ');
+		 this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanSave);
+		}
+	}
+}
+Muxlink=JsPlgd_Ml;
+
 
 //////////////
 //   2315   //
