@@ -1,0 +1,307 @@
+//////////////
+//   1595   //
+//////////////
+//7-24-12 JChoy Example for using constructor for inheritance
+//7-27-12 JChoy elToHtml, onReady
+//7-28-12 JChoy onReadyDiv
+//7-19-12 JChoy pReq
+//8-7-12  JChoy allow empty req
+//8-16-12 JChoy clear onReadyDiv
+//-----
+//Framework to load and wait for distributed base classes before inheriting
+function Curly(){
+  if (Curly) Curly.inherit_js_class("TMNCurly",this);
+  this.readyHooks= new Array();
+  this.onReadyDelay= 100;  //ms
+  this.init = function( initData ){ this.initData = initData; return this;}
+  this.cgi= function(k,def,qy){
+	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
+	return (at.length==1)?def:at[1].split("&")[0];
+  }
+  this.selectEl= function(idOrTag){
+    var res = document.getElementsByTagName(idOrTag);
+    return (res.length)? res[0] : document.getElementById(idOrTag);
+  }
+  this.addHook= function( reqdClsCsv, fcn ){
+    this.readyHooks[this.readyHooks.length]= {reqd:reqdClsCsv, fcn:fcn}
+  }
+  this.fireWhenReadyDelay= function(reason){
+    this.msg= reason;
+    if (this.onReadyDiv) this.onReadyDiv.innerHTML= this.msg;
+    if (!this.progId) this.setId();
+    if (this.onReadyDelay>999999) this.onReadyDelay=999999;
+    setTimeout( this.progId+".fireWhenReady()", this.onReadyDelay *=2 );
+  }
+  this.fireWhenReady= function(){
+    if (!(document.readyState==="complete")) 
+      return this.fireWhenReadyDelay();
+    if (!this.onReadyDiv)
+      this.onReadyDiv= document.body.appendChild(this.createEl('div'));
+    for (var i=0, at=this.readyHooks; i<at.length; i++){
+      for (var j=0, ac=at[i].reqd.split(','); (j<ac.length); j++)
+        if ((!window[ac[j]]) && (ac[j]))
+          return this.fireWhenReadyDelay(ac[j]+' javascript is missing.');
+      this.onReadyDiv.innerHTML= '';
+      if (at[i].fcn) at[i].fcn();
+      at[i].fcn=null;
+    }
+  }
+}
+Curly.inherit_js_class = function( clsname, derive ){
+    if (!window[clsname]) return;
+    derive.constructor = window[clsname];
+    derive.constructor();
+    derive["inheritsFrom"+clsname]= true;
+}
+Curly.addJS= function(){
+	var rip="http://rip.okdaily.com/mad/textStore.php?f=text&i=";
+	for (var i=0; i<arguments.length; i++)
+          for (var j=0,at=arguments[i].split(','); j<at.length; j++){
+	    var src= (at[j].indexOf('TS')==0)? (rip+at[j].substr(2)) : at[j];
+	    var el = (new Curly()).createEl("script", {src:src});
+	    document.getElementsByTagName('head')[0].appendChild( el );
+	  }
+}
+Curly.onReady= function( reqdClsCsv, fcn ){
+	if (!Curly._onReadyMgr) Curly._onReadyMgr= new Curly();
+	Curly._onReadyMgr.addHook( reqdClsCsv, fcn );
+	Curly._onReadyMgr.fireWhenReady(); 
+}
+Curly.bootClass= function( pAddJS, pReq ){
+  var bootApp= new Curly( );
+  Curly.addJS( pAddJS+bootApp.cgi('addJS','',location) );
+  Curly.onReady( pReq+bootApp.cgi('req','',location),   function(){ (new PageApp()).init().start(); }  );
+}
+
+//----------
+function TMNCurly(){
+  this.write= function(s){
+		if (this.writer) return this.writer.write(s);
+		document.body.appendChild( this.createEl("div",{innerHTML:s}) );
+  }
+  this.mold= function(d, s, ovr){
+	for (var m in s){ if ((!d[m]) || ovr) d[m]=s[m]; }return d;
+  }	
+  this.createEl= function(tag, mm){
+	return this.mold(document.createElement(tag), mm);
+  }
+  this.elToHtml= function(el){
+	return this.createEl('div').appendChild(el).innerHTML;
+  }
+  this.getAttr= function(nm, def, obj){
+	return (obj && obj.attributes && obj.attributes[nm])
+		? obj.attributes[nm].value : def;
+  }
+  this.setId= function(){
+	for (var i=0,nm=""; true; i++) if (!window[nm="inst_"+i]) 
+		return [this.progId=nm,window[nm]=this][0];
+  }
+  this.anfuge= function(nm){ return new Function("e", 
+		((this.progId)?this.progId:this.setId())+"."+nm+"(e)");
+  }
+}
+
+//////////////
+//   1597   //
+//////////////
+//8-13-12 JChoy 1597 webPost
+function Ajax() {
+	if (Curly) Curly.inherit_js_class( "Curly", this );
+	this.newHttpRequest= function(){
+		if (window.ActiveXObject)
+			return new ActiveXObject( "Msxml2.XMLHTTP" )
+		else 
+			return new XMLHttpRequest();
+	}
+	this.onmorph= function(){ this.webGet(); }
+	this.webPost= function( url, handler ){
+		var scraper = this.scraper = this.newHttpRequest();
+		var url= (url)? url:this.getAttr("src","",this);
+		if ((!scraper) || (!url)) return;
+		try {
+		 var myMethod= "POST";
+		 scraper.open( myMethod, url.substr(0,url.indexOf('?')), true );
+		 scraper.onreadystatechange= this.anfuge( (handler)?handler:"handleHttp" );
+		 scraper.setRequestHeader( "If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT" );
+		   var params = url.substr(url.indexOf('?')+1);
+		   scraper.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		   scraper.setRequestHeader("Content-length", params.length);
+		   scraper.setRequestHeader("Connection", "close");
+		   scraper.send(params);
+		} catch (e) { this.handleError( e ); }
+	}
+	this.webGet= function( url, handler, post ){
+                var scraper = this.scraper = this.newHttpRequest();
+                var url= (url)? url:this.getAttr("src","",this);
+                if ((!scraper) || (!url)) return;
+                try {
+                 var myMethod= (post)? post:"GET";
+                 scraper.open( myMethod, url, true );
+                 scraper.onreadystatechange= this.anfuge( (handler)?handler:"handleHttp" );
+                 scraper.setRequestHeader( "If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT" );
+                 scraper.send(true);
+                } catch (e) { this.handleError( e ); }
+        }
+	this.handleHttp= function(){
+		if (this.scraper.readyState != 4) return;
+		if ((this.scraper.status == 200) || (this.scraper.status == 0)) {
+			var rh= this.scraper.getAllResponseHeaders(); 
+			if (this.scraper.myMethod=="HEAD") return this.write( (rh==null)? "Found":rh);
+			return this.write( this.scraper.responseText );
+		}
+		this.handleError( this.scraper.status + " - " + this.scraper.statusText );
+	}
+	this.handleError= function(e){ this.write(e) }
+	this.isFileExist= function(url){
+		this.handleError= function(e){ this.write("") }
+		this.webGet( url, null, "HEAD");
+	}
+	this.getHeaderInfo= function(h, k, def){
+		return this.lookup( this.csv2array(h,"\n",": "), k, 0, [0,def] )[1];
+	}
+	this.showToSave= function(s, title){
+		var w=new Window();	//simply writes s to another window for saving.
+		w.document.write(s);
+		w.document.close();
+	}
+}
+
+//////////////
+//   1599   //
+//////////////
+//7-26-12 JChoy utility class that understands cqtabulate syntax
+//7-27-12 JChoy rawData
+//8-15-12 JChoy CqCfgTab, readRowObj
+//8-21-12 JChoy a2cq optional params
+//-----
+//Fetches cqtab structured data via ajax.
+function CqTabDob() {
+  if (Curly) Curly.inherit_js_class( "Ajax", this );
+  this.tsUrl = "http://rip.okdaily.com/mad/textStore.php";
+  this.data = new Array();
+  this.init = function(num){
+	this.num = num;
+	this.status = CqTabDob.unsent;
+	return this;
+  }
+  this.getFromTS= function(num,monitor){
+	  this.webGet( this.tsUrl +"?f=text&i="+ ((num)?num:this.num) );
+	  this.status= CqTabDob.sent;
+	  this.monitor = monitor;
+  }
+  this.write= function(s){
+	this.rawData=s;
+	this.extractRow(s,0);
+  }
+  this.extractRow= function(s,i){
+	var at = unescape(this.cgi("row"+i, "", s)).split('^^');
+	if (!at[0]) {
+		this.status= CqTabDob.received;
+		if ((this.monitor) && (this.monitor.notify))
+			this.monitor.notify(this);
+		return;
+	}
+	this.data[i]=at;
+	this.extractRow(s,i+1);
+  }
+  this.cqToHtml= function(){
+	return this.elToHtml( this.toDomTable() );
+  }
+  this.toDomTable= function(){
+	var tmp= this.createEl('table');
+	for (var i=0,at=this.data; i<at.length; i++)
+		for (var j=0,row=tmp.insertRow(i); j<at[i].length; j++)
+			row.insertCell(j).innerHTML=at[i][j];
+	return tmp;
+  }
+  this.readCell= function(row,col){
+	if (this.data.length<=row) return null;
+	if (this.data[row].length<=col) return null;
+	return this.data[row][col];
+  }
+  this.readRowObj= function(row){
+	if (this.data.length<=row) return null;
+	var res={}, _d=this.data; 
+	for (var i=0,at=_d[0],av=_d[row]; (i<at.length) && (i<av.length); i++)
+		res[at[i]]= av[i];
+	return res;
+  }
+  this.lookUp= function( key ){
+	for (var i=0; i<this.data.length; i++)
+	  if (this.data[i][0]==key) return this.data[i];
+	return [];
+  }
+  this.a2cq=function(an,av){
+	if (!an)
+		return this.a2cq(this.data[0],this.data.slice(1));
+	var rs='http://rip.okdaily.com/svc/amdisk/cq/tabulofl.htm?'
+		+'row0='+escape(an.join('^^'));
+	for (var i=0; i<av.length; i++)
+		rs+= '&row'+(i+1)+'='+escape(av[i].join('^^'));
+	return rs;
+  }
+  this.parseNewTSNum=function(xml){
+    var pref='<item><title>id</title><description>';
+    return xml.split(pref).reverse()[0].split('</description>')[0];
+  }
+}
+CqTabDob.unsent = 0;
+CqTabDob.sent = 1;
+CqTabDob.receiving = 2;
+CqTabDob.received = 3;
+CqTabDob.errored = -1;
+
+//-----
+//Sets up a tabbed display UI inside clientDiv, reads config from TS
+function CqCfgTab(){
+	if (Curly) Curly.inherit_js_class( "Ajax",  this );
+	this.rip= "http://rip.okdaily.com/mad/textStore.php?";
+	this.init= function(clientDiv){
+		this.clientDiv=clientDiv;
+		this.cqDobs= [new CqTabDob().init(clientDiv.cfgn) ];
+		this.cfg= {payload:this.cqDobs[0]};
+		return this;
+	}
+	this.start= function(){
+		this.cqDobs[0].getFromTS(null,this);
+	}
+	this.notify= function(worker){
+		for (var i=0, at=this.cqDobs; i<at.length; i++)
+		  if (at[i].status==CqTabDob.unsent)
+		    return at[i].getFromTS(null,this);
+		this.engage();
+	}
+	this.engage=function(){
+		var _c=this.clientDiv, _m;
+		_m= this.menuPan = _c.appendChild( this.createEl('div',{innerHTML:'<br />'}) );
+		this.payloadPan = _c.appendChild( this.createEl('div') );
+		for (var i=1, ad=this.cfg.payload.data; i<ad.length; i++) {
+			//if (i>1) _m.appendChild(this.createEl('span', {innerHTML:' - '}));
+			_m.appendChild( this.prepSpan(this.createEl('span',{frogData:ad[i]})) );
+		}
+		if (this.defaultTab) this.defaultTab.onclick();
+	}
+  this.prepSpan= function(el){
+	el.master = this;
+	el.onclick = this.spanClick;
+	el.innerHTML = '&nbsp;'+el.frogData[0]+' ';
+	el.onmouseover = function(){this.style.backgroundColor='#DDDDDD'};
+	el.onmouseout = function(){this.style.backgroundColor='#FFFFFF'};
+	if (el.frogData[3]=='y') this.defaultTab=el;
+	el.payloadDiv= this.payloadPan.appendChild( this.createEl('div') );
+	if (window['CCTPayloadManager'])
+		el.payloadMgr= new CCTPayloadManager().init(el.payloadDiv,el.frogData);
+	return el;
+  }
+  this.spanClick= function(){
+	var _m=this.master;
+	if (_m.lastClickedSpan) {
+		_m.lastClickedSpan.style.border = "none";
+		_m.lastClickedSpan.payloadDiv.style.display = "none";
+	}
+	this.style.borderTop= this.style.borderLeft= this.style.borderRight= "thin solid gray";
+	this.master.lastClickedSpan = this;
+	this.payloadDiv.style.display = "block";
+  }
+}
+
