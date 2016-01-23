@@ -1,0 +1,242 @@
+//////////////
+//   2049   //
+//////////////
+//11-9-14 JChoy JsonGet 2049
+//----------
+JsonGet= function(key, client, meth, limit){
+	this.key= key;
+	this.client= client;
+	this.meth= meth;
+	this.expiry= new Date().valueOf() + limit*1000;
+	this.start= function(){
+		window[this.key]= null;
+		setTimeout( new OOCallback(this,"tup").fcn, 300 );
+	}
+	this.srcScript= function(url){
+		var el = document.createElement("scr"+"ipt");
+		el.setAttribute("src", url+"&rand"+Math.random() );
+        	document.body.appendChild(el);
+	}
+	this.tup= function(){
+		if (window[this.key])
+			this.client[meth](window[this.key])
+		else if (new Date().valueOf() > this.expiry)
+			this.client[meth](null,this)
+		else
+			setTimeout( this.cbFcn, 300 );
+	}
+}
+//-----
+function OOCallback(obj,meth,arg){
+	var _pt= this;
+	_pt.obj = obj;
+	_pt.meth = meth;
+	_pt.arg = arg;
+	this.fcn= function(a,b,c,d,e){ _pt.obj[_pt.meth](a,b,c,d,e); }
+	this.fcna= function(b,c,d){ _pt.obj[_pt.meth](_pt.arg,b,c,d);}
+}
+
+//////////////
+//   2055   //
+//////////////
+//PageApp (for Curly) 2055
+//8-20-12 JChoy TS1655 adapted to CSDS
+//8-21-12 JChoy subscription, addcmt, saveToSvr, title
+//8-23-12 JChoy ldd, runtsc-csds link in create
+//8-29-12 JChoy wtw
+//11-10-14 JChoy TS1655 -> 2055, use MyCfg
+//6-25-15 JChoy adjust auxPanel size
+function PageApp(){
+  this.version= '0.32';
+  this.lddVersion= 'csds-114';
+  if (Curly) Curly.inherit_js_class( "Ajax",  this );
+  if (Curly) Curly.inherit_js_class( "CqTabDobPubSubCSDS",  this );
+  this.subscribers=[];
+  this.start = function(s){
+	this.titleDiv=document.body.appendChild(this.createEl('div',{align:'center'}));
+	var clientDiv=document.body.appendChild(this.createEl('div',
+		{cfgn:new MyCfg().mainPanelCfgNum}));
+	//prod=1647 dev=1730
+	(this.cct= new CqCfgTab().init(clientDiv)).start();
+	var clientDiv=document.body.appendChild(this.createEl('div',
+		{cfgn:new MyCfg().auxPanelCfgNum}));
+	//this.mold(clientDiv.style, {height:'180', overflow:'auto'});
+	new CqCfgTab().init(clientDiv).start();
+
+	var nn=this.cgi('nn',new MyCfg().defaultNn,location);
+	this.startCqPubSub( this.tsNum=nn );
+  }
+  this.setTitle= function(at){
+	this.titleDiv.innerHTML= document.title= at[1];
+  }
+}
+//-----
+//Gets csds data from server and handles requests on that data including subscriptions.
+//Don't know why this doesn't work as a child object, only works as a superclass
+function CqTabDobPubSubCSDS(){
+	this.startCqPubSub=function(){
+		new CqTabDob().init(this.tsNum).getFromTS(this.tsNum,this);
+	}
+  this.notify= function(cqdob){
+	this.cqdob= cqdob;
+	new VRS().listen('csds',this);
+	if (this.setTitle) this.setTitle(this.cqdob.lookUp('title'));
+  }
+  this.request=function(reqObj){
+	var f= this.cgi('f','',reqObj.url);
+	if (this['request_'+f]) this['request_'+f](reqObj);
+	if ('body/cmt/key/wtw/'.match(f+'/'))
+	  this.subscribers[this.subscribers.length]=[f,reqObj];
+	this.publishToSubscribers();
+  }
+  this.publishToSubscribers=function(){
+	var res={cmt:[]}, ok=VRS.statusCode.OK;
+	res.body=this.cqdob.lookUp('body0')[1];
+	res.key=this.cqdob.lookUp('key')[1];
+	res.wtw=this.cqdob.lookUp('wtw')[1];
+	for (var i=0,at=this.cqdob.data; i<at.length; i++)
+		if (at[i][0]=='com') res.cmt[res.cmt.length]=at[i];
+
+	for (var i=0, at=this.subscribers; i<at.length; i++)
+	  if(res[at[i][0]])
+	    at[i][1].caller.vrsResponse(res[at[i][0]],at[i][1],ok);
+  }
+  this.request_setcmt=function(reqObj){
+	this.saveToSvr(this.cqdob.data[this.cqdob.data.length]=['com',''], reqObj);
+  }
+  this.request_refresh=function(reqObj){ this.startCqPubSub();  }
+  this.request_setbody=function(reqObj){
+	this.saveToSvr(this.cqdob.lookUp('body0'), reqObj);
+  }
+  this.saveToSvr=function(at, reqObj){
+	at[1]= unescape(this.cgi('data','',reqObj.url));
+	var _c=this.cqdob, eu= escape(this.cqdob.a2cq()+'&title=CSDS');
+	this.webPost(_c.tsUrl +'?f=set&i=' +_c.num +'&data=' +eu);
+  }
+  this.write=function(s){
+	new VRS().request('vrs://status/?saved');
+  }
+}
+//-----
+function CCTPayloadManager(){
+	if (Curly) Curly.inherit_js_class( "CCTPayloadManagerBase",  this );
+}
+
+
+//////////////
+//   2059   //
+//////////////
+//11-11-14 JChoy Muxlink 2059 muxUrl
+//12-08-14 checkbox
+//url add reset show load help new
+//-----
+function Muxlink(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	this.ripurl = "http://rip.okdaily.com/mad/textStore.php";
+	this.btnLabel = "GO";
+	this.uu= "http://rip.okdaily.com/svc/amdisk/cq/tabulofl.htm?waffle,";
+	this.start=function(){
+		this.tx = document.createElement("input");
+		this.tx.size = "36";
+		this.btn = document.createElement("input");
+		this.btn.value = this.btnLabel;
+		this.btn.type = "button";
+		this.btn.onclick = new OOCallback(this,"btnClick").fcn;
+		this.txDiv = document.createElement("div");
+		this.div.appendChild(this.tx);
+		this.div.appendChild(this.btn);
+		this.div.appendChild(this.txDiv);
+		this.jsonRead( this.cgi("dn","2058",location) );
+
+		if (new MyCfg().muxUrl) this.uu = new MyCfg().muxUrl;
+		//new VRS().request('vrs://csds/w/?f=wtw',this);
+		//this.setId();
+		//setInterval(this.progId+".tickle()",5000);
+	}
+	this.btnClick= function(){
+		if (this.tx.value=="url") { this.uu= this.lastVal; }
+		if (this.tx.value=="add") { this.aData.push(this.lastVal); this.saveData() }
+		if (this.tx.value=="del") { this.aData.pop(); this.saveData() }
+		this.renderData(); 
+		this.lastVal = this.tx.value;
+		this.tx.value = "";
+		this.tx.focus();
+	}
+	this.saveData= function(){
+		var pl = btoa(this.aData.join(' '));
+		pl = "data_ts_"+this.dataSlot+"=" + JSON.stringify( {text64:pl} );
+		var img= new Image();
+		img.src= this.ripurl + "?f=set&i="+this.dataSlot+"&data="+ escape(pl);
+	}
+	this.jsonRead= function(slotNum){
+		this.txDiv.innerHTML = "loading "+(this.dataSlot=slotNum);
+		var jg = new JsonGet("data_ts_"+this.dataSlot, this, "jGot", 5);
+		jg.srcScript( this.ripurl+"?f=text&i="+this.dataSlot );
+		jg.start();
+	}
+	this.jGot= function(resJson, jg){
+		var disx = "data:image/svg+xml;charset=utf-8;base64,";
+		if (resJson) {
+			var fix64= resJson.text64.replace(/ /g, '+');
+			this.aData=atob(fix64).split(' ');
+			this.renderData();
+		}
+	}
+	this.renderData= function(){
+		this.txDiv.innerHTML = "";
+		var isParm0= this.uu.indexOf("{0}") > 0;
+		for (var i=0,at=this.aData; i<at.length; i++){
+			  var link= document.createElement('a');
+			  link.href= this.uu+at[i];
+			  if (isParm0) link.href = this.uu.replace(/\{0\}/g,at[i]);
+			  link.innerHTML= (i+1)+') '+at[i];
+			  this.txDiv.appendChild(link);
+			  var cb = document.createElement("input");
+			  cb.type = "checkbox";
+			  this.txDiv.appendChild(cb);
+			  var nl= document.createElement('br');
+			  this.txDiv.appendChild(nl);
+		}
+	}
+}
+
+//////////////
+//   2065   //
+//////////////
+//11-10-14 JChoy MyCfg 2065
+//11-11-14 JChoy MyCfgExt
+//-----
+function MyCfg(){
+  if (Curly) Curly.inherit_js_class( "Ajax",  this );
+  this.mainPanelCfgNum= "2064";
+  this.auxPanelCfgNum= "1631";
+  this.defaultNn= "1789";
+  var cfgName = this.cgi('cfg','',location);
+
+  if (cfgName) new MyCfgExt(this,cfgName);
+}
+//usage: new MyCfg().mainPanelCfgNum;
+//-----
+
+function MyCfgExt(obj,cfgName){
+  if (cfgName=="waffle"){
+	obj.muxUrl= "/svc/amdisk/cq/tabulofl.htm?waffle,";
+  }
+  if (cfgName=="text"){
+	obj.muxUrl= "/mad/textStore.php?f=text&i=";
+  }
+  if (cfgName=="csds"){
+	obj.muxUrl= "/mad/tsm.php?f=html&i=2063&nn=";
+  }
+  if (cfgName=="list"){
+	obj.muxUrl= "/mad/tsm.php?f=html&i=2063&nn=1789&dn=";
+  }
+  if (cfgName=="listtest")
+	obj.muxUrl= "/mad/tsm.php?f=html&i=2046&nn=2122&dn=";
+  if (cfgName=="amzaannnn"){
+	obj.muxUrl= "http://www.amazon.com/gp/product/{0}/ref=as_li_tf_tl?ie=UTF8&tag=aannnn-20&linkCode=as2&camp=217145&creative=399373&creativeASIN={0}";
+  }
+  if (cfgName=="tsm"){
+	obj.muxUrl= "http://rip.okdaily.com/mad/tsm.php?f=html&i=";
+  }
+}
