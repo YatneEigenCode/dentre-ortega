@@ -16,7 +16,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy repeat 
+//psdbnoz.hta 1-23-2016 JChoy remove atob and alert
 //TODO: count skips, disable button
 function PageApp(frm){
     this.frm= frm;
@@ -30,7 +30,7 @@ function PageApp(frm){
       this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
       this.ajax= new Ajax();
       var pt= this;
-      this.ajax.write= function(s){ alert(s); pt.detectChange(s) }
+      this.ajax.write= function(s){ pt.detectChange(s) }
     }
     this.doButton= function(btn){
       var pt= this;
@@ -38,7 +38,7 @@ function PageApp(frm){
         function(){pt.doButton()}, 5000 );
       if (!this.pw) this.init();
       var bt="aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==";
-      var url= atob(bt)+"?f=text&i=" +this.num.ts;
+      var url= "http://c.be/ts?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
     }
     this.detectChange= function(s){
@@ -49,8 +49,10 @@ function PageApp(frm){
       //!/c/psdb /S 152 !/ENDCMD
       var br1 = s.indexOf("\n");
       var at=s.substr(0,br1).toUpperCase().split(" ");;
+      this.log( s.substr(0,br1) );
       var parms= (at[0] != "!/C/PSDB") ? {} : this.parseParams(at);
       if (parms.num) this.pw.write( parms.num, s.substr(br1+1) );
+      if (parms.num) this.log(parms.num+".txt written");
     }
     this.parseParams= function(at){
       var res= [{},""];
