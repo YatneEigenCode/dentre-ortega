@@ -16,7 +16,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy split by space 
+//psdbnoz.hta 1-23-2016 JChoy log method 
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
@@ -56,6 +56,11 @@ function PageApp(frm){
         if (at[i]=="/S") res[1]="num";
       }
       return res[0];
+    }
+    this.log= function(s){
+      var div= document.getElementById("result");
+      div= div.appendChild(document.createElement("div"));
+      div.innerHTML= new Date().toString()+" "+s;
     }
 }
 //-----
