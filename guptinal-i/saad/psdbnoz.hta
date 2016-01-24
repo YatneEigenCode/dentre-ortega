@@ -16,7 +16,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy checkbox 
+//psdbnoz.hta 1-23-2016 JChoy split by space 
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
@@ -44,7 +44,7 @@ function PageApp(frm){
     this.parseCmd= function(s){
       //!/c/psdb /S 152 !/ENDCMD
       var br1 = s.indexOf("\n");
-      var at=s.substr(0,br1).toUpperCase();
+      var at=s.substr(0,br1).toUpperCase().split(" ");;
       var parms= (at[0] != "!/C/PSDB") ? {} : this.parseParams(at);
       if (parms.num) this.pw.write( parms.num, s.substr(br1+1) );
     }
