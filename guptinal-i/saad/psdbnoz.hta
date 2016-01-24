@@ -8,6 +8,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 <form name=appForm>
 <br>Input file <input name=tx1 value="" size=45 maxlength=90>
 <input type=button name=recent_filename value="foo" onclick=pageApp.doButton(this)>
+<br />Repeat<input type=checkbox name=cb1>
 </form>
 <div id=result style="overflow:scroll;height:280;background-color:lightyellow;font-family:courier"></div>
 <br><input type=button value="Open output folder" onclick=window.open('output')>
@@ -15,7 +16,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy parseParams 
+//psdbnoz.hta 1-23-2016 JChoy checkbox 
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
@@ -31,6 +32,7 @@ function PageApp(frm){
       this.ajax.write= function(s){ alert(s); pt.detectChange(s) }
     }
     this.doButton= function(btn){
+      this.frm.tx1.value = this.frm.cb1.checked;
       if (!this.pw) this.init();
       var url= "http://z.be/ts.php?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
