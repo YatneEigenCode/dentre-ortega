@@ -16,7 +16,8 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy log method 
+//psdbnoz.hta 1-23-2016 JChoy repeat 
+//TODO: count skips, disable button
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
@@ -32,7 +33,9 @@ function PageApp(frm){
       this.ajax.write= function(s){ alert(s); pt.detectChange(s) }
     }
     this.doButton= function(btn){
-      this.frm.tx1.value = this.frm.cb1.checked;
+      var pt= this;
+      if (this.frm.cb1.checked) setTimeout( 
+        function(){pt.doButton()}, 5000 );
       if (!this.pw) this.init();
       var url= "http://z.be/ts.php?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
