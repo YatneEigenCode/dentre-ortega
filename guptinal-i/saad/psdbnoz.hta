@@ -1,8 +1,8 @@
 <HTA:APPLICATION border="thin" borderStyle="normal" caption="yes" icon="favicon.ico" 
 id="oHTA"
-maximizeButton="yes" minimizeButton="yes" showInTaskbar="no" windowState="normal"innerBorder="yes"
+maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="normal"innerBorder="yes"
 navigable="yes" scroll="no" scrollFlat="yes" /> 
-<title>Generic HTA*</title>
+<title>Psdb Noz</title>
 <html>
 <body style="background-color:whitesmoke">
 <form name=appForm>
@@ -17,11 +17,17 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 <script>
 function PageApp(frm){
     this.frm= frm;
-    this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
+    this.num= {ts:11, psdb:164};
+    var pw= this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
+    this.ajax= new Ajax();
+    this.ajax.write= function(s){ alert(s); pw.write( 164, s) }
+
     this.doButton= function(btn){
-      this.pw.write( 164, this.frm.tx1.value );
+      var url= "http://z.be/ts.php?f=text&i=" +this.num.ts;
+      this.ajax.webGet(url);
     }
 }
+//-----
 function PsdbWriter(rootPath){
     this.msf = new MSFeatures();
     this.path = rootPath;
@@ -32,6 +38,70 @@ function PsdbWriter(rootPath){
       fo.write( s );
       fo.close();
     }
+}
+function Ajax() {
+	this.newHttpRequest= function(){
+		if (window.ActiveXObject)
+			return new ActiveXObject( "Msxml2.XMLHTTP" )
+		else 
+			return new XMLHttpRequest();
+	}
+	this.onmorph= function(){ this.webGet(); }
+	this.webPost= function( url, handler ){
+		var scraper = this.scraper = this.newHttpRequest();
+		var url= (url)? url:this.getAttr("src","",this);
+		if ((!scraper) || (!url)) return;
+		try {
+		 var myMethod= "POST";
+		 scraper.open( myMethod, url.substr(0,url.indexOf('?')), true );
+		 scraper.onreadystatechange= this.anfuge( (handler)?handler:"handleHttp" );
+		 scraper.setRequestHeader( "If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT" );
+		   var params = url.substr(url.indexOf('?')+1);
+		   scraper.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		   scraper.setRequestHeader("Content-length", params.length);
+		   scraper.setRequestHeader("Connection", "close");
+		   scraper.send(params);
+		} catch (e) { this.handleError( e ); }
+	}
+	this.webGet= function( url, handler, post ){
+                var scraper = this.scraper = this.newHttpRequest();
+                //var url= (url)? url:this.getAttr("src","",this);
+                if ((!scraper) || (!url)) return;
+                try {
+                 var myMethod= (post)? post:"GET";
+                 scraper.open( myMethod, url, true );
+                 scraper.onreadystatechange= this.anfuge( (handler)?handler:"handleHttp" );
+                 scraper.setRequestHeader( "If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT" );
+                 scraper.send(true);
+                } catch (e) { this.handleError( e ); }
+        }
+	this.handleHttp= function(){
+		if (this.scraper.readyState != 4) return;
+		if ((this.scraper.status == 200) || (this.scraper.status == 0)) {
+			var rh= this.scraper.getAllResponseHeaders(); 
+			if (this.scraper.myMethod=="HEAD") return this.write( (rh==null)? "Found":rh);
+			return this.write( this.scraper.responseText );
+		}
+		this.handleError( this.scraper.status + " - " + this.scraper.statusText );
+	}
+	this.handleError= function(e){ this.write(e) }
+	this.isFileExist= function(url){
+		this.handleError= function(e){ this.write("") }
+		this.webGet( url, null, "HEAD");
+	}
+	this.getHeaderInfo= function(h, k, def){
+		return this.lookup( this.csv2array(h,"\n",": "), k, 0, [0,def] )[1];
+	}
+	this.showToSave= function(s, title){
+		var w=new Window();	//simply writes s to another window for saving.
+		w.document.write(s);
+		w.document.close();
+	}
+	this.anfuge= function(nm){
+	  var pt= this;
+	  var method= nm;
+	  return function(a,b,c,d,e){ pt[method](a,b,c,d,e); }
+	}
 }
 //-----
 function MSFeatures(){
