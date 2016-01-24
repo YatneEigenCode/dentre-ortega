@@ -18,15 +18,24 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
-    var pw= this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
-    this.ajax= new Ajax();
-    this.ajax.write= function(s){ alert(s); pw.write( 164, s) }
     //read ts
     //interpret first line
     //write file
+    //repeat every 5 seconds
+    this.init= function(){
+      this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
+      this.ajax= new Ajax();
+      var pt= this;
+      this.ajax.write= function(s){ alert(s); pt.parseCmd(s) }
+    }
     this.doButton= function(btn){
+      if (!this.pw) this.init();
       var url= "http://z.be/ts.php?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
+    }
+    this.parseCmd= function(s){
+      //parse first line
+      this.pw.write( 164, s );
     }
 }
 //-----
