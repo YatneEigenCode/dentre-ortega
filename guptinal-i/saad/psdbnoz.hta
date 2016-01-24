@@ -21,7 +21,9 @@ function PageApp(frm){
     var pw= this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
     this.ajax= new Ajax();
     this.ajax.write= function(s){ alert(s); pw.write( 164, s) }
-
+    //read ts
+    //interpret first line
+    //write file
     this.doButton= function(btn){
       var url= "http://z.be/ts.php?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
