@@ -15,7 +15,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy detectChange 
+//psdbnoz.hta 1-23-2016 JChoy parseParams 
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
@@ -40,8 +40,20 @@ function PageApp(frm){
         this.parseCmd( this.prevDat=s );
     }
     this.parseCmd= function(s){
-      //parse first line
-      this.pw.write( 164, s );
+      //!/c/psdb /S 152 !/ENDCMD
+      var br1 = s.indexOf("\n");
+      var at=s.substr(0,br1).toUpperCase();
+      var parms= (at[0] != "!/C/PSDB") ? {} : this.parseParams(at);
+      if (parms.num) this.pw.write( parms.num, s.substr(br1+1) );
+    }
+    this.parseParams= function(at){
+      var res= [{},""];
+      for (var i=1; i<at.length; i++){
+        if (res[1]) res[0][res[1]]= at[i];
+        res[1]="";
+        if (at[i]=="/S") res[1]="num";
+      }
+      return res[0];
     }
 }
 //-----
