@@ -4,15 +4,15 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-24-2016 JChoy PageAppCfg
-//TODO: count skips, disable button 
+//psdbnoz.hta 1-24-2016 JChoy change button label, use counter, log params
+//TODO: count skips, disable button, check num range
 -->
 <title>Psdb Noz</title>
 <html>
 <body style="background-color:whitesmoke">
 <form name=appForm>
 <br>Input file <input name=tx1 value="" size=45 maxlength=90>
-<input type=button name=recent_filename value="foo" onclick=pageApp.doButton(this)>
+<input type=button name=recent_filename value="Run" onclick=pageApp.doButton(this)>
 <br />Repeat<input type=checkbox name=cb1>
 </form>
 <div id=result style="overflow:scroll;height:280;background-color:lightyellow;font-family:courier"></div>
@@ -23,9 +23,10 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 <script>
 function PageAppCfg(){
   this.config= function(o){
-    o.num= {ts:2321, psdb:130};
-    o.psdbPath = "c:\\Users\\jchoy\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
-    o.tsUrl = "http://c.be/ts.php?";
+    o.tsNum= 2321;
+    o.psdbPath = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
+    o.tsUrl = "http://c.be/ts.php";
+    o.repeatIntervalMS = 15000;
   }
 }
 </script>
@@ -33,8 +34,9 @@ function PageAppCfg(){
 <script>
 function PageApp(frm){
     this.frm= frm;
-    this.num= {ts:11, psdb:164};
+    this.tsNum= 11;
     this.repeatIntervalMS = 5000;
+    this.maxNum = 999;
     //read ts
     //continue only if modified since last read
     //interpret first line
@@ -42,7 +44,9 @@ function PageApp(frm){
     //repeat every 5 seconds
     this.init= function(){
       if (PageAppCfg) new PageAppCfg().config(this);
+      for (var m in {tsNum:0,tsUrl:0,psdbPath:0}) this.log(m+' '+this[m]);
       this.pw = new PsdbWriter( this.psdbPath );
+      this.counter= new Counter();
       this.ajax= new Ajax();
       var pt= this;
       this.ajax.write= function(s){ pt.detectChange(s) }
@@ -52,10 +56,16 @@ function PageApp(frm){
       if (this.frm.cb1.checked) setTimeout( 
         function(){pt.doButton()}, this.repeatIntervalMS );
       if (!this.pw) this.init();
-      var url= this.tsUrl + "?f=text&i=" +this.num.ts;
+      if (this.counter.elapsedTime() > 300) {
+        this.log( this.counter.report().toString() );
+        this.counter= new Counter();
+      }
+      var url= this.tsUrl + "?f=text&i=" +this.tsNum;
+      this.counter.add("check");
       this.ajax.webGet(url);
     }
     this.detectChange= function(s){
+      this.counter.add("received");
       if (s != this.prevDat)
         this.parseCmd( this.prevDat=s );
     }
@@ -65,8 +75,12 @@ function PageApp(frm){
       var at=s.substr(0,br1).toUpperCase().split(" ");;
       this.log( s.substr(0,br1) );
       var parms= (at[0] != "!/C/PSDB") ? {} : this.parseParams(at);
-      if (parms.num) this.pw.write( parms.num, s.substr(br1+1) );
-      if (parms.num) this.log(parms.num+".txt written");
+      if (!parms.num) return;
+      if (isNaN(parms.num)) return;
+      if (parms.num > this.maxNum) return;
+      this.counter.add("write");
+      this.pw.write( parms.num, s.substr(br1+1) );
+      this.log(parms.num+".txt written");
     }
     this.parseParams= function(at){
       var res= [{},""];
