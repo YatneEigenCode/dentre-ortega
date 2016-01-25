@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-24-2016 JChoy change button label, use counter, log params
+//psdbnoz.hta 1-25-2016 JChoy log counts every 100 checks
 //TODO: count skips, disable button, check num range
 -->
 <title>Psdb Noz</title>
@@ -24,7 +24,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 function PageAppCfg(){
   this.config= function(o){
     o.tsNum= 2321;
-    o.psdbPath = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
+    o.psdbPath = "c:\\Users\\xyz\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
     o.tsUrl = "http://c.be/ts.php";
     o.repeatIntervalMS = 15000;
   }
@@ -56,12 +56,10 @@ function PageApp(frm){
       if (this.frm.cb1.checked) setTimeout( 
         function(){pt.doButton()}, this.repeatIntervalMS );
       if (!this.pw) this.init();
-      if (this.counter.elapsedTime() > 300) {
-        this.log( this.counter.report().toString() );
-        this.counter= new Counter();
-      }
       var url= this.tsUrl + "?f=text&i=" +this.tsNum;
       this.counter.add("check");
+      if (this.counter.data.check % 100 == 0) 
+        this.log( this.counter.report().toString() );
       this.ajax.webGet(url);
     }
     this.detectChange= function(s){
