@@ -2,6 +2,11 @@
 id="oHTA"
 maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="normal"innerBorder="yes"
 navigable="yes" scroll="no" scrollFlat="yes" /> 
+<!-- 
+///////////////////////
+//psdbnoz.hta 1-24-2016 JChoy PageAppCfg
+//TODO: count skips, disable button 
+-->
 <title>Psdb Noz</title>
 <html>
 <body style="background-color:whitesmoke">
@@ -16,18 +21,28 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script>
-//psdbnoz.hta 1-23-2016 JChoy remove atob and alert
-//TODO: count skips, disable button
+function PageAppCfg(){
+  this.config= function(o){
+    o.num= {ts:2321, psdb:130};
+    o.psdbPath = "c:\\Users\\jchoy\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
+    o.tsUrl = "http://c.be/ts.php?";
+  }
+}
+</script>
+
+<script>
 function PageApp(frm){
     this.frm= frm;
     this.num= {ts:11, psdb:164};
+    this.repeatIntervalMS = 5000;
     //read ts
     //continue only if modified since last read
     //interpret first line
     //write file
     //repeat every 5 seconds
     this.init= function(){
-      this.pw = new PsdbWriter("C:\\lcpub\\proj16\\psdb\\ape\\");
+      if (PageAppCfg) new PageAppCfg().config(this);
+      this.pw = new PsdbWriter( this.psdbPath );
       this.ajax= new Ajax();
       var pt= this;
       this.ajax.write= function(s){ pt.detectChange(s) }
@@ -35,10 +50,9 @@ function PageApp(frm){
     this.doButton= function(btn){
       var pt= this;
       if (this.frm.cb1.checked) setTimeout( 
-        function(){pt.doButton()}, 5000 );
+        function(){pt.doButton()}, this.repeatIntervalMS );
       if (!this.pw) this.init();
-      var bt="aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==";
-      var url= "http://c.be/ts?f=text&i=" +this.num.ts;
+      var url= this.tsUrl + "?f=text&i=" +this.num.ts;
       this.ajax.webGet(url);
     }
     this.detectChange= function(s){
