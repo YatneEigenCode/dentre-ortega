@@ -128,9 +128,6 @@ function JsPlgd_Ml(){
 		this.div.appendChild(this.createEl('br'));
 		var sp= this.appendSpan(' [Edit] ');
 		this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanEdit);
-//////////////
-//   2319   //
-//////////////
 		if (! this.reqKey){
 		 sp= this.appendSpan(' [Save] ');
 		 this.spanButton(sp,'#DDDDDD','#FFFFFF',this.spanSave);
@@ -139,9 +136,114 @@ function JsPlgd_Ml(){
 }
 Muxlink=JsPlgd_Ml;
 
+//////////////
+//   2319   //
+//////////////
 //JPFoo 1-21-2016 JChoy JPFoo
 function JPFoo(){
   this.start= function(){
     return "JP Foo";
+  }
+}
+
+//////////////
+//   2326   //
+//////////////
+//JsonLoader 1-25-2016 JChoy 2326
+//-----
+//This class may not deliver payload 
+//if another subscriber errors out due to deleted DOM elements
+function JsonLoader(){
+  this.clients= [];
+  this.s= function( jd ){
+    for (var at=this.clients, i=0; i<at.length; i=i-(-1))
+      try { at[i].obj[at[i].meth]( jd ); } catch (e) {}
+  }
+  this.checkSubscriber= function( client ){
+    for (var at=this.clients, i=0; i<at.length; i=i-(-1))
+      if ( client == at[i].obj )  return; true;
+    return false;
+  }
+  this.subscribe= function( client, method ){
+    this.clients.push( {obj:client, meth:method} );
+  }
+}
+//-----
+//idea: JsonSourcer where payload takes form of
+//{t:"blah",notify:function(){new JsonSourcer().webGot(this)}.notify();
+
+//////////////
+//   2327   //
+//////////////
+//ApeCklist ts2327 1-26-16 JChoy v0.131 show checkboxes 
+//TODO: saveData should avoid slamming other's changes
+//-----
+function ApeCklist(){
+  var $d= document;
+  var $t= this;
+  var $u=  atob( "aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==" );
+  this.payload= {title:"Noname",items:[]}
+  this.apeNum= "110";
+  this.start= function(div){
+    div.innerHTML= "";
+    this.titleDiv= div.appendChild($d.createElement("div"));
+    this.form= div.appendChild($d.createElement("form"));
+    this.itemsDiv= div.appendChild($d.createElement("div"));
+    this.addButton("Add");
+    this.addTextbox("tb1");
+    div.appendChild($d.createElement("br"));
+    //Curly.addJS( "TS2326" );
+    //Curly.onReady( "JsonLoader", function(){ $t.webGet() } );
+    this.webGet();
+  }
+  this.addTextbox= function(nm, sz){
+    var tb=this.form.appendChild($d.createElement("input"));
+    tb.name= nm;
+    if (sz) tb.size= sz;
+  }
+  this.addButton= function(lbl){
+    var btn=this.form.appendChild($d.createElement("input"));
+    btn.value = lbl;
+    btn.type= "button";
+    btn.onclick= this.doClick;
+  }
+  this.doCheck= function(){
+  }
+  this.doClick= function(){
+    $t.payload.items.push({text:$t.form.tb1.value,checked:0})
+    $t.saveData();
+  }
+  this.saveData= function(){
+    var res= "!/c/psdb /s {0} !/ENDCMD\nif (_j) _j.s( {1} )";
+    res= res.replace("{1}", JSON.stringify($t.payload));
+    res= res.replace("{0}", this.apeNum );
+    res= [$u,"?f=set&i=2321&data=",escape(res)].join('');
+    var img= new Image();
+    $d.body.appendChild( img ).src= res;
+    img.height=1;
+  }
+  this.webGet= function(){
+    if (!window["_j"]) _j= new JsonLoader();
+    if (!_j.checkSubscriber(this))
+      _j.subscribe( this, "gotWebData" );
+    var at= ["http://dl.dropboxusercontent.com"]
+    at.push( "/u/28448395/jsondata/psdb/ape/3d/" );
+    at.push( this.apeNum.split('').join("/") );
+    at.push( ".txt");
+    var el= $d.createElement("script");
+    el.src= at.join("");
+    $d.getElementsByTagName('head')[0].appendChild( el );
+  }
+  this.gotWebData= function( jd ){
+    $t.payload = jd;
+    $t.titleDiv.innerHTML= jd.title;
+    for (var div,i=0; i<jd.items.length; i=i-(-1) ){
+      div=$t.itemsDiv.appendChild($d.createElement("div"));
+      var cb =div.appendChild($d.createElement("input"));
+      cb.type= "checkbox";
+      cb.checked= (jd.items[i].checked==1);
+      var spn =div.appendChild($d.createElement("span"));
+      spn.innerHTML = jd.items[i].text;
+    }
   }
 }
