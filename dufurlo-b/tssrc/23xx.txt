@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-26-16 JChoy v1.216 delCheckedItems 
+//ApeCklist ts2327 1-26-16 JChoy v1.228 different deletion scheme 
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -184,13 +184,14 @@ function ApeCklist(){
   var $u=  atob( "aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==" );
   this.payload= {title:"Noname",items:[]}
   this.apeNum= "110";
+  this.isDelMode= false;
   this.start= function(div){
     div.innerHTML= "";
     this.titleDiv= div.appendChild($d.createElement("div"));
     this.form= div.appendChild($d.createElement("form"));
     this.itemsDiv= div.appendChild($d.createElement("div"));
     this.itemsDiv.innerHTML= "loading data...";
-    this.addButton("Add");
+    this.addButton("*");
     this.addTextbox("tb1");
     div.appendChild($d.createElement("br"));
     //Curly.addJS( "TS2326" );
@@ -214,21 +215,11 @@ function ApeCklist(){
   }
   this.doClick= function(){
     var tbv= $t.form.tb1.value;
-    if (!tbv) return;
-    if ($t.delCheckedItems( tbv )) return $t.saveData();
+    if (!tbv) return $t.reShowItems( $t.isDelMode=!$t.isDelMode );
     $t.payload.items.push({text:tbv,checked:0});
     var num= $t.payload.items.length-1;
     $t.show1item( $t.payload.items[num], num );
     $t.saveData();
-  }
-  this.delCheckedItems= function(s){
-    if (s.toUpperCase().indexOf("!DEL") != 0) return false;
-    var items=[];
-    for (var i=0,at=$t.payload.items; i<at.length; i++)
-      if (!at[i].checked) items.push( at[i] );
-    $t.payload.items= items;
-    $t.reShowItems();
-    return true;
   }
   this.saveData= function(){
     var res= "!/c/psdb /s {0} !/ENDCMD\nif (_j) _j.s( {1} )";
@@ -255,12 +246,12 @@ function ApeCklist(){
     $t.titleDiv.innerHTML= jd.title;
     $t.reShowItems();
   }
-  this.reShowItems= function(){
+  this.reShowItems= function( isDel ){
     $t.itemsDiv.innerHTML= "";
     for (var i=0,at=$t.payload.items; i<at.length; i++ )
-      $t.show1item( at[i], i );
+      $t.show1item( at[i], i, isDel );
   }
-  this.show1item= function( item, i ){
+  this.show1item= function( item, i, isDel ){
       var div=$t.itemsDiv.appendChild($d.createElement("div"));
       var cb =div.appendChild($d.createElement("input"));
       cb.type= "checkbox";
@@ -269,5 +260,18 @@ function ApeCklist(){
       cb.checked= (item.checked==1);
       var spn =div.appendChild($d.createElement("span"));
       spn.innerHTML = item.text;
+      if (isDel) {
+        var btn =div.appendChild($d.createElement("input"));
+        btn.type= "button";
+        btn.dataIndex= i;
+        btn.value= "Del";
+        btn.onclick= $t.doDel;
+      }
+  }
+  this.doDel= function(){
+    $t.payload.items.splice( this.dataIndex, 1 );
+    $t.reShowItems( $t.isDelMode );
+    $t.saveData();
   }
 }
+
