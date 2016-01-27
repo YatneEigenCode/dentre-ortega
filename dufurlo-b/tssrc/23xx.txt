@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-26-16 JChoy v0.131 show checkboxes 
+//ApeCklist ts2327 1-26-16 JChoy v0.134 show added item 
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -211,6 +211,7 @@ function ApeCklist(){
   }
   this.doClick= function(){
     $t.payload.items.push({text:$t.form.tb1.value,checked:0})
+    $t.show1item( $t.payload.items[$t.payload.items.length-1] );
     $t.saveData();
   }
   this.saveData= function(){
@@ -237,13 +238,15 @@ function ApeCklist(){
   this.gotWebData= function( jd ){
     $t.payload = jd;
     $t.titleDiv.innerHTML= jd.title;
-    for (var div,i=0; i<jd.items.length; i=i-(-1) ){
-      div=$t.itemsDiv.appendChild($d.createElement("div"));
+    for (var i=0; i<jd.items.length; i=i-(-1) )
+      $t.show1item( jd.items[i] );
+  }
+  this.show1item= function( item ){
+      var div=$t.itemsDiv.appendChild($d.createElement("div"));
       var cb =div.appendChild($d.createElement("input"));
       cb.type= "checkbox";
-      cb.checked= (jd.items[i].checked==1);
+      cb.checked= (item.checked==1);
       var spn =div.appendChild($d.createElement("span"));
-      spn.innerHTML = jd.items[i].text;
-    }
+      spn.innerHTML = item.text;
   }
 }
