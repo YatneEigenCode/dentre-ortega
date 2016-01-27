@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-26-16 JChoy v0.134 show added item 
+//ApeCklist ts2327 1-26-16 JChoy v1.216 delCheckedItems 
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -189,6 +189,7 @@ function ApeCklist(){
     this.titleDiv= div.appendChild($d.createElement("div"));
     this.form= div.appendChild($d.createElement("form"));
     this.itemsDiv= div.appendChild($d.createElement("div"));
+    this.itemsDiv.innerHTML= "loading data...";
     this.addButton("Add");
     this.addTextbox("tb1");
     div.appendChild($d.createElement("br"));
@@ -208,11 +209,26 @@ function ApeCklist(){
     btn.onclick= this.doClick;
   }
   this.doCheck= function(){
+    $t.payload.items[ this.dataIndex ].checked = (this.checked)?1:0;
+    $t.saveData();
   }
   this.doClick= function(){
-    $t.payload.items.push({text:$t.form.tb1.value,checked:0})
-    $t.show1item( $t.payload.items[$t.payload.items.length-1] );
+    var tbv= $t.form.tb1.value;
+    if (!tbv) return;
+    if ($t.delCheckedItems( tbv )) return $t.saveData();
+    $t.payload.items.push({text:tbv,checked:0});
+    var num= $t.payload.items.length-1;
+    $t.show1item( $t.payload.items[num], num );
     $t.saveData();
+  }
+  this.delCheckedItems= function(s){
+    if (s.toUpperCase().indexOf("!DEL") != 0) return false;
+    var items=[];
+    for (var i=0,at=$t.payload.items; i<at.length; i++)
+      if (!at[i].checked) items.push( at[i] );
+    $t.payload.items= items;
+    $t.reShowItems();
+    return true;
   }
   this.saveData= function(){
     var res= "!/c/psdb /s {0} !/ENDCMD\nif (_j) _j.s( {1} )";
@@ -229,8 +245,7 @@ function ApeCklist(){
       _j.subscribe( this, "gotWebData" );
     var at= ["http://dl.dropboxusercontent.com"]
     at.push( "/u/28448395/jsondata/psdb/ape/3d/" );
-    at.push( this.apeNum.split('').join("/") );
-    at.push( ".txt");
+    at.push( this.apeNum.split('').join("/") + ".txt");
     var el= $d.createElement("script");
     el.src= at.join("");
     $d.getElementsByTagName('head')[0].appendChild( el );
@@ -238,13 +253,19 @@ function ApeCklist(){
   this.gotWebData= function( jd ){
     $t.payload = jd;
     $t.titleDiv.innerHTML= jd.title;
-    for (var i=0; i<jd.items.length; i=i-(-1) )
-      $t.show1item( jd.items[i] );
+    $t.reShowItems();
   }
-  this.show1item= function( item ){
+  this.reShowItems= function(){
+    $t.itemsDiv.innerHTML= "";
+    for (var i=0,at=$t.payload.items; i<at.length; i++ )
+      $t.show1item( at[i], i );
+  }
+  this.show1item= function( item, i ){
       var div=$t.itemsDiv.appendChild($d.createElement("div"));
       var cb =div.appendChild($d.createElement("input"));
       cb.type= "checkbox";
+      cb.dataIndex = i;
+      cb.onchange= $t.doCheck;
       cb.checked= (item.checked==1);
       var spn =div.appendChild($d.createElement("span"));
       spn.innerHTML = item.text;
