@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-26-16 JChoy v1.228 different deletion scheme 
+//ApeCklist ts2327 1-26-16 JChoy v1.229 use https to access psdb data 
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -234,7 +234,7 @@ function ApeCklist(){
     if (!window["_j"]) _j= new JsonLoader();
     if (!_j.checkSubscriber(this))
       _j.subscribe( this, "gotWebData" );
-    var at= ["http://dl.dropboxusercontent.com"]
+    var at= ["https://dl.dropboxusercontent.com"]
     at.push( "/u/28448395/jsondata/psdb/ape/3d/" );
     at.push( this.apeNum.split('').join("/") + ".txt");
     var el= $d.createElement("script");
@@ -274,4 +274,3 @@ function ApeCklist(){
     $t.saveData();
   }
 }
-
