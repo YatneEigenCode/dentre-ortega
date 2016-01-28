@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-25-2016 JChoy v1.159 - read local config in psdbnoz.hta
+//psdbnoz.hta 1-25-2016 JChoy v1.161 - rolling log in psdbnoz.hta
 //TODO: count skips, disable button, check num range
 -->
 <title>Psdb Noz</title>
@@ -48,6 +48,7 @@ function PageApp(frm){
       if (PageAppCfg) new PageAppCfg().config(this);
       for (var m in {version:0,tsNum:0,tsUrl:0,psdbPath:0,repeatIntervalMS:0}) this.log(m+' '+this[m]);
       this.pw = new PsdbWriter( this.psdbPath );
+      this.lw = new LogWriter( this.psdbPath );
       this.counter= new Counter();
       this.ajax= new Ajax();
       var pt= this;
@@ -94,7 +95,8 @@ function PageApp(frm){
     this.log= function(s){
       var div= document.getElementById("result");
       div= div.appendChild(document.createElement("div"));
-      div.innerHTML= new Date().toString()+" "+s;
+      div.innerHTML= this.lw.write( new Date().toString()+" "+s );
+      div.scrollBy( 0, 10 );
     }
 }
 //-----
@@ -125,6 +127,17 @@ function PsdbWriter(rootPath){
       var fo = this.msf.fso.openTextFile( this.path+fn, 2, true );
       fo.write( s );
       fo.close();
+    }
+}
+function LogWriter(rootPath) {
+    this.constructor= PsdbWriter;
+    this.constructor(rootPath);
+    this.write= function( s ){
+      var fn= new Date().getDate() +"log.txt";
+      var fo = this.msf.fso.openTextFile( this.path+fn, 8, true );
+      fo.write( s );
+      fo.close();
+      return s;
     }
 }
 function Ajax() {
