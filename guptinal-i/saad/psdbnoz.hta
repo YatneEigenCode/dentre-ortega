@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-25-2016 JChoy v1.161 - rolling log in psdbnoz.hta
+//psdbnoz.hta 1-25-2016 JChoy v1.162 - rolling log to logs folder in psdbnoz.hta
 //TODO: count skips, disable button, check num range
 -->
 <title>Psdb Noz</title>
@@ -48,7 +48,7 @@ function PageApp(frm){
       if (PageAppCfg) new PageAppCfg().config(this);
       for (var m in {version:0,tsNum:0,tsUrl:0,psdbPath:0,repeatIntervalMS:0}) this.log(m+' '+this[m]);
       this.pw = new PsdbWriter( this.psdbPath );
-      this.lw = new LogWriter( this.psdbPath );
+      this.lw = new LogWriter( this.psdbPath+"logs\\" );
       this.counter= new Counter();
       this.ajax= new Ajax();
       var pt= this;
