@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-25-2016 JChoy v1.162 - rolling log to logs folder in psdbnoz.hta
+//psdbnoz.hta 1-27-2016 JChoy v1.163 - check lw==null in psdbnoz.hta
 //TODO: count skips, disable button, check num range
 -->
 <title>Psdb Noz</title>
@@ -95,7 +95,9 @@ function PageApp(frm){
     this.log= function(s){
       var div= document.getElementById("result");
       div= div.appendChild(document.createElement("div"));
-      div.innerHTML= this.lw.write( new Date().toString()+" "+s );
+      var ln = new Date().toString()+" "+s;
+      div.innerHTML= ln;
+      if (this.lw) this.lw.write( ln );
       div.scrollBy( 0, 10 );
     }
 }
