@@ -4,8 +4,8 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-27-2016 JChoy v1.163 - check lw==null in psdbnoz.hta
-//TODO: count skips, disable button, check num range
+//psdbnoz.hta 1-27-2016 JChoy v1.164 - scroll results in psdbnoz.hta
+//TODO: 
 -->
 <title>Psdb Noz</title>
 <html>
@@ -94,11 +94,11 @@ function PageApp(frm){
     }
     this.log= function(s){
       var div= document.getElementById("result");
-      div= div.appendChild(document.createElement("div"));
+      div1= div.appendChild(document.createElement("div"));
       var ln = new Date().toString()+" "+s;
-      div.innerHTML= ln;
+      div1.innerHTML= ln;
       if (this.lw) this.lw.write( ln );
-      div.scrollBy( 0, 10 );
+      div.scrollTop = div.children.length*20;
     }
 }
 //-----
