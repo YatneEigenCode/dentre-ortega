@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-27-2016 JChoy v1.164 - scroll results in psdbnoz.hta
+//psdbnoz.hta 1-27-2016 JChoy v1.165 - cr log lines in psdbnoz.hta
 //TODO: 
 -->
 <title>Psdb Noz</title>
@@ -97,7 +97,7 @@ function PageApp(frm){
       div1= div.appendChild(document.createElement("div"));
       var ln = new Date().toString()+" "+s;
       div1.innerHTML= ln;
-      if (this.lw) this.lw.write( ln );
+      if (this.lw) this.lw.write( ln +"\n" );
       div.scrollTop = div.children.length*20;
     }
 }
