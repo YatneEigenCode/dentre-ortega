@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-26-16 JChoy v1.229 use https to access psdb data 
+//ApeCklist ts2327 1-28-16 JChoy v1.232 cgi ape num param 
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -196,6 +196,7 @@ function ApeCklist(){
     div.appendChild($d.createElement("br"));
     //Curly.addJS( "TS2326" );
     //Curly.onReady( "JsonLoader", function(){ $t.webGet() } );
+    this.apeNum= this.cgi("n","110",$d.location);
     this.webGet();
   }
   this.addTextbox= function(nm, sz){
@@ -272,5 +273,9 @@ function ApeCklist(){
     $t.payload.items.splice( this.dataIndex, 1 );
     $t.reShowItems( $t.isDelMode );
     $t.saveData();
+  }
+  this.cgi= function(k,def,qy){
+	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
+	return (at.length==1)?def:at[1].split("&")[0];
   }
 }
