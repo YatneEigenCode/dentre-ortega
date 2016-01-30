@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//1-29-2016 JChoy psdbnoz.hta v1.168 - PsdbJob
+//1-29-2016 JChoy psdbnoz.hta v1.212 - PsdbJob_106 writes file
 //TODO: 
 -->
 <title>Psdb Noz</title>
@@ -38,12 +38,7 @@ function PageApp(frm){
     this.tsNum= 11;
     this.repeatIntervalMS = 5000;
     this.maxNum = 999;
-    this.version = "1.168";
-    //read ts
-    //continue only if modified since last read
-    //interpret first line
-    //write file
-    //repeat every 5 seconds
+    this.version = "1.212";
     this.init= function(){
       if (PageAppCfg) new PageAppCfg().config(this);
       for (var m in {version:0,tsNum:0,tsUrl:0,psdbPath:0,repeatIntervalMS:0}) this.log(m+' '+this[m]);
@@ -117,15 +112,25 @@ function PageApp(frm){
 //-----
 function PsdbJob_106(){
     this.msf = new MSFeatures();
+    if (PageAppCfg) new PageAppCfg().config(this);
     this.path = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\tssrc\\";
+    this.ajax= new Ajax();
+    var pt= this;
+    this.ajax.write= function(s){ pt.writeFile(s) }
+    this.numList= [2327,2326];
     this.start= function(){
-      //get data vi ajax
-      this.writeFile("test2327.txt", "slick");
+      if (this.numList.length <= 0) return;
+      this.cNum = this.numList.pop();
+      this.fn = this.cNum+".txt";
+      var url= this.tsUrl +"?f=text&i="+this.cNum;
+      this.ajax.webGet( url );
     }
-    this.writeFile= function(fn, s){
-      var fo = this.msf.fso.openTextFile( this.path+fn, 2, true );
+    this.writeFile= function(s){
+      if (!pt.fn) return;
+      var fo = this.msf.fso.openTextFile( pt.path+pt.fn, 2, true );
       fo.write( s );
       fo.close();
+      pt.start();
     }
 }
 //-----
