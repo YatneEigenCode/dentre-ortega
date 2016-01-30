@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//psdbnoz.hta 1-27-2016 JChoy v1.165 - cr log lines in psdbnoz.hta
+//1-29-2016 JChoy psdbnoz.hta v1.168 - PsdbJob
 //TODO: 
 -->
 <title>Psdb Noz</title>
@@ -27,7 +27,6 @@ function PageAppCfg(){
     o.psdbPath = "c:\\Users\\xyz\\Dropbox\\Public\\jsondata\\psdb\\ape\\";
     o.tsUrl = "http://c.be/ts.php";
     o.repeatIntervalMS = 15000;
-    o.version = "1.159";
   }
 }
 </script>
@@ -39,6 +38,7 @@ function PageApp(frm){
     this.tsNum= 11;
     this.repeatIntervalMS = 5000;
     this.maxNum = 999;
+    this.version = "1.168";
     //read ts
     //continue only if modified since last read
     //interpret first line
@@ -76,12 +76,19 @@ function PageApp(frm){
       var at=s.substr(0,br1).toUpperCase().split(" ");;
       this.log( s.substr(0,br1) );
       var parms= (at[0] != "!/C/PSDB") ? {} : this.parseParams(at);
-      if (!parms.num) return;
-      if (isNaN(parms.num)) return;
-      if (parms.num > this.maxNum) return;
-      this.counter.add("write");
-      this.pw.write( parms.num, s.substr(br1+1) );
-      this.log(parms.num+".txt written");
+      if (this.parmIsValid(parms.num)) {
+        this.counter.add("write");
+        this.pw.write( parms.num, s.substr(br1+1) );
+        this.log(parms.num+".txt written");
+      }
+      if (this.parmIsValid(parms.job))
+        this.runPsdbJob(parms.job);
+    }
+    this.parmIsValid= function(x){
+      if (!x) return false;
+      if (isNaN(x)) return false;
+      if (x > this.maxNum) return false;
+      return true;
     }
     this.parseParams= function(at){
       var res= [{},""];
@@ -89,8 +96,14 @@ function PageApp(frm){
         if (res[1]) res[0][res[1]]= at[i];
         res[1]="";
         if (at[i]=="/S") res[1]="num";
+        if (at[i]=="/JOB") res[1]="job";
       }
       return res[0];
+    }
+    this.runPsdbJob= function(job){
+      var isAvail= (window["PsdbJob_"+job] != null);
+      this.log( "can run job "+job+" : "+isAvail );
+      if (isAvail) new window["PsdbJob_"+job]().start();
     }
     this.log= function(s){
       var div= document.getElementById("result");
@@ -99,6 +112,20 @@ function PageApp(frm){
       div1.innerHTML= ln;
       if (this.lw) this.lw.write( ln +"\n" );
       div.scrollTop = div.children.length*20;
+    }
+}
+//-----
+function PsdbJob_106(){
+    this.msf = new MSFeatures();
+    this.path = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\tssrc\\";
+    this.start= function(){
+      //get data vi ajax
+      this.writeFile("test2327.txt", "slick");
+    }
+    this.writeFile= function(fn, s){
+      var fo = this.msf.fso.openTextFile( this.path+fn, 2, true );
+      fo.write( s );
+      fo.close();
     }
 }
 //-----
