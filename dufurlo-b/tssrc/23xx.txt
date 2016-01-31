@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-28-16 JChoy v1.232 cgi ape num param 
+//ApeCklist ts2327 1-31-16 JChoy v1.312 add to top, $version
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -185,13 +185,14 @@ function ApeCklist(){
   this.payload= {title:"Noname",items:[]}
   this.apeNum= "110";
   this.isDelMode= false;
+  this.version= "1.312";
   this.start= function(div){
     div.innerHTML= "";
     this.titleDiv= div.appendChild($d.createElement("div"));
     this.form= div.appendChild($d.createElement("form"));
     this.itemsDiv= div.appendChild($d.createElement("div"));
     this.itemsDiv.innerHTML= "loading data...";
-    this.addButton("*");
+    this.addButton("btn1", "*");
     this.addTextbox("tb1");
     div.appendChild($d.createElement("br"));
     //Curly.addJS( "TS2326" );
@@ -199,29 +200,41 @@ function ApeCklist(){
     this.apeNum= this.cgi("n","110",$d.location);
     this.webGet();
   }
+  //---DOM
   this.addTextbox= function(nm, sz){
     var tb=this.form.appendChild($d.createElement("input"));
     tb.name= nm;
     if (sz) tb.size= sz;
   }
-  this.addButton= function(lbl){
+  this.addButton= function(nm, lbl){
     var btn=this.form.appendChild($d.createElement("input"));
     btn.value = lbl;
     btn.type= "button";
+    btn.name= nm;
     btn.onclick= this.doClick;
   }
+  //---event
   this.doCheck= function(){
     $t.payload.items[ this.dataIndex ].checked = (this.checked)?1:0;
     $t.saveData();
   }
   this.doClick= function(){
     var tbv= $t.form.tb1.value;
+    if ($t.form.btn1.value=="Title") return $t.setTitle();
     if (!tbv) return $t.reShowItems( $t.isDelMode=!$t.isDelMode );
     $t.payload.items.push({text:tbv,checked:0});
     var num= $t.payload.items.length-1;
     $t.show1item( $t.payload.items[num], num );
     $t.saveData();
   }
+  this.setTitle= function( ){
+    s= $t.form.tb1.value;
+    if (s=="$default") s= "ApeCklist v"+this.version;
+    if (s) $d.title= $t.titleDiv.innerHTML= $t.payload.title= s;
+    var isNorm = $t.form.btn1.value=="*";
+    $t.form.btn1.value= (isNorm)? "Title":"*";
+  }
+  //---comm
   this.saveData= function(){
     var res= "!/c/psdb /s {0} !/ENDCMD\nif (_j) _j.s( {1} )";
     res= res.replace("{1}", JSON.stringify($t.payload));
@@ -244,16 +257,23 @@ function ApeCklist(){
   }
   this.gotWebData= function( jd ){
     $t.payload = jd;
-    $t.titleDiv.innerHTML= jd.title;
+    $d.title= $t.titleDiv.innerHTML= jd.title;
     $t.reShowItems();
   }
+  this.cgi= function(k,def,qy){
+	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
+	return (at.length==1)?def:at[1].split("&")[0];
+  }
+  //---UI
   this.reShowItems= function( isDel ){
     $t.itemsDiv.innerHTML= "";
     for (var i=0,at=$t.payload.items; i<at.length; i++ )
       $t.show1item( at[i], i, isDel );
+    $t.titleDiv.onclick= $t.setTitle;
   }
   this.show1item= function( item, i, isDel ){
       var div=$t.itemsDiv.appendChild($d.createElement("div"));
+      $t.itemsDiv.insertBefore(div,$t.itemsDiv.firstChild);
       var cb =div.appendChild($d.createElement("input"));
       cb.type= "checkbox";
       cb.dataIndex = i;
@@ -273,9 +293,5 @@ function ApeCklist(){
     $t.payload.items.splice( this.dataIndex, 1 );
     $t.reShowItems( $t.isDelMode );
     $t.saveData();
-  }
-  this.cgi= function(k,def,qy){
-	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
-	return (at.length==1)?def:at[1].split("&")[0];
   }
 }
