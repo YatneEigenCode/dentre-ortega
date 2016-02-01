@@ -175,7 +175,7 @@ function JsonLoader(){
 //////////////
 //   2327   //
 //////////////
-//ApeCklist ts2327 1-31-16 JChoy v1.312 add to top, $version
+//ApeCklist ts2327 1-31-16 JChoy v1.416 action red
 //TODO: saveData should avoid slamming other's changes
 //-----
 function ApeCklist(){
@@ -184,8 +184,8 @@ function ApeCklist(){
   var $u=  atob( "aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==" );
   this.payload= {title:"Noname",items:[]}
   this.apeNum= "110";
-  this.isDelMode= false;
-  this.version= "1.312";
+  this.actMode= 0;
+  this.version= "1.416";
   this.start= function(div){
     div.innerHTML= "";
     this.titleDiv= div.appendChild($d.createElement("div"));
@@ -221,7 +221,8 @@ function ApeCklist(){
   this.doClick= function(){
     var tbv= $t.form.tb1.value;
     if ($t.form.btn1.value=="Title") return $t.setTitle();
-    if (!tbv) return $t.reShowItems( $t.isDelMode=!$t.isDelMode );
+    if (++$t.actMode>2) $t.actMode= 0;
+    if (!tbv) return $t.reShowItems();
     $t.payload.items.push({text:tbv,checked:0});
     var num= $t.payload.items.length-1;
     $t.show1item( $t.payload.items[num], num );
@@ -229,7 +230,7 @@ function ApeCklist(){
   }
   this.setTitle= function( ){
     s= $t.form.tb1.value;
-    if (s=="$default") s= "ApeCklist v"+this.version;
+    if (s=="$default") s= "ApeCklist v"+$t.version;
     if (s) $d.title= $t.titleDiv.innerHTML= $t.payload.title= s;
     var isNorm = $t.form.btn1.value=="*";
     $t.form.btn1.value= (isNorm)? "Title":"*";
@@ -260,18 +261,29 @@ function ApeCklist(){
     $d.title= $t.titleDiv.innerHTML= jd.title;
     $t.reShowItems();
   }
+  //---stateless functions
   this.cgi= function(k,def,qy){
 	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
 	return (at.length==1)?def:at[1].split("&")[0];
   }
   //---UI
-  this.reShowItems= function( isDel ){
+  this.reShowItems= function(){
     $t.itemsDiv.innerHTML= "";
+    var action= ($t.actMode==1)? "Del": $t.getSelectedAction();
+    if ($t.actMode==0) action="";
+    if (action=="") $t.actMode=0;
     for (var i=0,at=$t.payload.items; i<at.length; i++ )
-      $t.show1item( at[i], i, isDel );
+      $t.show1item( at[i], i, action );
     $t.titleDiv.onclick= $t.setTitle;
   }
-  this.show1item= function( item, i, isDel ){
+  this.getSelectedAction= function( ){
+    for (var i=0,at=$t.payload.items; i<at.length; i++ )
+      if (!at[i].checked) {
+      } else if (at[i].text.indexOf("!button")==0)
+        return at[i].text.substr(8);
+    return "";
+  }
+  this.show1item= function( item, i, action ){
       var div=$t.itemsDiv.appendChild($d.createElement("div"));
       $t.itemsDiv.insertBefore(div,$t.itemsDiv.firstChild);
       var cb =div.appendChild($d.createElement("input"));
@@ -281,17 +293,32 @@ function ApeCklist(){
       cb.checked= (item.checked==1);
       var spn =div.appendChild($d.createElement("span"));
       spn.innerHTML = item.text;
-      if (isDel) {
+      if (action) {
         var btn =div.appendChild($d.createElement("input"));
         btn.type= "button";
         btn.dataIndex= i;
-        btn.value= "Del";
-        btn.onclick= $t.doDel;
+        btn.value= action;
+        btn.onclick= $t.doAction;
       }
   }
-  this.doDel= function(){
-    $t.payload.items.splice( this.dataIndex, 1 );
-    $t.reShowItems( $t.isDelMode );
+  this.doAction= function(){
+    if ($t.actMode==1) $t.doDel( this.dataIndex );
+    if ($t.actMode==2) {
+      if (this.value.indexOf("color:")==0) $t.doColor(this);
+      $t.reShowItems( );
+      $t.saveData();
+    }
+  }
+  this.doColor= function(btn){
+    var color= btn.value.substr(6);
+    var item= $t.payload.items[btn.dataIndex];
+    var spn= $d.createElement("span");
+    spn.innerHTML= item.text;
+    item.text= "<font color="+color+">"+spn.innerText+"</font>";
+  }
+  this.doDel= function(i){
+    $t.payload.items.splice( i, 1 );
+    $t.reShowItems( );
     $t.saveData();
   }
 }
