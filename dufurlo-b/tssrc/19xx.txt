@@ -1,0 +1,86 @@
+//////////////
+//// 1918 ////
+//////////////
+//7-27-14 JChoy ScrollBottomDetector 1918
+//7-28-14 JChoy Try to fix for android
+//---------------------
+function OOcallback(obj, meth, arg){
+	var _privThis = this;
+	this.meth = meth;
+	this.obj = obj;
+	this.arg = arg;
+	this.fcn=function(a,b,c,d){_privThis.obj[_privThis.meth](a,b,c,d);}
+	this.fcna=function(){_privThis.obj[_privThis.meth](_privThis.arg);}
+}
+//----------
+ScrollBottomDetector= function( obj, meth ){
+	this.obj = obj;
+	this.meth = meth;
+	var _d = document;
+	this.check= function(){
+		this.timeMark = new Date();
+		if (!this.isCssSet) this.setupCss();
+		if (this.isBusy) return;
+		setTimeout( new OOcallback(this, "checkBottom").fcn, 200 );
+	}
+	this.setupCss= function(){
+		this.isCssSet = true;
+		var sty= document.createElement("style");
+		sty.innerHTML= "@keyframes acs { from {width: 100px;} to {width: 200px;} } "
+		  +"@-webkit-keyframes acs{ from {width: 100px;} to {width: 200px;} }";
+		document.getElementsByTagName("head")[0].appendChild(sty);
+	}
+	this.checkBottomDroid= function(){
+		if (0 != document.body.scrollLeft) return;
+		if (this.dbstDroid) {
+		  if (0 == document.body.scrollTop) return;
+		  if (this.dbstDroid == document.body.scrollTop){
+		    this.showSpinner();
+		    this.obj[this.meth]();
+		  }
+		}
+		this.dbstDroid = 0 + document.body.scrollTop;
+	}
+	this.checkBottom= function(){
+		if (new Date().valueOf() - this.timeMark < 200) return;
+		this.dbst = 0 + document.body.scrollTop;
+		if (this.isDroid) return this.checkBottomDroid();
+		if (this.dbst==0) return;
+		this.isDroid = (!this.isScrollTopImmediate())
+		this.isBusy = true;
+		window.scrollBy( 0, 10 );
+		if (document.body.scrollTop==this.dbst){
+		  this.showSpinner();
+		  this.obj[this.meth]();
+		}
+		window.scrollBy( 0, -10 );
+		this.isBusy = false;
+		return;
+	}
+	this.hideSpinner= function(){
+		if (!this.spinner) return;
+		this.spinner.parentNode.removeChild(this.spinner);
+		this.spinner = null;
+	}
+	this.showSpinner= function(){
+		this.hideSpinner();
+		var sp= this.spinner = document.createElement("div");
+		sp.setAttribute( "style", 
+		  "position:absolute; left:50px; top:"+(100+this.dbst)+"px; "
+		  +"border-radius: 10px; text-align:right; "
+		  +"opacity:0.5; background-color:#110022; color: yellow; "
+		  +"-webkit-animation: acs linear 2s infinite alternate; "
+		  +"animation: acs linear 3s infinite alternate;"
+		);
+		sp.innerHTML = "Loading &nbsp;";
+		document.body.appendChild( this.spinner );
+		setTimeout( new OOcallback(this, "hideSpinner").fcn, 2000 );
+	}
+	this.isScrollTopImmediate= function(){	//detect android behavior
+		var dbst = 0 + document.body.scrollTop;
+		window.scrollBy( 0, -1 );
+		var res= (document.body.scrollTop!=dbst);
+		window.scrollBy( 0, 1 );
+		return res;
+	}
+}
