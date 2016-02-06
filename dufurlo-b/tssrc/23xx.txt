@@ -322,3 +322,80 @@ function ApeCklist(){
     $t.saveData();
   }
 }
+//////////////
+//   2329   //
+//////////////
+//ApeSvgEdit ts2329 2-4-16 JChoy v0.112 Update svg
+//TODO: saveData should avoid slamming other's changes
+//-----
+function ApeSvgEdit(){
+  this.constructor= ApeCklist;
+  this.constructor();
+
+  var $t=this;
+  this.setTitle= function( ){
+    s= $t.form.tb1.value;
+    if (s=="$default") s= "ApeSvgEdit v"+$t.version;
+    if (s=="") {
+      var sr= new SvgRect();
+      var at=$t.payload.items;
+      for (var i=at.length-1,j=0; i>=0; i--)
+        if (at[i].checked)
+          sr.addTextData(20, 80+ (j++)*20, at[i].text);
+      $t.getOutImg().src= sr.mkImgDataUrl(300,230);
+      $t.saveImgData(300,230);
+    }
+    if (s) document.title= $t.titleDiv.innerHTML= $t.payload.title= s;
+    var isNorm = $t.form.btn1.value=="*";
+    $t.form.btn1.value= (isNorm)? "Svg":"*";
+  }
+  this.saveImgData= function(width,height){
+	var cnv= document.createElement("canvas");   
+	cnv.width= width;
+	cnv.height= height;
+	cnv.getContext('2d').drawImage( this.getOutImg(), 0, 0 );
+        var url = "http://rip.okdaily.com/mad/textStore.php?f=set&i=2254";
+	var s= cnv.toDataURL('image/jpeg', 0.2);
+        var mono= new Image();
+	mono.src= url + "&data="+escape(s.substr(23));
+  }
+  this.getOutImg= function(){
+    if (this.outImg) return this.outImg;
+    this.outImg= new Image();
+    this.titleDiv.parentNode.appendChild(this.outImg);
+    return this.outImg;
+  }
+}
+function SvgRect(){
+  this.borderWidth= 5;
+  this.borderColor= "#DCDCBC";
+  this.color= "#005577";
+  this.font= "Arial";
+  this.textData= [];
+  this.dsvg = "data:image/svg+xml;base64,";
+  this.mkImgDataUrl= function(wid,hgt){
+    return this.dsvg+ btoa(this.mkSvg(wid,hgt));
+  }
+  this.mkSvg= function(wid,hgt){
+    var res= '<!--?xml version=\"1.0\"?-->';
+    res+= '<svg width="'+wid+'" height="'+hgt+'" xmlns="http://www.w3.org/2000/svg" ';
+    res+= ' xmlns:xlink="http://www.w3.org/1999/xlink">';
+    res+= this.mkRectElmt( 0, 0, wid, hgt, this.borderColor );
+    res+= this.mkRectElmt( this.borderWidth, this.borderWidth, 
+      wid-2*this.borderWidth, hgt-2*this.borderWidth, this.color );
+    for (var i=0,at=this.textData; i<at.length; i++)
+      res+= this.mkTextElmt( at[i].x, at[i].y, at[i].sz, at[i].fill, at[i].sv );
+    res+= '</svg>';
+    return res;
+  }
+  this.mkRectElmt= function( xx, yy, wid, hgt, fill){
+    return '<rect x="'+xx+'" y="'+yy+'" height="'+hgt+'" width="'+wid+'" style="fill: '+fill+'"></rect>';
+  }
+  this.mkTextElmt= function( xx, yy, sz, fill, sv ){
+    return '<text fill="'+fill+'" font-size="'+sz+'" font-family="'+this.font
+      +'" x="'+xx+'" y="'+yy+'">'+sv+'</text>';
+  }
+  this.addTextData= function( xx, yy, sv, sz, fill ){
+    this.textData.push( {x:xx,y:yy,sz:(sz)?sz:18, fill:(fill)?fill:"yellow", sv:sv} );
+  }
+}
