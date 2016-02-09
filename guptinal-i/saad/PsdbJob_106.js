@@ -1,4 +1,4 @@
-//1-30-2016 JChoy PsdbJob_106.js separate file from hta
+//2-8-2016 JChoy PsdbJob_106.js 4 items on numList
 //copies ts source code into dropbox tssrc folder
 //-----
 function PsdbJob_106(){
@@ -8,7 +8,7 @@ function PsdbJob_106(){
     this.ajax= new Ajax();
     var pt= this;
     this.ajax.write= function(s){ pt.writeFile(s) }
-    this.numList= [2327,2326];
+    this.numList= [2327,2326,2329,2332];
     this.start= function(){
       if (this.numList.length <= 0) return;
       this.cNum = this.numList.pop();
