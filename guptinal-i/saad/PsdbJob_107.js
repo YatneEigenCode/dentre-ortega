@@ -35,7 +35,10 @@ function PsdbJob_107(){
       this.numList= [];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
-   this.numList.length=3;
+   this.numList.length=6;
+      this.goWebGet();
+   }
+   this.goWebGet= function(){ 
       if (this.numList.length <= 0) return;
       this.cNum = this.numList.pop();
       this.fn = this.cNum+".txt";
@@ -44,8 +47,8 @@ function PsdbJob_107(){
     }
     this.writeFile= function(s){
       if (!pt.fn) return;
-      var fo = pt.pw.write( pt.fn, s );
-      pt.lw.write( "wrote to "+pt.fn+"\n" );
-      pt.start();
+      var fo = pt.pw.write( pt.cNum, s );
+      pt.lw.write( "wrote to "+pt.cNum+"\n" );
+      pt.goWebGet();
     }
 }
