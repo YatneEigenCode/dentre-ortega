@@ -1,5 +1,9 @@
 //2-9-2016 JChoy PsdbJob_107.js dev
 //copies ts data into dropbox psdb folder
+
+// if (this.counter.data.check % 2 == 0)  //120
+//     this.runPsdbJob( "107" );
+
 //-----
 function PsdbJob_107(){
     this.trak= [[2300,2350,3]
