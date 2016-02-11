@@ -4,7 +4,7 @@ maximizeButton="yes" minimizeButton="yes" showInTaskbar="yes" windowState="norma
 navigable="yes" scroll="no" scrollFlat="yes" /> 
 <!-- 
 ///////////////////////
-//1-29-2016 JChoy psdbnoz.hta v1.213 - PsdbJob_106 writes file
+//2-9-2016 JChoy psdbnoz.hta v1.312 - PsdbJob_107 archiveRip
 //TODO: 
 -->
 <title>Psdb Noz</title>
@@ -21,6 +21,7 @@ navigable="yes" scroll="no" scrollFlat="yes" />
 </html>
 
 <script src="PsdbJob_106.js"></script>
+<script src="PsdbJob_107.js"></script>
 <script>
 function PageAppCfg(){
   this.config= function(o){
@@ -39,7 +40,7 @@ function PageApp(frm){
     this.tsNum= 11;
     this.repeatIntervalMS = 5000;
     this.maxNum = 999;
-    this.version = "1.213";
+    this.version = "1.312";
     this.init= function(){
       if (PageAppCfg) new PageAppCfg().config(this);
       for (var m in {version:0,tsNum:0,tsUrl:0,psdbPath:0,repeatIntervalMS:0}) this.log(m+' '+this[m]);
@@ -57,6 +58,8 @@ function PageApp(frm){
       if (!this.pw) this.init();
       var url= this.tsUrl + "?f=text&i=" +this.tsNum;
       this.counter.add("check");
+      if (this.counter.data.check % 12 == 0) 
+        this.runPsdbJob( "107" );
       if (this.counter.data.check % 100 == 0) 
         this.log( this.counter.report().toString() );
       this.ajax.webGet(url);
