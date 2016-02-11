@@ -1,4 +1,4 @@
-//2-9-2016 JChoy PsdbJob_107.js dev
+//2-10-2016 JChoy PsdbJob_107.js v0.152 catch when failed writing non-ascii
 //copies ts data into dropbox psdb folder
 
 // if (this.counter.data.check % 2 == 0)  //120
@@ -17,12 +17,12 @@ function PsdbJob_107(){
     this.msf = new MSFeatures();
     if (PageAppCfg) new PageAppCfg().config(this);
     //this.path = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\tssrc\\";
-    //this.path = "d:\\16data\\archiveRip\\psdb\\ar\\";
+    this.arPath = "d:\\write\\ar\\awos\\";
     this.ajax= new Ajax();
     var pt= this;
     this.ajax.write= function(s){ pt.writeFile(s) }
     this.lw = new LogWriter( this.psdbPath+"logs\\" );
-    this.pw = new PsdbWriter( this.psdbPath+"psdb\\" );
+    this.pw = new PsdbWriter( this.arPath );
     this.start= function(){
       if (document.psdbJob_107_trak) this.trak= document.psdbJob_107_trak;
       var k=0,sum=-12;
@@ -35,20 +35,25 @@ function PsdbJob_107(){
       this.numList= [];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
-   this.numList.length=6;
+ if (this.numList.length>120) this.numList.length=120;   // *****
       this.goWebGet();
    }
    this.goWebGet= function(){ 
       if (this.numList.length <= 0) return;
       this.cNum = this.numList.pop();
-      this.fn = this.cNum+".txt";
+      if (!this.cNum) return;
+      this.fn = this.cNum+".txt";  //not needed
       var url= this.tsUrl +"?f=text&i="+this.cNum;
       this.ajax.webGet( url );
     }
     this.writeFile= function(s){
       if (!pt.fn) return;
-      var fo = pt.pw.write( pt.cNum, s );
-      pt.lw.write( "wrote to "+pt.cNum+"\n" );
+      pt.lw.write( "writing "+s.length+" bytes to "+pt.cNum+"\n" );
+      try {
+        pt.pw.write( pt.cNum, s );
+      } catch (e) {
+        pt.lw.write( "FAILED "+s.length+" bytes to "+pt.cNum+"\n" );
+      }
       pt.goWebGet();
     }
 }
