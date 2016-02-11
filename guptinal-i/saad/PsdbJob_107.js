@@ -1,4 +1,4 @@
-//2-10-2016 JChoy PsdbJob_107.js v0.154 reduce logging
+//2-10-2016 JChoy PsdbJob_107.js v0.312 MaxNonZero()
 //copies ts data into dropbox psdb folder
 //TODO: fix bug that occurs after many loads
 
@@ -7,14 +7,14 @@
 
 //-----
 function PsdbJob_107(){
-    this.trak= [[2300,2350,61]
-               ,[2200,2299,27]
-               ,[2000,2199,18]
-               ,[1800,1999,12]
-               ,[1500,1799,8]
+    this.trak= [[2300,2350,29]
+               ,[2200,2299,20]
+               ,[2000,2199,14]
+               ,[1800,1999,10]
+               ,[1500,1799,7]
                ,[1000,1499,5]
-               ,[500,999,3]
-               ,[1,499,2]];
+               ,[500,999,4]
+               ,[1,499,3]];
     this.msf = new MSFeatures();
     if (PageAppCfg) new PageAppCfg().config(this);
     //this.path = "c:\\Users\\choy\\Dropbox\\Public\\jsondata\\psdb\\ape\\tssrc\\";
@@ -24,25 +24,41 @@ function PsdbJob_107(){
     this.ajax.write= function(s){ pt.writeFile(s) }
     this.lw = new LogWriter( this.psdbPath+"logs\\" );
     this.pw = new PsdbWriter( this.arPath );
+    this.MazNonZero= function(seed){
+      this.maxNum= seed;
+      this.pad= 5;
+      this.check= function(num){
+        return (num<this.maxNum+3);
+      }
+      this.set= function(num,byteCount){
+        if (byteCount<=0) return;
+        if (num>this.maxNum)  this.maxNum= num;
+      }
+    }
     this.start= function(){
       if (document.psdbJob_107_trak) this.trak= document.psdbJob_107_trak;
+      this.mnz= new MaxTrak(2311);
       var k=0,sum=-12;
       for (var i=0,at=this.trak; i<at.length-1; sum+= at[i++][2])
         if ((at[i][2]/at[i+1][2]) > 1.5) k=i+1;
       this.trak[k][2]++;
-      this.lw.write(sum+" xar "+this.trak[k]+"\n");
+      this.lw.write(sum+" ar "+this.trak[k]+" "+new Date()+"\n");
       document.psdbJob_107_trak = this.trak;
 
-      this.numList= [this.trak[k][1]];
+      this.numList= [];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
- if (this.numList.length>120) this.numList.length=120;   // *****
+  this.numList.length=100;   // *****
+      this.numList.unshift(this.numList[this.numList.length-1]);
       this.goWebGet();
    }
    this.goWebGet= function(){ 
-      if (this.numList.length <= 1) return;
+      if (this.numList.length <= 1) 
+        return this.lw.write(new Date()+" Finished numlist\n");
       this.cNum = this.numList.pop();
       if (!this.cNum) return;
+      if (this.mnz.check(this.cNum))
+        return this.goWebGet();
       this.fn = this.cNum+".txt";  //not needed
       this.url= this.tsUrl +"?f=text&i="+this.cNum;
       this.ajax.webGet( this.url );
@@ -58,6 +74,7 @@ function PsdbJob_107(){
       } catch (e) {
         pt.lw.write( "FAILED "+s.length+" bytes to "+pt.cNum+"\n" );
       }
+      pt.mnz.set( pt.cNum, s.length );
       pt.goWebGet();
     }
 }
