@@ -1,4 +1,4 @@
-//2-10-2016 JChoy PsdbJob_107.js v0.312 MaxNonZero()
+//2-10-2016 JChoy PsdbJob_107.js v0.315 MaxNonZero()
 //copies ts data into dropbox psdb folder
 //TODO: fix bug that occurs after many loads
 
@@ -21,23 +21,23 @@ function PsdbJob_107(){
     this.arPath = "d:\\write\\ar\\awos\\";
     this.ajax= new Ajax();
     var pt= this;
-    this.ajax.write= function(s){ pt.writeFile(s) }
-    this.lw = new LogWriter( this.psdbPath+"logs\\" );
-    this.pw = new PsdbWriter( this.arPath );
-    this.MazNonZero= function(seed){
+    this.MaxNonZero= function(seed){
       this.maxNum= seed;
       this.pad= 5;
       this.check= function(num){
-        return (num<this.maxNum+3);
+        return (num<(this.maxNum+this.pad));
       }
       this.set= function(num,byteCount){
         if (byteCount<=0) return;
         if (num>this.maxNum)  this.maxNum= num;
       }
     }
+    this.ajax.write= function(s){ pt.writeFile(s) }
+    this.lw = new LogWriter( this.psdbPath+"logs\\" );
+    this.pw = new PsdbWriter( this.arPath );
     this.start= function(){
       if (document.psdbJob_107_trak) this.trak= document.psdbJob_107_trak;
-      this.mnz= new MaxTrak(2311);
+      this.mnz= new this.MaxNonZero(2311);
       var k=0,sum=-12;
       for (var i=0,at=this.trak; i<at.length-1; sum+= at[i++][2])
         if ((at[i][2]/at[i+1][2]) > 1.5) k=i+1;
@@ -45,11 +45,11 @@ function PsdbJob_107(){
       this.lw.write(sum+" ar "+this.trak[k]+" "+new Date()+"\n");
       document.psdbJob_107_trak = this.trak;
 
-      this.numList= [];
+      var tnl = this.numList = [];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
-  this.numList.length=100;   // *****
-      this.numList.unshift(this.numList[this.numList.length-1]);
+   if (tnl.length>100) tnl.length=100;   // *****
+      tnl.unshift(tnl[tnl.length-1]);
       this.goWebGet();
    }
    this.goWebGet= function(){ 
@@ -57,7 +57,7 @@ function PsdbJob_107(){
         return this.lw.write(new Date()+" Finished numlist\n");
       this.cNum = this.numList.pop();
       if (!this.cNum) return;
-      if (this.mnz.check(this.cNum))
+      if (!this.mnz.check(this.cNum))
         return this.goWebGet();
       this.fn = this.cNum+".txt";  //not needed
       this.url= this.tsUrl +"?f=text&i="+this.cNum;
