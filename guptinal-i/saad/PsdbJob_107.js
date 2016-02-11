@@ -1,18 +1,19 @@
-//2-10-2016 JChoy PsdbJob_107.js v0.152 catch when failed writing non-ascii
+//2-10-2016 JChoy PsdbJob_107.js v0.154 reduce logging
 //copies ts data into dropbox psdb folder
+//TODO: fix bug that occurs after many loads
 
 // if (this.counter.data.check % 2 == 0)  //120
 //     this.runPsdbJob( "107" );
 
 //-----
 function PsdbJob_107(){
-    this.trak= [[2300,2350,3]
-               ,[2200,2299,2]
-               ,[2000,2199,2]
-               ,[1800,1999,2]
-               ,[1500,1799,2]
-               ,[1000,1499,2]
-               ,[500,999,2]
+    this.trak= [[2300,2350,61]
+               ,[2200,2299,27]
+               ,[2000,2199,18]
+               ,[1800,1999,12]
+               ,[1500,1799,8]
+               ,[1000,1499,5]
+               ,[500,999,3]
                ,[1,499,2]];
     this.msf = new MSFeatures();
     if (PageAppCfg) new PageAppCfg().config(this);
@@ -32,23 +33,26 @@ function PsdbJob_107(){
       this.lw.write(sum+" xar "+this.trak[k]+"\n");
       document.psdbJob_107_trak = this.trak;
 
-      this.numList= [];
+      this.numList= [this.trak[k][1]];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
  if (this.numList.length>120) this.numList.length=120;   // *****
       this.goWebGet();
    }
    this.goWebGet= function(){ 
-      if (this.numList.length <= 0) return;
+      if (this.numList.length <= 1) return;
       this.cNum = this.numList.pop();
       if (!this.cNum) return;
       this.fn = this.cNum+".txt";  //not needed
-      var url= this.tsUrl +"?f=text&i="+this.cNum;
-      this.ajax.webGet( url );
+      this.url= this.tsUrl +"?f=text&i="+this.cNum;
+      this.ajax.webGet( this.url );
     }
     this.writeFile= function(s){
       if (!pt.fn) return;
-      pt.lw.write( "writing "+s.length+" bytes to "+pt.cNum+"\n" );
+      if (s.length==15)
+        pt.lw.write( this.url );
+      if ((pt.cNum==pt.numList[0]) || (pt.numList.length<5))
+        pt.lw.write( "writing "+s.length+" bytes to "+pt.cNum+"\n" );
       try {
         pt.pw.write( pt.cNum, s );
       } catch (e) {
