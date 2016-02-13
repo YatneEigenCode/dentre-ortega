@@ -399,3 +399,77 @@ function SvgRect(){
     this.textData.push( {x:xx,y:yy,sz:(sz)?sz:18, fill:(fill)?fill:"yellow", sv:sv} );
   }
 }
+//////////////
+//   2332   //
+//////////////
+//2-9-2016 JChoy ts2332 SlideMenu v0.152 detect edge drag
+//TODO: load via ajax
+//-----
+function SlideMenuItems(clsName,aLinks){
+  this.sm= new SlideMenu(clsName);
+  this.aLinks= aLinks;
+  var $d=document;
+  this.start= function(){
+    var at=$d.getElementsByClassName(this.sm.clsName);
+    var $t= this;
+    this.sm.map( at, function(el){$t.setContentEl(el)} );
+    this.sm.start();
+  }
+  this.setContentEl= function(el){
+    el.innerHTML="";
+    for (var ii=0,at=this.aLinks; ii<at.length; ii++)
+      el.appendChild(this.mkLinkDiv( at[ii][0], at[ii][1] ));
+    el.appendChild($d.createElement("div")).innerHTML=
+      "<br /><br /><br /><br />";
+  }
+  this.mkLinkDiv= function(tx,url){
+    var res= $d.createElement("div");
+    var ln= res.appendChild($d.createElement("a"));
+    ln.href= url;
+    ln.innerHTML= tx;
+    return res;
+  }
+}
+//-----
+function SlideMenu(clsName){
+  this.clsName= clsName;
+  this.start= function(){
+    var at=document.getElementsByClassName(this.clsName);
+    var $t= this;
+    this.map( at, function(el){$t.engage(el)} );
+  }
+  this.map= function( at, fcn, meth ){
+    for (var ii=0; ii<at.length; ii++)
+      if (meth) {at[ii][meth]()} else fcn(at[ii]);
+  }
+  this.engage= function(el){
+    var $t= this;
+    this.el= el;
+    this.originalLeft= el.style.left;
+    //if (el.offsetLeft < 0)
+    //  el.onclick= function(){ $t.onMenuClick(this) }
+    if (el.offsetLeft < 0){
+      el.ontouchstart= function(ev){ $t.onTouchstart(ev) }
+      el.ontouchend= function(ev){ $t.onTouchend(ev) }
+    }//if
+  }
+  /*
+  this.onMenuClick= function(el){
+    var isShow= (el.style.left!=this.originalLeft);
+    el.style.left= (isShow)? this.originalLeft: 0;
+  }
+  */
+  this.onTouchstart= function(ev){
+    this.startx= ev.changedTouches[0].pageX;
+    ev.preventDefault();
+  }
+  this.onTouchend= function(ev){
+    var dx=ev.changedTouches[0].pageX-this.startx;
+    this.el.style.left= (dx>0)? 0: this.originalLeft;
+    ev.preventDefault();
+  }
+}
+
+var at=[["CqTab","http://q.okdaily.com"],["Template","tsm.php?f=html&i=2330"]];
+new SlideMenuItems("left-menu",at).start();
+//can override by calling again
