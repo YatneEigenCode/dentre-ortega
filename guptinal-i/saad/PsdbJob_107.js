@@ -1,4 +1,4 @@
-//2-10-2016 JChoy PsdbJob_107.js v0.315 MaxNonZero()
+//2-10-2016 JChoy PsdbJob_107.js v0.318 save maxNum to trak
 //copies ts data into dropbox psdb folder
 //TODO: fix bug that occurs after many loads
 
@@ -7,7 +7,7 @@
 
 //-----
 function PsdbJob_107(){
-    this.trak= [[2300,2350,29]
+    this.trak= [[2300,2310,29]
                ,[2200,2299,20]
                ,[2000,2199,14]
                ,[1800,1999,10]
@@ -37,14 +37,15 @@ function PsdbJob_107(){
     this.pw = new PsdbWriter( this.arPath );
     this.start= function(){
       if (document.psdbJob_107_trak) this.trak= document.psdbJob_107_trak;
-      this.mnz= new this.MaxNonZero(2311);
-      var k=0,sum=-12;
+      this.mnz= new this.MaxNonZero(this.trak[0][1]);
+      var k=0,sum=-89;
       for (var i=0,at=this.trak; i<at.length-1; sum+= at[i++][2])
         if ((at[i][2]/at[i+1][2]) > 1.5) k=i+1;
       this.trak[k][2]++;
       this.lw.write(sum+" ar "+this.trak[k]+" "+new Date()+"\n");
       document.psdbJob_107_trak = this.trak;
 
+      this.loopCount = 0;
       var tnl = this.numList = [];
       for (var i=this.trak[k][0]; i<=this.trak[k][1]; i++)
         this.numList.push(i);
@@ -53,22 +54,26 @@ function PsdbJob_107(){
       this.goWebGet();
    }
    this.goWebGet= function(){ 
-      if (this.numList.length <= 1) 
+      if (this.numList.length <= 1) {
+        this.trak[0][1]= this.mnz.maxNum+5;
         return this.lw.write(new Date()+" Finished numlist\n");
+      }
       this.cNum = this.numList.pop();
       if (!this.cNum) return;
       if (!this.mnz.check(this.cNum))
         return this.goWebGet();
       this.fn = this.cNum+".txt";  //not needed
       this.url= this.tsUrl +"?f=text&i="+this.cNum;
+      this.loopCount++;
       this.ajax.webGet( this.url );
     }
     this.writeFile= function(s){
       if (!pt.fn) return;
       if (s.length==15)
-        pt.lw.write( this.url );
-      if ((pt.cNum==pt.numList[0]) || (pt.numList.length<5))
-        pt.lw.write( "writing "+s.length+" bytes to "+pt.cNum+"\n" );
+        pt.lw.write( this.url+"\n" );
+      if ((pt.loopCount<=3) || (pt.numList.length<5))
+        pt.lw.write( pt.loopCount+" writing "+s.length
+          +" bytes to "+pt.cNum+"/"+pt.mnz.maxNum+"\n" );
       try {
         pt.pw.write( pt.cNum, s );
       } catch (e) {
