@@ -1,0 +1,90 @@
+//////////
+// 219
+//////////
+//2-23-2016 JChoy v0.212 $t._
+//Sandbox, Divapp, Noz
+function Sandbox(){
+  (function(t,c){t.c=c;t.c()})( this,DivApp);
+  $t=this;
+  this.start= function(div){
+    div.innerHTML="";
+    var form= this.addEl( div, "form" );
+    form.helper=this;
+    this.addTextarea(form, "ta1");
+    $t.addEl(form, "br");
+    $t.addButton(form, "Preview");
+    $t.resultDiv= $t.addEl(div, "div");
+  }
+  this.cgi= function(k,def,qy){
+	var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); 
+	return (at.length==1)?def:at[1].split("&")[0];
+  }
+  this.validatePayload= function(pl,beg){
+    this.payload= this.cgi("ia",pl, location);
+    if (this.payload[0]!=beg) this.payload=pl;
+  }
+  //---
+  $t.onButtonClick= function(){
+    eval (this.form.ta1.value);
+    new PageApp().start(
+     this.form.helper.resultDiv
+    )
+  }
+}
+
+//-----
+function Noz(){
+  var $u=  atob( "aHR0cDovL3JpcC5va2RhaWx5LmNvbS9tYWQvdGV4dFN0b3JlLnBocA==" );
+  this.delayMs=1200;
+  this.url=function(cmd, s){
+    return $u +"?f=set&i="
+      +"2321&data=" +escape(
+        "!/c/psdb "+ cmd
+        +" !/endcmd\n" +s
+      );
+  }
+  this.reEnableSoon= function (btn){
+    btn.disabled= true;
+    var bn= btn;
+    setTimeout( function(){
+      bn.disabled= false;}, this.delayMs);
+  }
+}
+//-----
+function PageApp(){
+  (function(t,c){t.c=c;t.c()})( this,DivApp);
+}
+function DivApp(){
+  $t= this;
+  $d= document;
+  $t.payload="ola";
+  this.start= function(div){
+    div.innerHTML=$t.payload;
+  }
+  $t.addButton= function(fm){}
+  $t.addTextbox= 
+  function( fm,nm) {
+    $t.addEl (fm,"input");
+    $t._.name= nm;
+  }
+  $t.addTextarea= function( fm,nm){ 
+    var res=$t.addEl(fm,"textarea");
+    res.name=nm;
+    return res;
+  }
+  $t.addButton= function(fm,val){
+    var res=$t.addEl(fm,"input");
+    res.type="button";
+    res.value=val;
+    res.onclick= $t.onButtonClick;
+    return res;
+  }
+  $t.addEl= function(pa,tag){
+    $t._=$d.createElement(tag);
+    return pa.appendChild( $t._);
+  }
+  //---
+  $t.onButtonClick= function(){
+  }
+}
+
