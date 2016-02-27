@@ -1,4 +1,77 @@
 //////////
+// 213
+//////////
+//2-22-2016 JChoy v0.623 linkItem css
+// SlideMenuItems ts2332
+//TODO: load via ajax
+//-----
+function SlideMenuItems(clsName,aLinks){
+  this.sm= new SlideMenu(clsName);
+  this.aLinks= aLinks;
+  var $d=document;
+  this.start= function(){
+    var at=$d.getElementsByClassName(this.sm.clsName);
+    var $t= this;
+    this.sm.map( at, function(el){$t.setContentEl(el)} );
+    this.sm.start();
+  }
+  this.setContentEl= function(el){
+    el.innerHTML="";
+    for (var ii=0,at=this.aLinks; ii<at.length; ii++)
+      el.appendChild(this.mkLinkDiv( at[ii][0], at[ii][1] ));
+    el.appendChild($d.createElement("div")).innerHTML=
+      "<br /><br /><br /><br />";
+    el.style.zIndex="10";
+  }
+  this.mkLinkDiv= function(tx,url){
+    var res= $d.createElement("div");
+    var ln= res.appendChild( $d.createElement("a"));
+    ln.href= url;
+    ln.innerHTML= tx;
+    res.className="linkitem";
+    return res;
+  }
+}
+//-----
+function SlideMenu(clsName){
+  this.clsName= clsName;
+  this.start= function(){
+    var at=document.getElementsByClassName(this.clsName);
+    var $t= this;
+    this.map( at, function(el){$t.engage(el)} );
+  }
+  this.map= function( at, fcn, meth ){
+    for (var ii=0; ii<at.length; ii++)
+      if (meth) {at[ii][meth]()} else fcn(at[ii]);
+  }
+  this.engage= function(el){
+    var $t= this;
+    this.el= el;
+    this.originalLeft= el.style.left;
+    if (el.offsetLeft < 0){
+      el.ontouchstart= function(ev){ $t.onTouchstart(ev) }
+      el.ontouchend= function(ev){ $t.onTouchend(ev) }
+    }//if
+  }
+  this.onTouchstart= function(ev){
+    this.startx= ev.changedTouches[0].pageX;
+    if ((this.startx < 10) || (this.startx>90)) ev.preventDefault();
+  }
+  this.onTouchend= function(ev){
+    var dx=ev.changedTouches[0].pageX-this.startx;
+    if (Math.abs(dx) > 10) {
+      this.el.style.left= (dx>0)? 0: this.originalLeft;
+      ev.preventDefault();
+    }
+  }
+}
+
+var at=[["CqTab","http://q.okdaily.com"],["Template","tsm.php?f=html&i=2330"]];
+new SlideMenuItems("left-menu",at).start();
+//can override by calling again
+
+
+//////////
 // 219
 //////////
 //2-23-2016 JChoy v0.212 $t._
