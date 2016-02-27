@@ -1,8 +1,9 @@
 //////////
 // 233
 //////////
-//2-25-2016 Jchoy v1.261 scale
-// EditorSandbox, ImgData64, SvgRectMac
+//2-26-2016 Jchoy v1.286 scale
+// EditorSandbox, ImgData64, ImgData64bg, SvgRectMac
+//todo: use canvas for preview
 //-----
 function EditorSandbox(){
   (function(t,c){t.c=c;t.c()})( this,Sandbox);
@@ -38,11 +39,11 @@ function EditorSandbox(){
     var btv= this.value;
     var tfh= this.form.helper;
     if (btv=="Preview"){
-      var sr= new SvgRectMac();
+      var sr= new SvgRectMac(1);
       var at= tav.split("\n");
       if (at.length<3) at.unshift("");
       for (var i=0; (i<at.length)&&(i<79); i++)
-        sr.addTextData(20+((i)?20:0), 80+i*20, at[i]);
+        sr.addTextData(40, 20+i*20, at[i]);
       tfh.sr= sr;
       tfh.getOutImg().src= sr.mkImgDataUrl(300,230);
       if (tfh.imgNum)
@@ -53,10 +54,11 @@ function EditorSandbox(){
         $a[0].src= $a[1] +tfh.imgNum+"&d" }, 800);
       tfh.imgLnk.href= $a[1] +tfh.imgNum;
       tfh.imgLnk.innerHTML= $a[1] +tfh.imgNum;
-      new ImgData64( tfh.imgNum ).save(
+      new ImgData64bg( tfh.imgNum ).save(
         tfh.getOutImg(),300,230, tfh.sr.imgUrl,
         tfh.sr.bmOffsetX, tfh.sr.bmOffsetY,
-        tfh.sr.bmScale );
+        tfh.sr.bmScale, 
+        tfh.sr.bgColor, tfh.sr.bgAlpha);
     } else if (btv=="Save"){
       var mnl= new Image();
       mnl.src= new Noz().url( 
@@ -82,34 +84,66 @@ function EditorSandbox(){
   }
 }//class
 //-----
-function ImgData64(num){
-  this.tsnum=(num)?num:"2254";
-  this.tu = "cmlwLm9rZGFpbHkuY29tL21hZC90ZXh0U3RvcmUucGhw";
-  $t = this;
-  this.save= 
-  function(img,width,height, bgbm,ox,oy ,scale){
-    var cnv= document.createElement( "canvas"); 
-    this.ofst=[ox,oy,scale];
-    this.mainImg= img;
-    cnv.width= width;
-    cnv.height= height;
-    var ctx= cnv.getContext('2d');
-    ctx.drawImage(img, 0,0);
-    this.cnv=cnv;
+function ImgData64bg(num){
+ (function(t,c){t.c=c;t.c(num)})( this,ImgData64);
+  var $t = this;
+  this.bgAlpha= 0.5;
+  this.saveA= function(img, bgbm){
     var bm = new Image();
     bm.onload= function(){ $t.saveFin(bm) }
     bm.src= bgbm;
   }
   this.saveFin= function(im2){
     var ctx= $t.cnv.getContext('2d');
+    ctx.fillStyle= $t.bgColor;
+    ctx.fillRect(0,0,$t.cnv.width, $t.cnv.height);
+    this.saveB(im2);
+    ctx.drawImage($t.mainImg, 0,0);
+    this.svJpg();
+  }
+}
+//-----
+function ImgData64(num){
+  this.tsnum=(num)?num:"2254";
+  this.tu = "cmlwLm9rZGFpbHkuY29tL21hZC90ZXh0U3RvcmUucGhw";
+  var $t = this;
+  this.bgAlpha=0.5;
+  this.save= 
+  function(img,width,height, bgbm,ox,oy ,scale,bgColor,bgAlpha){
+    var cnv= document.createElement( "canvas"); 
+    this.ofst=[ox,oy,scale];
+    this.mainImg= img;
+    this.bgColor= bgColor; 
+    this.bgAlpha= bgAlpha;
+    cnv.width= width;
+    cnv.height= height;
+    this.cnv=cnv;
+    this.saveA(img, bgbm);
+  }
+  this.saveA= function(img, bgbm){
+    var ctx= $t.cnv.getContext('2d');
+    ctx.drawImage(img, 0,0);
+    var bm = new Image();
+    bm.onload= function(){ $t.saveFin(bm) }
+    bm.src= bgbm;
+  }
+  this.saveFin= function(im2){
+    this.saveB(im2);
+    this.svJpg();
+  }
+  this.saveB= function(im2){
+    var ctx= $t.cnv.getContext('2d');
     ctx.save();
-    ctx.globalAlpha= 0.5;
+    ctx.globalAlpha= $t.bgAlpha;
     ctx.drawImage(im2, 
       $t.ofst[0], $t.ofst[1],
       im2.width*$t.ofst[2],
       im2.height*$t.ofst[2]
     );
-    url= "http://"+atob(this.tu)+"?f=set&i="+ this.tsnum;
+    ctx.restore();
+  }
+  this.svJpg= function(){
+    var url= "http://"+atob(this.tu)+ "?f=set&i="+ this.tsnum;
     var s= $t.cnv.toDataURL('image/jpeg', 0.2);
     this.monImg= new Image();
     this.monImg.src= url + "&data="+escape( s.substr(23));
@@ -150,11 +184,13 @@ function SvgRect(){
     this.textData.push( {x:xx,y:yy,sz:(sz)?sz:18, fill:(fill)?fill:"yellow", sv:sv} );
   }
 }
-function SvgRectMac(){
+function SvgRectMac(isNoBg){
   (function(t,c){t.c=c;t.c()})( this,SvgRect);
   this.bmOffsetX= "0";
   this.bmOffsetY= "0";
   this.textFill= "yellow";
+  this.bmScale= 1.0; 
+  this.bgAlpha= 0.8;
   $d= document;
   this.addTextData= function( xx, yy, sv, sz, fill ){
     if (this.doCmt(sv)) return;
@@ -181,11 +217,17 @@ function SvgRectMac(){
       this.imgUrl= pv;
     if (cm=="img-zoom")
       this.bmScale= parseFloat(pv);
+    if (cm=="img-alpha")
+      this.bgAlpha= parseFloat(pv);
     if (cm=="img-move"){
       var at= pv.split(",");
       this.bmOffsetX= at[0];
       this.bmOffsetY= at[1];
     }
+  } 
+  if (isNoBg)
+  this.mkRectElmt= function(){
+    return "";
   }
   this.mkTextElmt= function( xx, yy, sz, fill, sv ){
     return '<text fill="'+this.textFill+'" font-size="'+sz
