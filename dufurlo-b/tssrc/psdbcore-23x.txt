@@ -194,5 +194,119 @@ function SvgRectMac(){
   }
 }
 
+//////////
+//  238
+//////////
+//2-25-2016 Jchoy v1.149 httpi fix
+//EditorSandbox, HtmlTemplate, Autolink
+//use JasonLoader2326, Sandbox119
+//-----
+function EditorSandbox(){
+  (function(t,c){t.c=c;t.c()})( this,Sandbox); 
+
+  this.payload="240"; 
+  var $t=this;
+  var $d=document;
+  $t.dbuc="https://dl.dropboxusercontent.com/u/28448395/";
+  $t.atl=new Autolink ();
+  //---
+  $t.init=function(pl){
+    this.validatePayload(pl,"3");
+    new JsonLoader().global();
+    _j.subscribe($t, "webGot");
+    var url=this.payload.split( '').join("/") + ".txt";
+    url="../../"+url;
+    $t.addEl( $d.getElementsByTagName( "head")[0], "script" ).src= url;
+    return this;
+  }
+  $t.webGot= function(jd){
+    var fm=$d.forms[0];
+    if (!fm.helper) {
+    } else if (fm.helper==this){
+      fm.ta1.value=jd.text;
+      fm.ta1.style.zIndex="0";
+      fm.ta1.rows=10;
+    }
+  }
+  $t.onButtonClick= function(){
+    var tav= this.form.ta1.value;
+    var btv= this.value;
+    var tfh= this.form.helper;
+    if (btv=="Preview"){
+      var pa=new PageApp();
+      pa.payload=tfh.atl.go(tav);
+      pa.start( tfh.resultDiv);
+      tfh.addPublishBtn(this);
+    } else if (btv=="Publish"){
+      var mnl= new Image();
+      mnl.src= new Noz().url( 
+          "/h "+tfh.payload, 
+          new HtmlTemplate().fill(
+            tfh.atl.go(tav) )
+        );
+    } else if (btv=="Save"){
+      var mnl= new Image();
+      mnl.src= new Noz().url( 
+        "/s "+tfh.payload, new JsonLoader(
+        ).stringify( {text:tav})
+      ) ;
+    }
+    new Noz().reEnableSoon(this);
+  }//on button click
+  $t.addPublishBtn= function(btn){
+    if(btn.isModOnce) return;
+    btn.isModOnce= true;
+    $t.addButton(btn.form, "Publish").onclick= this.onButtonClick;
+    $t.addButton( btn.form, "Save").onclick= this.onButtonClick;
+  }
+}//class
+
+function HtmlTemplate(){
+  this.sa='<meta name=viewport content="width=device-width; initial-scale=1.5; maximum-scale=4.0; minimum-scale=0.7;" />'
+    +'<LINK REL=StyleSheet HREF=../../2/1/1.txt TYPE="text/css">'
+    +'<title>{0}</title>'
+    +'<body><div class=title>{0}</div>'
+    +'<div class=left-menu></div>'
+    +'<div class=content>';
+  this.sb= '</div><div class=content>'
+    +'</div></body>'
+    +'<scr'+'ipt src=../../2/1/2.txt></scr'+'ipt >'
+    +'<scr'+'ipt src=../../2/1/6.txt></scri'+'pt >';
+
+  this.fill= function(s){
+    var res=this.sa +s + this.sb;
+    var ttl=s.split("\n",2)[0 ].substr (0,30);
+    return res.replace("{0}",ttl ).replace("{0}",ttl);
+  }
+}
+//----
+function Autolink (){
+  this.go= function (s){
+    var at=s.split("\n");
+    var res= "<hr>";
+    this.resImg= "<hr>";
+    for (var i=0; i<at.length; i++ )
+      res+=this.doLink(at[i]);
+    return s+res+this.resImg;
+  }
+  this.doLink=function(sr){
+    var s=sr.replace ("\r",""); 
+    var t1='<div class="linkitem">';
+    var t2='</div>\n';
+    var fn, s8, s7= s.substr (0,7);
+    if (s7.indexOf("http")!=0) return "";
+    if ((s7=="http://")|| (s7=="https:/") )
+      return t1+s.link (s) +t2;
+    s8= s.substr (8);
+    if (s7=="httpr:/")
+      return t1+ s8.link (s8) +t2;
+    fn=location.pathname.split( "/").pop();
+    if (s7=="httpc:/")
+      return t1+s8.link ( fn+s8) +t2;
+    if (s7=="httpi:/")
+      this.resImg+='<img src="http://'+ s8+'"> ';
+    return "";
+  }
+}
 
 
