@@ -1,1 +1,198 @@
-//placehoder
+//////////
+// 233
+//////////
+//2-25-2016 Jchoy v1.261 scale
+// EditorSandbox, ImgData64, SvgRectMac
+//-----
+function EditorSandbox(){
+  (function(t,c){t.c=c;t.c()})( this,Sandbox);
+  this.payload="99"; 
+  var $t=this;
+  var $d=document;
+  $t.c9u="http://demo-project-jcc9.c9.io/mimerelay64?ts="
+  $t.dbuc="https://dl.dropboxusercontent.com/u/28448395/";
+  $t.init=function(pl,imgnum){
+    this.validatePayload(pl,"4");
+    this.getTaData( "webGot" );
+    this.imgNum= imgnum;
+    return this;
+  }
+  $t.getTaData = function(callback){
+    new JsonLoader().global();
+    _j.subscribe($t,callback);
+    var url=this.payload.split( '').join("/") + ".txt";
+    $t.addEl( $d.getElementsByTagName( "head")[0], "script" ).src= "../../"+url;
+  }
+  $t.webGot= function(jd){
+    var fm=$d.forms[0];
+    if (!fm.helper) {
+    } else if (fm.helper==this){
+      fm.ta1.value=jd.text;
+      fm.ta1.rows=10;
+      if (!isNaN( jd.imgnum )) 
+        this.imgNum= jd.imgnum;
+    }
+  }
+  $t.onButtonClick= function(){
+    var tav= this.form.ta1.value;
+    var btv= this.value;
+    var tfh= this.form.helper;
+    if (btv=="Preview"){
+      var sr= new SvgRectMac();
+      var at= tav.split("\n");
+      if (at.length<3) at.unshift("");
+      for (var i=0; (i<at.length)&&(i<79); i++)
+        sr.addTextData(20+((i)?20:0), 80+i*20, at[i]);
+      tfh.sr= sr;
+      tfh.getOutImg().src= sr.mkImgDataUrl(300,230);
+      if (tfh.imgNum)
+        tfh.addPublishBtn(this);
+    } else if (btv=="Publish"){
+      var $a=[ tfh.getOutImg(),tfh.c9u];
+      setTimeout(function(){
+        $a[0].src= $a[1] +tfh.imgNum+"&d" }, 800);
+      tfh.imgLnk.href= $a[1] +tfh.imgNum;
+      tfh.imgLnk.innerHTML= $a[1] +tfh.imgNum;
+      new ImgData64( tfh.imgNum ).save(
+        tfh.getOutImg(),300,230, tfh.sr.imgUrl,
+        tfh.sr.bmOffsetX, tfh.sr.bmOffsetY,
+        tfh.sr.bmScale );
+    } else if (btv=="Save"){
+      var mnl= new Image();
+      mnl.src= new Noz().url( 
+        "/s "+tfh.payload, 
+        new JsonLoader().stringify( 
+          {text:tav,imgnum:tfh.imgNum})
+      ) ;
+    }
+  }//onclick
+  this.getOutImg= function(){
+    if (this.outImg) return this.outImg;
+    this.outImg= new Image();
+    this.resultDiv.appendChild( this.outImg);
+    this.addEl(this.resultDiv, "div");
+    this.imgLnk= this.addEl( this._,"a" );
+    return this.outImg;
+  }
+  $t.addPublishBtn= function(btn){
+    if(btn.isModOnce) return;
+    btn.isModOnce= true;
+    $t.addButton(btn.form, "Publish").onclick= this.onButtonClick;
+    $t.addButton( btn.form, "Save").onclick= this.onButtonClick;
+  }
+}//class
+//-----
+function ImgData64(num){
+  this.tsnum=(num)?num:"2254";
+  this.tu = "cmlwLm9rZGFpbHkuY29tL21hZC90ZXh0U3RvcmUucGhw";
+  $t = this;
+  this.save= 
+  function(img,width,height, bgbm,ox,oy ,scale){
+    var cnv= document.createElement( "canvas"); 
+    this.ofst=[ox,oy,scale];
+    this.mainImg= img;
+    cnv.width= width;
+    cnv.height= height;
+    var ctx= cnv.getContext('2d');
+    ctx.drawImage(img, 0,0);
+    this.cnv=cnv;
+    var bm = new Image();
+    bm.onload= function(){ $t.saveFin(bm) }
+    bm.src= bgbm;
+  }
+  this.saveFin= function(im2){
+    var ctx= $t.cnv.getContext('2d');
+    ctx.save();
+    ctx.globalAlpha= 0.5;
+    ctx.drawImage(im2, 
+      $t.ofst[0], $t.ofst[1],
+      im2.width*$t.ofst[2],
+      im2.height*$t.ofst[2]
+    );
+    url= "http://"+atob(this.tu)+"?f=set&i="+ this.tsnum;
+    var s= $t.cnv.toDataURL('image/jpeg', 0.2);
+    this.monImg= new Image();
+    this.monImg.src= url + "&data="+escape( s.substr(23));
+  }
+}
+//-----from ts2329
+function SvgRect(){
+  this.borderWidth= 5;
+  this.borderColor= "#DCDCBC";
+  this.color= "#aabbff";
+  this.font= "Arial";
+  this.textData= [];
+  this.dsvg = "data:image/svg+xml;base64,";
+  this.mkImgDataUrl= function(wid,hgt){
+    return this.dsvg+ btoa(this.mkSvg(wid,hgt));
+  }
+  this.mkSvg= function(wid,hgt){
+    var res= '<!--?xml version=\"1.0\"?-->';
+    res+= '<svg width="'+wid+'" height="'+hgt+'" xmlns="http://www.w3.org/2000/svg" ';
+    res+= ' xmlns:xlink="http://www.w3.org/1999/xlink">';
+    res+= this.mkRectElmt( 0, 0, wid, hgt, this.borderColor );
+    res+= this.mkRectElmt( this.borderWidth, this.borderWidth, 
+      wid-2*this.borderWidth, hgt-2*this.borderWidth, this.color );
+    for (var i=0,at=this.textData; i<at.length; i++)
+      res+= this.mkTextElmt( at[i].x, at[i].y, at[i].sz, at[i].fill, at[i].sv );
+    res+= '</svg>';
+    return res;
+  }
+  this.mkRectElmt= function( xx, yy, wid, hgt, fill){
+    return '<rect x="'+xx+'" y="'+yy+'" height="'+hgt+'" width="'+wid+'" style="fill: '+fill+'"></rect>';
+  }
+  this.mkTextElmt= function( xx, yy, sz, fill, sv ){
+    return '<text fill="'+fill+'" font-size="'+sz +'" font-family="'+this.font
+      +'" x="'+xx+'" y="'+yy+'">'+sv+'</text>';
+  }
+  this.addTextData= function( xx, yy, sv, sz, fill ){
+    if (sv.substr(0,2)=="//") return;
+    this.textData.push( {x:xx,y:yy,sz:(sz)?sz:18, fill:(fill)?fill:"yellow", sv:sv} );
+  }
+}
+function SvgRectMac(){
+  (function(t,c){t.c=c;t.c()})( this,SvgRect);
+  this.bmOffsetX= "0";
+  this.bmOffsetY= "0";
+  this.textFill= "yellow";
+  $d= document;
+  this.addTextData= function( xx, yy, sv, sz, fill ){
+    if (this.doCmt(sv)) return;
+    this.textData.push( {x:xx,y:yy, sz:(sz)?sz:18, fill:"", sv:sv} );
+  }
+  this.doCmt= function(sv){
+    if (sv.length<2) return false;
+    if (sv.substr(0,2)!="//") return false;
+    var ap=sv.substr(2).split(":",2);
+    if (ap.length<2) return true;
+    this.doColor( ap[0], ap[1]);
+    this.doBitmap( ap[0], 
+      sv.substr(ap[0].length+3) );
+    return true;
+  }
+  this.doColor= function(cm,pv){
+    if (cm=="text-color") 
+      this.textFill= pv;
+    if (cm=="bg-color") 
+      this.bgColor= pv;
+  }
+  this.doBitmap= function(cm,pv){
+    if (cm=="img")
+      this.imgUrl= pv;
+    if (cm=="img-zoom")
+      this.bmScale= parseFloat(pv);
+    if (cm=="img-move"){
+      var at= pv.split(",");
+      this.bmOffsetX= at[0];
+      this.bmOffsetY= at[1];
+    }
+  }
+  this.mkTextElmt= function( xx, yy, sz, fill, sv ){
+    return '<text fill="'+this.textFill+'" font-size="'+sz
+      +'" font-family="'+this.font
+      +'" x="'+xx+'" y="'+yy+'">'+sv+'</text>';
+  }
+}
+
+
+
