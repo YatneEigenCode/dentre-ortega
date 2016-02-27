@@ -235,6 +235,68 @@ function SvgRectMac(isNoBg){
       +'" x="'+xx+'" y="'+yy+'">'+sv+'</text>';
   }
 }
+//////////
+// 234
+//////////
+//2-24-2016 Jchoy v0.115 read
+//CoderSandbox
+//use JasonLoader2326, Sandbox119
+//-----
+function CoderSandbox (){
+  (function(t,c){t.c=c;t.c()})( this,Sandbox); 
+
+  this.payload="510"; 
+  var $t=this;
+  var $d=document;
+  $t.dbuc="https://dl.dropboxusercontent.com/u/28448395/";
+  //---
+  $t.init=function(pl){
+    this.validatePayload(pl,"5");
+    new JsonLoader().global();
+    _j.subscribe($t, "webGot");
+    var url=this.payload.split( '').join("/") + ".txt";
+    url="../../"+url;
+    $t.addEl( $d.getElementsByTagName( "head")[0], "script" ).src= url;
+    return this;
+  }
+  $t.webGot= function(jd){
+    var fm=$d.forms[0];
+    if (!fm.helper) {
+    } else if (fm.helper==this){
+      fm.ta1.value=jd.text;
+      fm.ta1.style.zIndex="0";
+      fm.ta1.rows=10;
+    }
+  }
+  $t.onButtonClick= function(){
+    var tav= this.form.ta1.value;
+    var btv= this.value;
+    var tfh= this.form.helper;
+    if (btv=="Preview"){
+      eval (tav);
+      new PageApp().start(
+        tfh.resultDiv
+      )
+      tfh.addPublishBtn(this);
+    } else if (btv=="Publish"){
+     
+    } else if (btv=="Save"){
+      var mnl= new Image();
+      mnl.src= new Noz().url( 
+        "/s "+tfh.payload, new JsonLoader(
+        ).stringify( {text:tav})
+      ) ;
+    }
+    new Noz( ).reEnableSoon( this);
+  }//on button click
+  $t.addPublishBtn= function(btn){
+    if(btn.isModOnce) return;
+    btn.isModOnce= true;
+    $t.addButton(btn.form, "Publish");
+    $t.addButton(btn.form, "Save");
+  }
+}//class
+
 
 //////////
 //  238
