@@ -5,8 +5,8 @@
   <meta xhttp-equiv="x-ua-compatible" xcontent="ie=10">
 </head>
 
+<body bgColor="gray">
 <div portalTargetClass="StubApp">Portals</div>
-
 <form id="fm101">
 <input type=button value=Go>
 <input type=button value=Reload>
@@ -15,7 +15,7 @@
 <input type=button value=Spawn>
 <input type=button value=Test>
 </form>
-
+</body>
 
 <script src="js/json2.js"></script>
 <script src="js/QuikNote.js"></script>
@@ -48,8 +48,8 @@ function PortalsLayout(){
 	var $ea;
 	var $d=document;
 	this.cfg= {cols:2, cellCfg: {
-		  width:"50%", height:200, bgColor:"#EEFFFF", vAlign:"top" }
-	}
+		  width:"50%", height:200, bgColor:"#EEFFFF", vAlign:"top" 
+	}}
 	this.start= function(parent){
 		this.addEl( "table", parent ).width="100%";
 		this._.insertRow().parentNode.parentNode.portalsLayoutMgr = this;
@@ -198,11 +198,12 @@ function FsoUtil(){
 new MyPageApp().start(document.forms[0]);
 
 var plm= new PortalsLayout().getPortalsMgr();
-plm.addPortal( new QuikLinks() ).start( plm.getAvailCell(), "quiklink102.txt");
+plm.addPortal( new QuikLinks() ).start( plm.getAvailCell(), "data/quiklink102.txt");
 plm.addPortal( new ScratchApp() ).start( plm.getAvailCell(), "scratchpad");
-plm.addPortal( new QuikNote() ).start( plm.getAvailCell(), "quiknote121.txt" );
+plm.addPortal( new QuikNote() ).start( plm.getAvailCell(), "data/quiknote121.txt" );
 plm.addPortal( new DomMvApp() ).start( plm.getAvailCell(), "fm101");
-plm.addPortal( new QuikHtml() ).start( plm.getAvailCell(), "quikhtml121.txt" );
+plm.addPortal( new QuikHtml() ).start( plm.getAvailCell(), "data/quikhtml121.txt" );
 plm.addPortal( new StubApp() ).start( plm.getAvailCell(), "clock "+new Date());
 plm.addPortal( new LogApp() ).start( plm.getAvailCell() );
+
 </script>
