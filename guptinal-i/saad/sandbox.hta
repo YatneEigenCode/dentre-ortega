@@ -18,9 +18,11 @@
 </body>
 
 <script src="js/json2.js"></script>
+<script src="js/json2jc.js"></script>
+<script src="js/FavTrak.js"></script>
 <script src="js/QuikNote.js"></script>
 <script>
-//4-6-2016 JChoy Sandbox.hta v0.213 PortalsLayout
+//4-8-2016 JChoy Sandbox.hta v0.214 filmstrip
 //3-8-2016 JChoy Sandbox.hta orig
 //-----
 function StubApp(){
@@ -68,7 +70,14 @@ function PortalsLayout(){
 		var row= tbl.rows[tbl.rows.length-1];
 		var cel= (row.cells.length<2) ? row.insertCell():tbl.insertRow().insertCell();
 		for (var m in this.cfg.cellCfg) cel[m]= this.cfg.cellCfg[m];
-		return [cel, cel.parentNode.portalsLayoutMgr=this][0];
+		this.addEl( "div", cel ).style.overflow= "hidden";
+		this._.style.height= this.cfg.cellCfg.height;
+		this._.style.width= "100%";
+		var div=this.addEl( "div", this._);
+		div.style.overflow= "scroll";
+		div.style.width= "110%";
+		div.style.height= this.cfg.cellCfg.height+20;
+		return [div, cel.parentNode.portalsLayoutMgr=this][0];
 	}
 	this.getPortalsMgr= function(){
 		return this.getTable().portalsLayoutMgr;
