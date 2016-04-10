@@ -1,4 +1,4 @@
-//4-9-2016 JChoy FsoUtil v0.216 fix typos
+//4-9-2016 JChoy FsoUtil v0.251 Vfs, VfsWb, FsBridge
 //3-8-2016 JChoy Sandbox.hta orig
 //-----
 function StubApp(){
@@ -128,14 +128,12 @@ function DivApp(){
 	this.addOn= function(el, evt, fcn){
 		if (el.addEventListener){
 			el.addEventListener( evt, fcn );
-		} else {
-			el["on"+evt] = fcn;
-		}
+		} else {  el["on"+evt] = fcn; }
 	}
 	this.noOp= function(){}
 }
 //-----
-function MyPageAppBase(){
+function AnyPageApp(){
 	(function(t,c){t.c=c,t.c()})(this,FormHelper);
 	this.start= function(parent){
 		this.prepForm(parent);
@@ -146,43 +144,82 @@ function MyPageAppBase(){
 }
 //-----
 function MyPageApp(){
-	(function(t,c){t.c=c,t.c()})(this, MyPageAppBase);
+	(function(t,c){t.c=c,t.c()})(this, AnyPageApp);
 	this.onButtonClick= function(){
+		if (this.value=="Go") this.form.helper.specialTest();
 		if (this.value=="Test") {
 			new NotificationBob().i0.notifyPeer(this.value);
 		} else new RedButton().start( this.value );
 		this.form.helper.addEl("div", this.form).innerHTML=this.value;
 	}
+	this.specialTest= function(){
+		var plm= new PortalsLayout().getPortalsMgr();
+		plm.addPortal( new QuikNote2().start(plm.getAvailCell(), "qn2.txt" ) );
+	}
 }
 //-----
 function DifJak(){
 	this.check= function(s){
-		var res= (this.payload==s);
+		var res= (this.payload != s);
 		return [res, this.payload=s][0];
 	}
 }
 //-----
+function FsBridge(maFs){
+	this.meta= {};
+	if (maFs) this.maFs= maFs;
+	var $t = this;
+	this.getOrAddMember= function( aa, k, def ){
+		return (aa[k])? aa[k] : (aa[k]=def);
+	}
+	this.getMeta= function(k){
+		return this.getOrAddMember( this.meta, k, 
+			{name2: this.validName(k), df:new DifJak()} );
+	}
+	this.validName= function( name ){
+		return name.replace( /\//g, "_" );
+	}
+	$t.readFile= function(fn){ return $t.maFs.readFile(fn) }
+	$t.writeFile= function(fn,s){ $t.maFs.writeFile( fn, s ) }
+}
+//-----
 function Vfs(){
-	(function(t,c,a){t.c=c,t.c(a)})(this,SingletonBob,"Vfs442");
-	var $t= this;
-	$t.fstab= {dat:{},meta:{}};
-	$t.fsma = {meta:{}, mgr:null};
-	$t.interval= 10000;	//ms
-	$t.readFile= function(fn){
-		return this.fstab.dat[fn];
+	(function(t,c,a){t.c=c,t.c(a)})(this,VfsWb, 
+		new FsBridge(new FsoUtil_htadir("bbb")) );
+}
+//-----
+function VfsWob(){
+	(function(t,c,a){t.c=c,t.c(a)})(this,SingletonBob,"VfsWob295");
+	this.fstab= {dat:{},meta:{}};
+	this.readFile= function(fn){
+		var res= this.fstab.dat[fn];
+		if (!res) { this.fsBridgeRead(fn); res= this.fstab.dat[fn]; }
+		return res;
 	}
 	this.writeFile= function(fn, s){
 		this.fstab.dat[fn] = s;
 		this.fstab.meta[fn] = {size:s.length,dateModified:new Date()};
 	}
-	this.getMeta= function(k){
-		return (this.meta[k])? this.meta[k] : this.meta[k]={df:new DifJak()};
+}
+//-----
+function VfsWb( bridge ){
+	(function(t,c,a){t.c=c,t.c(a)})(this,VfsWob);
+	(function(t,c,a){t.c=c,t.c(a)})(this,SingletonBob,"Vfs442");
+	var $t= this;
+	$t.cfg= {interval: 60000, lastTimestamp: new Date(), lastFn:""};
+	if (bridge) $t.cfg.fsBridge= bridge;
+	this.fsBridgeRead= function(fn){
+		if (!$t.cfg.fsBridge) return;
+		var isDo = ($t.cfg.lastFn != fn);
+		isDo = isDo || (new Date().valueOf()-$t.cfg.lastTimestamp.valueOf()>5000)
+		if (isDo) this.fstab.dat[fn]= $t.cfg.fsBridge.readFile(fn);
 	}
 	this.check= function(){
-		if (!$t.fsma.mgr) return;
+		if (!$t.cfg.fsBridge) return;
 		for (var m in this.fstab.meta){
-			var mtm= this.getMeta(m);
-			//if (mtm) 
+			var cr= [$t.fstab.dat[m], $t.cfg.fsBridge.getMeta(m)];
+			if (cr[1].df.check( cr[0] ))
+				$t.cfg.fsBridge.writeFile( cr[1].name2, cr[0] );
 		}
 		setTimeout( function(){ $t.check() }, $t.interval );
 	}
@@ -197,21 +234,27 @@ function FsoUtil(){
 	this.runCmd= this.noOp= function(){}
 	this.inherit( FsoUtil_hta );  //hta*, ts, cloud, lan, ms-big, paw, msql
 }
-
-//-----
+//-----asynchronous
+/*
 function FsoUtil_ajson(){
 	this.readFile= function(fn, cb){
-		this.cb= cb;
-		this.asyncGot( "N/A" );
-	}
-	this.asyncGot= function(s){
-		this.payload= s;
-		this.cb(this);
+		this.cb= cb;	this.asyncGot( "N/A" );
 	}
 	this.writeFile= function(fn, s, cb){
-		this.cb= cb;
-		this.asyncGot( "failed" );
+		this.cb= cb;	this.asyncGot( "failed" );
 	}
+	this.asyncGot= function(s){
+		this.payload= s;	this.cb(this);
+	}
+}
+*/
+//-----
+function FsoUtil_htadir(fldr){
+	this.fldr = (fldr)? (fldr+"/") : "fsu/"; 
+	this.fsu = new FsoUtil_hta();
+	var $t=this;
+	$t.readFile= function(fn){ return $t.fsu.readFile($t.fldr+fn) }
+	$t.writeFile= function(fn,s){ $t.fsu.writeFile( $t.fldr+fn, s ) }
 }
 
 //-----
