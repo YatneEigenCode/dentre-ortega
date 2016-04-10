@@ -1,4 +1,4 @@
-//4-9-2016 JChoy FsoUtil v0.215 fstab
+//4-9-2016 JChoy FsoUtil v0.216 fix typos
 //3-8-2016 JChoy Sandbox.hta orig
 //-----
 function StubApp(){
@@ -166,14 +166,14 @@ function Vfs(){
 	(function(t,c,a){t.c=c,t.c(a)})(this,SingletonBob,"Vfs442");
 	var $t= this;
 	$t.fstab= {dat:{},meta:{}};
-	$t.fsma = {meta:{}: mgr:null};
+	$t.fsma = {meta:{}, mgr:null};
 	$t.interval= 10000;	//ms
 	$t.readFile= function(fn){
 		return this.fstab.dat[fn];
 	}
 	this.writeFile= function(fn, s){
 		this.fstab.dat[fn] = s;
-		this.fstab.meta[fn] = {size:s.length,dateModified=new Date()};
+		this.fstab.meta[fn] = {size:s.length,dateModified:new Date()};
 	}
 	this.getMeta= function(k){
 		return (this.meta[k])? this.meta[k] : this.meta[k]={df:new DifJak()};
