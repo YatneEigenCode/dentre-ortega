@@ -1,4 +1,4 @@
-//4-9-2016 JChoy FsoUtil v0.251 Vfs, VfsWb, FsBridge
+//4-10-2016 JChoy FsoUtil v0.252 Vfs, VfsWb, detect
 //3-8-2016 JChoy Sandbox.hta orig
 //-----
 function StubApp(){
@@ -116,7 +116,9 @@ function DivApp(){
 	var $t=this;
 	var $d=document;
 	this.addEl= function(tag, parent){
-		$t._= $d.createElement(tag);
+		if ((tag=="button") && (!window["ActiveXObject"])) {
+			this.addEl("input", parent).type="button";
+		} else $t._= $d.createElement(tag);
 		if (parent) parent.appendChild($t._);
 		return $t._;
 	}
@@ -154,7 +156,7 @@ function MyPageApp(){
 	}
 	this.specialTest= function(){
 		var plm= new PortalsLayout().getPortalsMgr();
-		plm.addPortal( new QuikNote2().start(plm.getAvailCell(), "qn2.txt" ) );
+		plm.addPortal( new QuikNote().start(plm.getAvailCell(), "qn2.txt" ) );
 	}
 }
 //-----
@@ -179,13 +181,16 @@ function FsBridge(maFs){
 	this.validName= function( name ){
 		return name.replace( /\//g, "_" );
 	}
-	$t.readFile= function(fn){ return $t.maFs.readFile(fn) }
-	$t.writeFile= function(fn,s){ $t.maFs.writeFile( fn, s ) }
+	$t.readFile= function(fn){ if ($t.maFs) return $t.maFs.readFile(fn) }
+	$t.writeFile= function(fn,s){ if ($t.maFs) $t.maFs.writeFile( fn, s ) }
 }
 //-----
 function Vfs(){
-	(function(t,c,a){t.c=c,t.c(a)})(this,VfsWb, 
-		new FsBridge(new FsoUtil_htadir("bbb")) );
+	var maFs;
+	try { maFs = new FsoUtil_htadir("bbb"); 
+	} catch (e) {
+	}
+	(function(t,c,a){t.c=c,t.c(a)})(this,VfsWb, new FsBridge(maFs) );
 }
 //-----
 function VfsWob(){
@@ -212,7 +217,8 @@ function VfsWb( bridge ){
 		if (!$t.cfg.fsBridge) return;
 		var isDo = ($t.cfg.lastFn != fn);
 		isDo = isDo || (new Date().valueOf()-$t.cfg.lastTimestamp.valueOf()>5000)
-		if (isDo) this.fstab.dat[fn]= $t.cfg.fsBridge.readFile(fn);
+		if (isDo)
+		  this.fstab.dat[$t.cfg.lastFn=fn]= $t.cfg.fsBridge.readFile($t.cfg.fsBridge.getMeta(fn).name2);
 	}
 	this.check= function(){
 		if (!$t.cfg.fsBridge) return;
@@ -226,28 +232,14 @@ function VfsWb( bridge ){
 	this.check();
 }
 
-//-----
+//----- backward compatibility
 function FsoUtil(){
 	//damodes: txt, json*, base64, encr
-	(function(t,c,a){t.c=c,t.c(a)})(this,SingletonBob,"fsoUtil429");
-	this.inherit= function(c,a){ this.cx=c; this.cx(a); }
-	this.runCmd= this.noOp= function(){}
-	this.inherit( FsoUtil_hta );  //hta*, ts, cloud, lan, ms-big, paw, msql
+	(function(t,c,a){t.c=c,t.c(a)})(this,Vfs);
+	//(function(t,c,a){t.c=c,t.c(a)})(this,FsoUtil_hta);
+	//hta*, ts, cloud, lan, ms-big, paw, msql
 }
-//-----asynchronous
-/*
-function FsoUtil_ajson(){
-	this.readFile= function(fn, cb){
-		this.cb= cb;	this.asyncGot( "N/A" );
-	}
-	this.writeFile= function(fn, s, cb){
-		this.cb= cb;	this.asyncGot( "failed" );
-	}
-	this.asyncGot= function(s){
-		this.payload= s;	this.cb(this);
-	}
-}
-*/
+
 //-----
 function FsoUtil_htadir(fldr){
 	this.fldr = (fldr)? (fldr+"/") : "fsu/"; 

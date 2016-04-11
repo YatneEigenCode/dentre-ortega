@@ -1,4 +1,4 @@
-//4-7-2016 jchoy QuikNote, ScratchApp, RedButton, QuikLinks, AutoLink, AutoSave, FavTrak
+//4-10-2016 jchoy Check null before parsing fav data in QuikLinks
 //https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 //-----
 function QuikNote( fn ){
@@ -38,7 +38,7 @@ function QuikLinks( fn ){
 	this.showPreview= function(s, el){
 		this.assetPrev = [s, el.innerHTML= ""][0];
 		var fav = [new FsoUtil().readFile("data/favtrak.txt"), new FavTrak().i0];
-		fav[1].scoreCard= JSON.parse( fav[0] );
+		if (fav[0]) fav[1].scoreCard= JSON.parse( fav[0] );
 		new AutoLink().start( s, el, this );
 		new AutoSave().i0.start().addClient(fav[1], "scoreCard", "data/favtrak.txt");
 	}

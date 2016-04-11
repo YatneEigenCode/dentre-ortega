@@ -1,4 +1,4 @@
-//4-8-2016 jchoy RedButton, AutoLink, AutoSave, FavTrak
+//4-10-2016 jchoy use FsoUtil_hta in RedButton
 //https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 //JsonLoader is in ts2326
 //-----
@@ -94,7 +94,7 @@ function RedButton(){
 		var lpn = (location.pathname).split(/[\/\\]/).pop();
 		if (s=="Spawn2") return showModelessDialog(lpn,window,"dialogwidth:1100px");
 		if (s=="Spawn") {
-			new FsoUtil().runCmd( lpn );
+			new FsoUtil_hta().runCmd( lpn );
 			window.close();
 		}
 	}
