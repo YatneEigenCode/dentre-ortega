@@ -1,4 +1,4 @@
-//4-11-2016 JChoy Notif v0.253 moved code into new file
+//4-15-2016 JChoy Notif v0.254 smartCols
 //3-8-2016 JChoy Sandbox.hta orig
 //-----
 function StubApp(){
@@ -24,6 +24,12 @@ function PortalsLayout(){
 	this.cfg= {cols:2, cellCfg: {
 		  width:"50%", height:200, bgColor:"#EEFFFF", vAlign:"top" 
 	}}
+	this.smartCols = function(){
+		if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) >480) return;
+		this.cfg= {cols:1, cellCfg: {
+		  width:"100%", height:200, bgColor:"#FFFFEE", vAlign:"top" 
+		}}
+	}
 	this.start= function(parent){
 		this.addEl( "table", parent ).width="100%";
 		this._.insertRow().parentNode.parentNode.portalsLayoutMgr = this;
@@ -40,7 +46,7 @@ function PortalsLayout(){
 	this.getAvailCell= function(){
 		var tbl= this.getTable();
 		var row= tbl.rows[tbl.rows.length-1];
-		var cel= (row.cells.length<2) ? row.insertCell():tbl.insertRow().insertCell();
+		var cel= (row.cells.length<this.cfg.cols) ? row.insertCell():tbl.insertRow().insertCell();
 		for (var m in this.cfg.cellCfg) cel[m]= this.cfg.cellCfg[m];
 		this.addEl( "div", cel ).style.overflow= "hidden";
 		this._.style.height= this.cfg.cellCfg.height;
@@ -149,10 +155,20 @@ function MyPageApp(){
 	(function(t,c){t.c=c,t.c()})(this, AnyPageApp);
 	this.onButtonClick= function(){
 		if (this.value=="Go") this.form.helper.specialTest();
+		if (this.value=="Publish") this.form.helper.publishApp();
 		if (this.value=="Test") {
 			new NotificationBob().i0.notifyPeer(this.value);
 		} else new RedButton().start( this.value );
 		this.form.helper.addEl("div", this.form).innerHTML=this.value;
+	}
+	this.publishApp= function(){
+		var dt=new Date();
+		var fldr= "publish"+(dt.getMonth()+1)+dt.toString().replace(/[^0-9]/g,'');
+		var res= "cmd /c md {0}\\js |copy js\\* {0}\\js";
+		res+= "|md {0}\\fsu |copy fsu\\* {0}\\fsu";
+		res+= "|copy sandbox.hta {0}";
+		res+= "|copy sandbox.html {0}";
+		new FsoUtil_hta().runCmd( res.replace(/\{0\}/g,fldr) );
 	}
 	this.specialTest= function(){
 		var plm= new PortalsLayout().getPortalsMgr();

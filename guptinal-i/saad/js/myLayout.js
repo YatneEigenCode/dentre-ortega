@@ -1,6 +1,8 @@
+//4-15-2016 JChoy call smartCols()
 new MyPageApp().start(document.forms[0]);
 
 var plm= new PortalsLayout().getPortalsMgr();
+plm.smartCols();
 plm.addPortal( new QuikLinks() ).start( plm.getAvailCell(), "data/quiklink102.txt");
 plm.addPortal( new ScratchApp() ).start( plm.getAvailCell(), "scratchpad");
 plm.addPortal( new QuikNote() ).start( plm.getAvailCell(), "data/quiknote121.txt" );

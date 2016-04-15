@@ -1,10 +1,10 @@
-//4-10-2016 jchoy use FsoUtil_hta in RedButton
+//4-15-2016 jchoy blank space signals plain html
 //https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 //JsonLoader is in ts2326
 //-----
 function AutoLink(){
 	(function(t,c,a){t.c=c,t.c(a)})(this,FormHelper);
-	var $ea;
+	var $ea, $nona;
 	this.start= function( s, par, mgr ){
 		this.massage(s, par);
 		var frm= this.addEl( "form", par );
@@ -14,12 +14,15 @@ function AutoLink(){
 		frm.helper= mgr;
 	}
 	this.massage= function( s, el ){
-		for (var m in $ea=this.enumArray(s.split("\n"))){
+		for (var m in $ea=this.enumArray(s.split("\n")))
+		  if ($ea[m].charAt(0)==" "){
+			($nona=(this._==$nona)? $nona:this.addEl("div",el)).innerHTML+= $ea[m].replace("<>","<p>");
+		  } else {
 			this._= new FavTrak().start( this.addEl("div", el), m, $ea[m].length );
 			this.addEl("a", this._.parentNode).innerHTML = $ea[m];
 			this._.href= $ea[m];
 			this._.parentNode.style.marginTop= "6";
-		}
+		  }
 	}
 }
 //-----
