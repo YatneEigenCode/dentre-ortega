@@ -1,4 +1,4 @@
-//4-21-2016 JChoy simplified log, use callback in readFile, JsonAjax replaces JsonLoader
+//4-22-2016 JChoy fixed out of sequence bug
 //4-20-2016 JChoy FsoUtil_ts, TimeJak, VfsWb_asyncRo
 //-----
 function FsoUtil_ts(){
@@ -12,6 +12,7 @@ function FsoUtil_ts(){
 		if (cb) cb(jo.text);
 	}
 	this.readFile= function(fn, cb){
+		log.log("FsoUtil_ts.readFile "+fn);
 		this.fstab.meta[fn]= {size:0,dateModified:null,cb:cb};
 		this.ajax.webGetCB(fn, function(o){$t.gotFileA(o)} );
 	}
@@ -54,19 +55,16 @@ function JsonAjax(){
 	this.jLoaders= [];
 	this.globalName= "_j";
 	this.cfg= JSON.parse(new RoCfg().i0.readFile("tscfg"));
+	var $t=this;
 	this.s= function( jd ){
-		log.log("JsonAjax.s "+this.singletonMark+" "+this.jLoaders.length+" "+((jd)?9:8) );
-		if ((jd) && (this.jLoaders.length>0)) {
-			var jn= this.jLoaders.shift();
+		var tjn= this.jLoaders[this.jLoaders.length-1].num;
+		log.log("JsonAjax.s "+this.singletonMark+" "+$t.jLoaders.length+" "+((jd)?9:("8 "+tjn)) );
+		if ((jd) && ($t.jLoaders.length>0)) {
+			var jn= $t.jLoaders.shift();
 			log.log("JsonAjax.s jn.num "+jn.num+" len "+JSON.stringify(jd).length );
 			jn.cb( [jd, jd.jsonAjaxNum= jn.num][0] );
 		}
-		if (!jd) this.addEl("script", document.body).src= this.cfg.readUrl+ this.jLoaders[this.jLoaders.length-1].num;
-	}
-	this.webGet= function( num, client, method ){
-		var jn = {jsonLoader:new JsonLoader(), num:num};
-		this.jLoaders.push( [jn, jn.jsonLoader.subscribe( client, method )][0] );
-		this.s();
+		if (!jd) this.addEl("script", document.body).src= this.cfg.readUrl+ tjn;
 	}
 	this.webGetCB= function( num, cb ){
 		this.jLoaders.push( {cb:cb, num:num} );

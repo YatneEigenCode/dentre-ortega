@@ -1,4 +1,4 @@
-//4-21-2016 JChoy FsoUtil.js v0.124 use callback in VfsWb
+//4-22-2016 JChoy FsoUtil.js v0.125 fixed out of sequence bug
 //4-11-2016 JChoy FsoUtil.js v0.113 VfsAuto instead of detect, moved code to Notif.js
 //-----
 function DifJak(){
@@ -42,7 +42,7 @@ function VfsWob(){
 	this.fstab= {dat:{},meta:{}};
 	this.readFile= this.readFile_= function(fn, cb){
 		var res= this.fstab.dat[fn];
-		if (cb) cb(res);
+		if (cb && res) cb(res);
 		return res;
 	}
 	this.writeFile= function(fn, s){
@@ -67,7 +67,8 @@ function VfsWb( bridge ){
 	this.gotFileA= function( s, fn ){
 		log.log( "VfsWb.gotFileA "+fn+"  "+s.length );
 		if (!fn) return;
-		try{ this.fstab.meta[fn].cb(s); } catch(e) {}	//{alert(e.message)}
+		try{ this.fstab.meta[fn].cb(s); } 
+			catch(e) { log.log("VfsWb.gotFileA "+e.message)}
 		$t.cfg.fsBridge.getMeta(fn).df.check(s);
 		this.writeFile(fn, s);
 	}

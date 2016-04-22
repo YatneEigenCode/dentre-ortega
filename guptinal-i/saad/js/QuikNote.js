@@ -1,4 +1,4 @@
-//4-21-2016 jchoy use async readFile
+//4-22-2016 jchoy fixed out of sequence bug; favFileName
 //4-10-2016 jchoy Check null before parsing fav data in QuikLinks
 //https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 //-----
@@ -34,27 +34,26 @@ function QuikLinks( fn ){
 	var $t=this;
 	this.start= function(parent, fn){
 		if (fn) this.fileName = fn;
+		this.favFileName = this.fileName.replace(".txt","_fav.txt");
 		this.addEl( "div", parent ).innerHTML = "loading...";
 		var $div= $t._
 		new FsoUtil().readFile( this.fileName, function(s){ $t.gotAsset(s,1,$div) } );
 	}
 	this.gotAsset= function(s,cd,div){
+		log.log("QuikLinks.gotAsset "+cd );
 		if (cd==1) {
 			this.asset= s;
-		this.favUtil= ["{}", new FavTrak().i0];	//TODO: troubleshoot
-		this.showPreview( this.asset+"", div );
-			//new FsoUtil().readFile( "data/favtrak.txt", function(s){ $t.gotAsset(s,2,div) } );
-		} else if (cd==2) {
+			new FsoUtil().readFile( this.favFileName, function(s){ $t.gotAsset(s,2,div) } );
+		} else if (cd==2)
 			this.favUtil= [s, new FavTrak().i0];
-			this.showPreview( this.asset+"", div );
-		}
+		this.showPreview( this.asset+"", div );
 	}
 	this.showPreview= function(s, el){
 		this.assetPrev = [s, el.innerHTML= ""][0];
 		var fav = this.favUtil;
 		if (fav[0]) fav[1].scoreCard= JSON.parse( fav[0] );
 		new AutoLink().start( s, el, this );
-		new AutoSave().i0.start().addClient(fav[1], "scoreCard", "data/favtrak.txt");
+		new AutoSave().i0.start().addClient(fav[1], "scoreCard", this.favFileName);
 	}
 	this.showEdit= function( el ){
 		var frm = this.addEl( "form", el, el.innerHTML= "" );
