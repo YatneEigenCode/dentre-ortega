@@ -1,3 +1,4 @@
+//4-21-2016 jchoy use async readFile
 //4-10-2016 jchoy Check null before parsing fav data in QuikLinks
 //https://raw.githubusercontent.com/douglascrockford/JSON-js/master/json2.js
 //-----
@@ -19,8 +20,9 @@ function QuikNote( fn ){
 		this._.value= val
 	}
 	this.onButtonClick= function(){
+		var $fm= this.form;
 		if (this.value=="Load")
-		  this.form.clientTa.value = new FsoUtil().readFile( this.form.helper.fileName );
+		  new FsoUtil().readFile( $fm.helper.fileName, function(s){$fm.clientTa.value=s} );
 		if (this.value=="Save")
 		  new FsoUtil().writeFile( this.form.helper.fileName, this.form.clientTa.value );
 	}
@@ -29,15 +31,27 @@ function QuikNote( fn ){
 function QuikLinks( fn ){
 	(function(t,c){t.c=c,t.c()})(this,QuikNote);
 	this.fileName = "quiklinks101.txt";
+	var $t=this;
 	this.start= function(parent, fn){
 		if (fn) this.fileName = fn;
 		this.addEl( "div", parent ).innerHTML = "loading...";
-		this.asset= new FsoUtil().readFile( this.fileName );
-		this.showPreview( this.asset+"", this._ );
+		var $div= $t._
+		new FsoUtil().readFile( this.fileName, function(s){ $t.gotAsset(s,1,$div) } );
+	}
+	this.gotAsset= function(s,cd,div){
+		if (cd==1) {
+			this.asset= s;
+		this.favUtil= ["{}", new FavTrak().i0];	//TODO: troubleshoot
+		this.showPreview( this.asset+"", div );
+			//new FsoUtil().readFile( "data/favtrak.txt", function(s){ $t.gotAsset(s,2,div) } );
+		} else if (cd==2) {
+			this.favUtil= [s, new FavTrak().i0];
+			this.showPreview( this.asset+"", div );
+		}
 	}
 	this.showPreview= function(s, el){
 		this.assetPrev = [s, el.innerHTML= ""][0];
-		var fav = [new FsoUtil().readFile("data/favtrak.txt"), new FavTrak().i0];
+		var fav = this.favUtil;
 		if (fav[0]) fav[1].scoreCard= JSON.parse( fav[0] );
 		new AutoLink().start( s, el, this );
 		new AutoSave().i0.start().addClient(fav[1], "scoreCard", "data/favtrak.txt");
@@ -97,5 +111,3 @@ function LogApp(){
 	}
 	
 }
-
-
