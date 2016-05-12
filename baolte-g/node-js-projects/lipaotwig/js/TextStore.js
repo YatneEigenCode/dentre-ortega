@@ -1,4 +1,5 @@
-//5-8-2016 jchoy textStore.js - v1.21 TextStore js on server side
+//5-12-2016 jchoy v1.212 - rename findPath to parsePath
+//5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextStoreCgi works with node-router, TextStoreWebApp works with http
 //-----
 TextStore = function(){
@@ -37,19 +38,19 @@ TextStoreCgi= function(){
     });
   }
 }
-//-----
+//----- works with http orig package
 BumWebApp= function(){
   var $svr= this;
   this.pathBums= new Array();
   this.reqHandler = function( req, res ){
-    $svr.findPath( req.url )[1](req, res);
+    $svr.parsePath( req.url )[1](req, res);
   }
   this.notFound = function( req, res ){ $svr.sendText(res, 404, "Not found\n"); }
   this.sendText = function( res, stat, msg, ctype ){
     res.writeHead( stat, {"Content-Type": ((ctype)? ctype : "text/plain")} );
     res.end(msg);
   }
-  this.findPath = function( url ){
+  this.parsePath = function( url ){
     var urlf = url.split('?',2)[0];
     for (var i=0,at=this.pathBums; i<at.length; i++)
       if (urlf==at[i][0]) return at[i];
