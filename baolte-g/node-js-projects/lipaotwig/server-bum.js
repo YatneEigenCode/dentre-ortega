@@ -1,4 +1,4 @@
-//5-14-2016 jchoy v0.214 config()
+//5-14-2016 jchoy v0.312 initAssets()
 //5-8-2916 jchoy server-bum.js - to use with bare nodejs on android ice cold server
 var http = require('http');
 require( './js/TextStore.js' );
@@ -7,9 +7,11 @@ var server = http.createServer(bum.reqHandler);
 var fs= require('fs');
 
 bum.config( {dataFilePath:"writedata/ts-payload.txt"} );
+bum.initAssets( fs.readFileSync(bum.getFilePath()) );
 bum.addGetPath( '/commit/', function(req, res){
     fs.writeFileSync( bum.getFilePath(), bum.getPayload() );
-    bum.sendText( res, 200, "Saved to  "+bum.getFilePath() );
+    bum.sendText( res, 200, "Saved assets to  "+bum.getFilePath() );
+    console.log( "Saved assets to "+bum.getFilePath() );
 })
 bum.addGetPath( '/ts', function(req, res){
     bum.sendText( res, 200, fs.readFileSync('pub_html/textStore.htm'), "text/html" );
