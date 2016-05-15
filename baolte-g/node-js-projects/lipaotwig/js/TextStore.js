@@ -1,9 +1,10 @@
-//5-14-2016 jchoy v1.213 - getFilePath, getpayload
+//5-14-2016 jchoy v1.214 - config()
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
-//TextStore works with express, TextStoreCgi works with node-router, TextStoreWebApp works with http
+//TextStore works with express, TextSstoreCgi works with node-router, TextStoreWebApp works with http
 //-----
 TextStore = function(){
   this.assets= {}
+  this.cfg= {};
   this.save= function(i,data){
     this.assets['t'+i]= data;
   }
@@ -14,7 +15,8 @@ TextStore = function(){
   }
   this.ucgi= function(k,def,qy){ return unescape(this.cgi(k,def,qy)); }
   this.getPayload= function(){	return JSON.stringify( this.assets ); }
-  this.getFilePath= function(){ return this.dataFilePath; }
+  this.getFilePath= function(){ return this.cfg.dataFilePath; }
+  this.config= function(cfg){  for (var m in cfg) this.cfg[m] = cfg[m]; }
 }
 //-----
 TextStoreCgi= function(){

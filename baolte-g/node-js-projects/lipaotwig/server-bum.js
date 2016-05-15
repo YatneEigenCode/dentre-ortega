@@ -1,4 +1,4 @@
-//5-13-2016 jchoy v0.213 commit payload
+//5-14-2016 jchoy v0.214 config()
 //5-8-2916 jchoy server-bum.js - to use with bare nodejs on android ice cold server
 var http = require('http');
 require( './js/TextStore.js' );
@@ -6,6 +6,7 @@ var bum = new TextStoreWebApp();
 var server = http.createServer(bum.reqHandler);
 var fs= require('fs');
 
+bum.config( {dataFilePath:"writedata/ts-payload.txt"} );
 bum.addGetPath( '/commit/', function(req, res){
     fs.writeFileSync( bum.getFilePath(), bum.getPayload() );
     bum.sendText( res, 200, "Saved to  "+bum.getFilePath() );
