@@ -1,0 +1,2 @@
+svn co https://github.com/YatneEigenCode/dentre-ortega/trunk/baolte-g/node-js-projects/lipaotwig
+svn propset svn:ignore -F ts-payload.txt .
