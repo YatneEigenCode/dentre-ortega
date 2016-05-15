@@ -1,4 +1,4 @@
-//5-14-2016 jchoy v1.215 - console.log, initAssets
+//5-14-2016 jchoy v1.216 - timestamp console.log
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextSstoreCgi works with node-router, TextStoreWebApp works with http
 //-----
@@ -75,10 +75,10 @@ TextStoreWebApp= function(){
   this.addGetPath("/ts/set/", function (request, response) {
       $t.save( request.url );
       $t.sendText( response, 200, "Saved to "+$t._);
-      console.log( "/ts/set "+$t._ );
+      console.log( new Date()+" /ts/set "+$t._ );
   });
   this.addGetPath("/ts/text/", function (request, response) {
       $t.sendText( response, 200, ""+$t.get(request.url));
-      console.log( "/ts/text "+$t._ );
+      console.log( new Date()+" /ts/text "+$t._ );
   });
 }
