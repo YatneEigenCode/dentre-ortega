@@ -1,4 +1,4 @@
-//5-12-2016 jchoy v1.212 - rename findPath to parsePath
+//5-14-2016 jchoy v1.213 - getFilePath, getpayload
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextStoreCgi works with node-router, TextStoreWebApp works with http
 //-----
@@ -13,27 +13,27 @@ TextStore = function(){
 	  return (at.length==1)?def:at[1].split("&")[0];
   }
   this.ucgi= function(k,def,qy){ return unescape(this.cgi(k,def,qy)); }
+  this.getPayload= function(){	return JSON.stringify( this.assets ); }
+  this.getFilePath= function(){ return this.dataFilePath; }
 }
 //-----
 TextStoreCgi= function(){
-  this.ts= new TextStore();
-  this.cgi= this.ts.cgi;
+  (function(t,c){t.c=c;t.c()})(this,TextStore);
+  this.tsSave= this.save;
+  this.tsGet= this.get;
   this.save= function(qy){
-    this.ts.save( this._=this.cgi('i','9',qy), this.ts.ucgi('data','',qy) );
+    this.tsSave( this._=this.cgi('i','9',qy), this.ucgi('data','',qy) );
   }
   this.get= function(qy){
-    return this.ts.get( this._=this.cgi('i','9',qy) );
+    return this.tsGet( this._=this.cgi('i','9',qy) );
   }
   this.startServer= function( server ){
     var $t= this;
     server.get("/ts/set/", function (request, response) {
-      //ts.save( request.url );
-      //response.simpleText(200, "Saved to "+ts._);
       $t.save( request.url );
       response.simpleText(200, "Saved to "+$t._);
     });
     server.get("/ts/text/", function (request, response) {
-      //response.simpleText(200, ""+ts.get(request.url));
       response.simpleText(200, ""+$t.get(request.url));
     });
   }
