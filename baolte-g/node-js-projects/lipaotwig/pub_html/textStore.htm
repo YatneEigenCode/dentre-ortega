@@ -15,7 +15,9 @@
 </body>
 
 <script src=ok88.element.base.js></script>
+<script src=RecentList.js></script>
 <script>
+//5-16-2016 jchoy v0.513 RecentList.js
 TaAjax = function( ta ){
 	this.taObj = ta;
 	ok88.element.base.mold( this, ok88.element.ajax );
@@ -24,6 +26,9 @@ TaAjax = function( ta ){
 document.forms[0].getText = function(el){
 	var taAjax = new TaAjax( this.data );
 	taAjax.webGet( "http://"+location.hostname+"/ts/text/?i="+ this.i.value );
+	if (!this.rcl) this.rcl= new RecentList();
+	var $tf= this;
+	this.rcl.addItem( this.i.value, function(s){$tf.i.value=s} )
 }
 document.forms[0].post = function(){
 	if (this.data.value!="utility") return;

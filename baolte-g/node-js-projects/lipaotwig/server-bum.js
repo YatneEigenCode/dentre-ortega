@@ -19,6 +19,9 @@ bum.addGetPath( '/ts', function(req, res){
 bum.addGetPath( '/ok88.element.base.js', function(req, res){
     bum.sendText( res, 200, fs.readFileSync('pub_html/js/ok88.element.base.js') );
 })
+bum.addGetPath( '/RecentList.js', function(req, res){
+    bum.sendText( res, 200, fs.readFileSync('pub_html/js/RecentList.js') );
+})
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
