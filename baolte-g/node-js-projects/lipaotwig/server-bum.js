@@ -1,7 +1,8 @@
-//5-14-2016 jchoy v0.313 timestamp consolelogs
+//5-17-2016 jchoy v0.315 BumWebApp.mapPathsToFN()
 //5-8-2916 jchoy server-bum.js - to use with bare nodejs on android ice cold server
 var http = require('http');
 require( './js/TextStore.js' );
+require( './js/BumWebApp.js' );
 var bum = new TextStoreWebApp();
 var server = http.createServer(bum.reqHandler);
 var fs= require('fs');
@@ -13,15 +14,16 @@ bum.addGetPath( '/commit/', function(req, res){
     bum.sendText( res, 200, "Saved assets to  "+bum.getFilePath() );
     console.log( new Date() +" Saved assets to "+bum.getFilePath() );
 })
-bum.addGetPath( '/ts', function(req, res){
-    bum.sendText( res, 200, fs.readFileSync('pub_html/textStore.htm'), "text/html" );
-})
-bum.addGetPath( '/ok88.element.base.js', function(req, res){
-    bum.sendText( res, 200, fs.readFileSync('pub_html/js/ok88.element.base.js') );
-})
-bum.addGetPath( '/RecentList.js', function(req, res){
-    bum.sendText( res, 200, fs.readFileSync('pub_html/js/RecentList.js') );
-})
+
+bum.mapPathsToFN( [
+     ['/ts',            'pub_html/textStore.htm']
+    ,['/helpdev.txt',   'pub_html/']
+    ,['/RecentList.js', 'pub_html/js/']
+    ,['/ok88.element.base.js',  'pub_html/js/']
+//    ,['/twigbud.htm',   'pub_html/']
+    ], 
+    function(fn){ return fs.readFileSync(fn); }
+)
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();

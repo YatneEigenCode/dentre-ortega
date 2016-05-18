@@ -1,4 +1,4 @@
-//5-14-2016 jchoy v1.216 - timestamp console.log
+//5-16-2016 jchoy v1.231 - mapPathsToFN
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextSstoreCgi works with node-router, TextStoreWebApp works with http
 //-----
@@ -64,10 +64,18 @@ BumWebApp= function(){
       if (urlf==at[i][0]) return at[i];
     return ['',this.notFound];
   }
+  this.mapPathsToFN = function( aPF, getFileFcn ){
+    for (var i=0; i<aPF.length; i++){
+      var $filename= at[1];
+      var fcn= function(){  getFileFcn($filename);  }
+      this.pathBums.push( [at[0], fcn] );
+    }
+  }
   this.addGetPath = function( path, fcn ){
     this.pathBums.push([path,fcn]);
   }
 }
+//-----
 TextStoreWebApp= function(){
   (function(t,c){t.c=c;t.c()})(this,TextStoreCgi);
   (function(t,c){t.c=c;t.c()})(this,BumWebApp);
