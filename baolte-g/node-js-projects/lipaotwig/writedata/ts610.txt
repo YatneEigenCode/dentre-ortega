@@ -1,0 +1,77 @@
+//5-19-2016 jchoy v0.242 save feature
+//5-19-2016 jchoy v0.118 js610.starter
+//-----
+SnApp= function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.tsNum= '603'
+  this.counter= new Counter();
+  this.colors= 'red,blue,green,yellow'.split(',');
+  this.sizes= '5,10,20,30,40,45,50'.split(',');
+  this.start= function(){
+    this.addEl('div').innerHTML= document.title = 'start 610'
+    this.form= this.setupForm( $t.addEl('div') );
+    this.div= this.addEl('div');
+    this.loadJs(this.tsNum);
+  }
+  this.setupForm= function(fm){
+    var fm = $t.addEl( 'form', $t.div );
+    $t.addEl( 'textarea', fm ).name= 'ta1';
+    $t._.rows=9;  $t._.cols= 45;
+    $t.addEl( 'br', fm );
+    $t.setupButton( $t.addEl('input', fm), 'Preview' );
+    $t.setupButton( $t.addEl('input', fm), 'Save' );
+    return fm;
+  }
+  this.setupButton= function(el, val){
+    el.type= 'button';
+    el.value= val;
+    el.onclick= function(){ $t.doButtonClick(this) }
+  }
+  this.doButtonClick= function(el){
+    if (el.value=="Save"){
+      return this.sendPkg( {text:el.form.ta1.value}, this.tsNum );
+    } else if (el.value=="Preview"){
+      new AutoLink().show( el.form.ta1.value, this.div );
+    }
+  }
+  this.gotNewPkg= function(s){  //override
+    this.form.ta1.value= pkg.text;
+    this.form= null;
+  }
+}
+AutoLink= function(){
+  new AppTool().inherit( this, AppTool );
+  this.lastLinkUrl= location+"{0}";
+  this.show= function( s, el ){
+    el.innerHTML= '';
+    for (var i=0,at=s.split('\n'); i<at.length; i++){
+      var s8= at[i].substr(0,8);
+      if (s8.indexOf('http') != 0){
+        this.addEl('div',el).innerHTML= (at[i])? at[i] : "&nbsp;";
+      } else if (s8=='httpt://') {
+        this.doLinkTemplate( at[i], this.addEl('div',el) );
+      } else {
+        this.doLink( at[i], this.addEl('div',el) );
+      }
+    }
+  }
+  this.doLink= function( s, el ){
+    this.addEl('a',el).innerHTML= s;
+    this._.href= this.lastLinkUrl= s;
+  }
+  this.doLinkTemplate= function( s, el ){
+    this.addEl('a',el).innerHTML= s;
+    var res= this.lastLinkUrl;
+    for (var i=2,j=0,at=s.split("/"); i<at.length; i++,j++)
+      while (res.indexOf("{"+j+"}") >= 0)
+        res= res.replace( "{"+j+"}", at[i] );
+    this._.href = res;
+  }
+}
+js610=pkg={};
+pkg.starter= new SnApp();
+pkg.starter.exposeClassNames( pkg );
+
+
+if (_n)_n();

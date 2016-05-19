@@ -1,0 +1,41 @@
+//5-19-2016 jchoy v0.118 js608.starter
+//-----
+SnApp= function(){
+  pkg.appTool.inherit( this, AppTool );
+  var $t= this;
+  this.counter= new Counter();
+  this.colors= 'red,blue,green,yellow'.split(',');
+  this.sizes= '5,10,20,30,40,45,50'.split(',');
+  this.start= function(){
+    this.addEl('div').innerHTML= document.title = 'start 608'
+    $t.div= $t.addEl('div');
+    setInterval( function(){ $t.dotClick() }, 1000 );
+  }
+  this.rndColorSize= function(k){
+    $t.counter.add( k );
+    var n= $t.counter.count( k );
+    return [$t.colors[n % $t.colors.length], $t.sizes[n % $t.sizes.length]];
+  }
+  this.dotClick= function(el){
+    var cz= $t.rndColorSize( (el)? el.style.backgroundColor : 'red' );
+    $t.div.appendChild( $t.mkDot(cz[0],cz[1]) ).onclick=function(){
+      $t.dotClick(this);
+    }
+  }
+  this.mkDot= function( bg, sz ){
+    var res= $t.addEl('span');
+    res.innerHTML= '';
+    res.style.backgroundColor= bg;
+    res.style.width= res.style.height= sz;
+    res.style.overflow = 'hidden';
+    res.style.display = 'inline-block';
+    res.style.borderRadius= sz/2;
+    return res;
+  }
+}
+js608=pkg={};
+pkg.appTool= new AppTool();
+pkg.starter= new SnApp();
+pkg.appTool.exposeClassNames( pkg );
+
+if (_n)_n();
