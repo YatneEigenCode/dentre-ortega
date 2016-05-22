@@ -1,80 +1,115 @@
-//5-20-2016 jchoy v0.154 js609 Gamepiece
+//5-20-2016 jchoy v0.382 js609 SvgMotion
 //5-19-2016 jchoy v0.118 js609.starter
+//TODO: viewPort, gravity, proximity, spin, background parallax
 //-----
 SnApp= function(){
   new AppTool().inherit( this, AppTool );
   var $t= this;
-  this.drawEls= []; this.svgEls= [];
+  this.svgEls= [];
   this.pz=[600,300];
   this.start= function(){
     this.addEl('div').innerHTML= document.title = 'Canvas Demo 609';
-    this.addEl('canvas').width= $t.pz[0];
-    this._.height= $t.pz[1];
-    this.colors= "red,green,yellow,pink,gray,orange,#FF99EE,#33FF44,#65F811,#90A4E4,#DD52E4,lime,mustard,salmon,aqua".split(',');
-    
-    this.ctx = this._.getContext('2d');
-    var imr = new IconMaker();
-    for (var i=0,cl=this.colors.length; i<80; i++)
+
+    this.colors= ("red,green,yellow,pink,gray,orange,#FF99EE,#33FF44"
+      +",#65F811,#90A4E4,#DD52E4,lime,mustard,salmon,aqua").split(',');
+    var imr = [this.imr=new IconMaker(), new IconMaker()];
+    imr[1].size= {width:20, height:30};
+    for (var i=0,cl=this.colors.length; i<4; i++) {
       this.svgEls.push( new GamePiece( 
-        imr.mkIconImg( "ABCDEFGHIJ".charAt(i%10), $t.colors[i%cl] ), 
-        Math.random() * $t.pz[0], Math.random() * $t.pz[0])
+        imr[i%2].mkIconImg( "ABCDEFGHIJ".charAt(i%10), $t.colors[i%cl] ), 
+        Math.floor(Math.random() * $t.pz[0]), Math.floor(Math.random() * $t.pz[0]))
       );
-    //window.requestAnimationFrame( function(){$t.repaint()} );
-    setInterval( function(){$t.repaint()}, 50 );
-    setInterval( function(){$t.play()}, 200 );
-  }
-  this.repaint= function(){
-    this.ctx.fillStyle = "#DDDDFF"
-    this.ctx.fillRect( 0, 0, $t.pz[0], $t.pz[1] );
-    for (var se,i=0,at=this.svgEls; i<at.length; i++){
-      se= at[i];
-      if (se.isVisible) this.ctx.drawImage(se.img, se.pos[0], se.pos[1]);
-      at[i].pos[0] += at[i].vel[0];
-      at[i].pos[1] += at[i].vel[1];
     }
+    this.smo= new SvgMotion();
+    for (var i=0; i<this.svgEls.length; i++)
+      this.smo.addItem( this.svgEls[i] );
+    this.smo.start( $t.pz[0], $t.pz[1], "#CCEECC" );
+    this.smo.canvas.addEventListener( "mousedown", function(e){$t.cnvClick(e)} );
+    setInterval( function(){$t.play()}, 200 );
   }
   this.play= function(){
     for (var i=0,at=this.svgEls; i<at.length; i++)
       for (var j=0; j<2; j++) 
-        if ((at[i].pos[j]<0) || (at[i].pos[j]+at[i].pos[j+3]>$t.pz[j]))
-          at[i].vel[j]= ($t.pz[j]/2-at[i].pos[j])/20 * (Math.random()+0.5);
-        else at[i].vel[j] *= 0.99;
+        if ((at[i].pos[j]<=0) || (at[i].pos[j]+at[i].pos[j+3]>=$t.pz[j]))
+          at[i].vel[j]= Math.floor(($t.pz[j]/2-at[i].pos[j])/20 * (Math.random()+0.5));
+        else if (at[i].vel[j]>2) at[i].vel[j]--
+        else if (at[i].vel[j]<-2) at[i].vel[j]++
   }
-
+  this.cnvClick= function(evt){
+      var cl= this.colors.length, i= this.svgEls.length;
+      var gp= new GamePiece( 
+        this.imr.mkIconImg( "ABCDEFGHIJ".charAt(i%10), $t.colors[i%cl] ), 
+        this.smo.getEventPos(evt).x, this.smo.getEventPos(evt).y );
+      gp.vel= [ gp.pos[1]%cl+1, -1-(gp.pos[0]%cl) ,0 ];
+      this.svgEls.push( gp );
+      this.smo.addItem( gp );
+  }
 }
+//-----
+SvgMotion= function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.frameIntervalMs = 50;
+  this.svgEls= [];
+  this.start= function(width, height, color, canvasEl){
+    if (!(this._=canvasEl)){
+      this.addEl('canvas').width= width;
+      this._.height= height;
+    }
+    this.pz= [ (this.canvas=this._).width, this._.height];
+    this.bgColor = color;
+    this.ctx = this._.getContext('2d');
+    //window.requestAnimationFrame( function(){$t.repaint()} );
+    setInterval( function(){$t.repaint()}, this.frameIntervalMs );
+  }
+  this.repaint= function(){
+    this.ctx.fillStyle = this.bgColor;
+    this.ctx.fillRect( 0, 0, $t.pz[0], $t.pz[1] );
+    for (var se,i=0,at=this.svgEls; i<at.length; i++){
+      se= at[i];
+      if (se.isVisible)  this.ctx.drawImage(se.img, se.pos[0], se.pos[1]);
+      at[i].pos[0] += at[i].vel[0];  //TODO: time
+      at[i].pos[1] += at[i].vel[1];
+    }
+  }
+  this.addItem= function(el){  this.svgEls.push(el); }
+  this.getEventPos= function(evt) {
+        var rect = this.canvas.getBoundingClientRect();
+        return {  x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+  }
+}
+//-----
 SvgEl = function(img, x, y){
   this.pos= [x,y,0,img.width,img.height];
   this.vel= [6,5,0];
   this.img= img;
   this.isVisible = true;
 }
+//-----
 GamePiece = function(img, x, y){
   new AppTool().inherit( this, SvgEl, img, x, y );
 }
-
+//-----
 IconMaker= function(){
   this.size= {width:50, height:50};
   this.textColor= 'blue';
   this.mkIconImg= function( s, color ){
-    var cnv= document.createElement('canvas');
-    cnv.width= this.size.width;
-    cnv.height= this.size.height;
-    var ctx= cnv.getContext('2d');
-    ctx.save();
-    ctx.translate(25,25);
-    ctx.fillStyle= color;
-    ctx.arc(0,0,25,0,Math.PI*2,true);
+    var res, ctx, cnv= document.createElement('canvas');
+    for (var m in this.size) cnv[m] = this.size[m];
+    (ctx=cnv.getContext('2d')).fillStyle= color;
+    ctx.translate(this.size.width/2,this.size.height/2);
+    this.drawImg( ctx, s );
+    (res=new Image()).src= cnv.toDataURL("image/png", 0.5);
+    return res;
+  }
+  this.drawImg= function(ctx, s){
+    ctx.arc(0,0,this.size.width/2,0,Math.PI*2,true);
     ctx.fill();
     ctx.textAlign='center';
-    var imd= ctx.getImageData( 25,25,2,2 );
+    var imd= ctx.getImageData( this.size.width/2,2,2,2 );
     ctx.fillStyle= (imd.data[0]+imd.data[1]+imd.data[2] < 255)? "white" : "blue";
-    ctx.scale( 3, 3 );
+    ctx.scale( 3*this.size.width/50, 3*this.size.height/50 );
     ctx.fillText(s, 0, 4.5);
-    ctx.restore();
-    var res= new Image();
-    res.src= cnv.toDataURL("image/png", 0.5);
-    //$t._.parentNode.removeChild( $t._ );
-    return res;
   }
 }
 
