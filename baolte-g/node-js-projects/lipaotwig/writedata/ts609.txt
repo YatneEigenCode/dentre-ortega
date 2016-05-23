@@ -1,12 +1,13 @@
-//5-21-2016 jchoy v0.519 js609 GamePiece.hitWall
+//5-21-2016 jchoy v0.573 js609 bounce
 //5-19-2016 jchoy v0.118 js609.starter
-//TODO: viewPort, gravity, proximity, spin, background parallax
+//TODO: viewPort, gravity, proximity, spin, background parallax, bounce collide
 //-----
 MyDemo= function(){
   new AppTool().inherit( this, AppTool );
   var $t= this;
   this.svgEls= [];
-  this.pz=[600,300];
+  this.pz=[600,200];
+  this.colors= ("green,yellow,pink,orange,lime,aqua").split(',');
   this.start= function(){
     this.loadJs('612');
   }
@@ -14,11 +15,8 @@ MyDemo= function(){
     if (pkg.svgMotion) this.startAfterLoadJs();
   }
   this.startAfterLoadJs= function(){
-    this.addEl('div').innerHTML= document.title = 
-     'Canvas Demo 609 - Click canvas to start';
-    this.colors= ("red,green,yellow,pink,gray,orange,#FF99EE,#33FF44"
-      +",#65F811,#90A4E4,#DD52E4,lime,mustard,salmon,aqua").split(',');
-    (this.imr=new IconMaker()).size= {width:40, height:30};
+    this.addEl('div').innerHTML= document.title = '609 - Click canvas to start';
+    (this.imr=new IconMaker()).size= {width:40, height:40};
 
     this.smo= new SvgMotion();
     this.smo.start( $t.pz[0], $t.pz[1], "#CCEECC" );
@@ -26,28 +24,36 @@ MyDemo= function(){
     setInterval( function(){$t.play()}, 200 );
 
     this.seo= new SvgElOverlay();
+    var clr= "red,red,red,orange,orange,yellow,yellow,lime,lime,lime,lime".split(',');
+    for (var i=0; i<11; i++)
+      this.seo.addOverlay( 'dot'+i, this.seo.mkDot(clr[i],5+i), 6, 1 );
     this.seo.addOverlay( 'reddot', this.seo.mkDot('red',5), 12, 12 );
   }
   this.play= function(){
     for (var i=0,at=this.svgEls; i<at.length; i++)
       for (var j=0; j<2; j++) 
-        if ((at[i].pos[j]<=0) || (at[i].pos[j]+at[i].pos[j+3]>=$t.pz[j])) {
-          at[i].hitWall( j, $t.pz[j], $t.seo );
-        } else if (at[i].vel[j]>2) at[i].vel[j]--
-        else if (at[i].vel[j]<-2) at[i].vel[j]++
+        if ((at[i].pos[j]<=0) || (at[i].pos[j]+at[i].pos[j+3]>=$t.pz[j])) 
+          at[i].hitWall( j, $t.pz[j] );
+    for (var i=0,at=this.svgEls,zo=new Zoner(); i<at.length; i++)
+      zo.setZone(at[i]);
+    for (var i=0,at=this.svgEls; i<at.length; i++)
+      at[i].collide();
   }
   this.addItem= function( gp ){
-      for (var i=0,at=this.svgEls; i<at.length; i++)
+      for (var i=0,at=this.svgEls; i<at.length; i++)  //cleanup
         if (!at[i].isVisible) at[i]=this.svgEls.pop();
       this.svgEls.push( gp );
+      gp.seo= this.seo;
+      this.seo.applyOverlay( gp, 'dot10' );
       return gp;
   }
   this.cnvClick= function(evt){
       var cl=$t.colors.length, ri=new Date().getMilliseconds(), i=$t.svgEls.length;
       var gp= new GamePiece( 
-        this.imr.mkIconImg( i, $t.colors[ri%cl] ), 
+        this.imr.mkIconImg( "UVWXYZ".charAt(ri%cl), $t.colors[ri%cl] ), 
         this.smo.getEventPos(evt).x, this.smo.getEventPos(evt).y );
       gp.vel= [ (ri%12)-6, ((ri+i)%12)-6 ,0 ];
+      gp.team= $t.colors[ri%cl];
       this.smo.addItem( this.addItem(gp) );
   }
 }
@@ -57,15 +63,57 @@ SvgEl = function(img, x, y){
   this.vel= [6,5,0];
   this.img= img;
   this.isVisible = true;
+  this.changeDir= function( oVel, dir ){
+    if ((dir[0]==0) && (dir[1]==0)) return oVel;
+    var spd= Math.sqrt( (oVel[0]*oVel[0] + oVel[1]*oVel[1]) /
+      (dir[0]*dir[0]   + dir[1]*dir[1]) );
+    oVel[0]= Math.ceil(spd * dir[0]);
+    oVel[1]= Math.ceil(spd * dir[1]);
+  }
 }
 //-----
 GamePiece = function(img, x, y){
   new AppTool().inherit( this, SvgEl, img, x, y );
   this.health= 10;
-  this.hitWall= function( j, pz, seo ){
-    this.vel[j]= Math.floor((pz/2-this.pos[j])/20 * (Math.random()+0.5));
-    seo.applyOverlay( this, 'reddot' );
-    if (--this.health <= 0) this.isVisible= false;
+  this.hitWall= function( j, pz ){
+    var pj2= this.pos[j]+this.pos[j];
+    if ((pj2>pz) && (this.vel[j]>0)) this.vel[j]=-this.vel[j];
+    if ((pj2<pz) && (this.vel[j]<0)) this.vel[j]=-this.vel[j];
+  }
+  this.collide= function(){
+    if (!this.zoner) return;
+    if (!this.isVisible) return;
+    for (var i=0,at=this.zoner.getNearby(this.zone); i<at.length; i++)
+      if ((at[i] == this) || (!at[i].isVisible)) {
+      } else if (this.distanceFrom(at[i])>this.img.width) {
+        this.towardTeammate();
+      } else {
+        if (at[i].team==this.team) {
+          this.health= 10;
+        } else 
+          this.health--;
+        this.changeDir( this.vel, [this.pos[0]-at[i].pos[0],this.pos[1]-at[i].pos[1]] );
+        console.log( [this.team,at[i].team,'h',this.health, 'd',this.distanceFrom(at[i])].join('*') )
+      }
+    if (this.health <= 0) this.isVisible= false;
+    this.seo.applyOverlay( this, 'dot'+this.health );
+  }
+  this.towardTeammate= function(){
+    var tmate, dist=999, p0=this.pos[0], p1=this.pos[1];
+    for (var i=0,at=this.zoner.getNearby(this.zone); i<at.length; i++)
+      if ((at[i].team==this.team) && (at[i]!=this)) {
+        var di = this.distanceFrom(at[i]);
+        if (di<dist) {tmate= at[i];  dist= di; }
+      }
+    if (!tmate) return;
+    if (this.health<7) {
+      this.changeDir( this.vel, [tmate.pos[0]-p0, tmate.pos[1]-p1] );          
+    } else
+      this.changeDir( this.vel, [p0-tmate.pos[0], p1-tmate.pos[1]] );
+  }
+  this.distanceFrom= function(el){
+    return [el.pos[0]-this.pos[0],this.pos[0]-el.pos[0],
+      el.pos[1]-this.pos[1],this.pos[1]-el.pos[1]].sort().pop();
   }
 }
 
