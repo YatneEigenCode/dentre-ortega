@@ -1,0 +1,73 @@
+<meta name=viewport content="width=device-width; initial-scale=1.5; maximum-scale=4.0; minimum-scale=0.7;" />
+<title>Local Image</title>
+<body>
+</body>
+<script src=js/ts604.js></script>
+<script>
+//5-26-2016 jchoy v0.112 local image
+//-----
+SnApp= function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.tsNum= '603'
+  this.msg= new Date().toLocaleString();
+  this.start= function(){
+    this.tsNum= this.cgi('ts','603',location);
+    this.addEl('div').innerHTML= document.title = 'Local Image ';
+    this.form= this.setupForm( $t.addEl('div') );
+    this.div= this.addEl('div');
+    //this.loadJs(this.tsNum);
+  }
+  this.setupForm= function(fm){
+    var fm = $t.addEl( 'form', $t.div );
+    $t.addEl( 'input', fm ).type= 'file';
+    $t._.onchange= function(){$t.useFile(this.files)};
+    return fm;
+  }
+  this.useFile= function(files){
+    if (files.length==0) return this.div.innerHTML='no files';
+    var fr= new FileReader();
+    fr.onload= function(evt){ $t.showFile(evt) }
+    fr.readAsDataURL(files[0]);
+  }
+  this.showFile= function(evt){
+    //this.addEl('img',this.div).src= evt.target.result;
+    this.img= new Image();
+    this.img.src= evt.target.result;
+    if (!this.cnv) {
+      this.addEl('canvas',this.div).width=this.img.width;
+      (this.cnv=$t._).height=this.img.height;
+      this.cnv.addEventListener('mousedown',
+        function(evt){$t.cnvClick(evt)} );
+      this.cnv.getContext('2d').drawImage(this.img,0,0);
+    } else this.isSecondImg= true;
+  }
+  this.cnvClick= function(evt){
+    var pos= this.getEventPos(evt);
+    if (this.isSecondImg)
+      this.cnv.getContext('2d').drawImage(this.img,pos.x,pos.y);
+    else {
+      var ctx= this.cnv.getContext('2d');
+      ctx.font="30px Arial";
+      ctx.strokeStyle="black";
+      ctx.fillStyle="white";
+      this.msg= prompt("Enter text",this.msg);
+      ctx.fillText( this.msg, pos.x, pos.y )
+      ctx.strokeText( this.msg, pos.x, pos.y )
+    }
+  }
+  this.getEventPos= function(evt) {
+        var rect = this.cnv.getBoundingClientRect();
+        return {  x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+  }
+  this.gotNewPkg= function(s){  //override
+  }
+}
+
+js610=pkg={};
+pkg.starter= new SnApp();
+pkg.starter.exposeClassNames( pkg );
+
+
+pkg.starter.start();
+</script>
