@@ -1,15 +1,13 @@
-//5-19-2016 jchoy v0.242 save feature
+//5-28-2016 jchoy v0.251 #h=hostname
 //5-19-2016 jchoy v0.118 js610.starter
 //-----
 SnApp= function(){
   new AppTool().inherit( this, AppTool );
   var $t= this;
   this.tsNum= '603'
-  this.counter= new Counter();
-  this.colors= 'red,blue,green,yellow'.split(',');
-  this.sizes= '5,10,20,30,40,45,50'.split(',');
   this.start= function(){
-    this.addEl('div').innerHTML= document.title = 'start 610'
+    this.tsNum= this.cgi('ts','603',location);
+    this.addEl('div').innerHTML= document.title = 'Preview '+this.tsNum;
     this.form= this.setupForm( $t.addEl('div') );
     this.div= this.addEl('div');
     this.loadJs(this.tsNum);
@@ -24,22 +22,21 @@ SnApp= function(){
     return fm;
   }
   this.setupButton= function(el, val){
-    el.type= 'button';
-    el.value= val;
+    el.type= 'button'; el.value= val;
     el.onclick= function(){ $t.doButtonClick(this) }
   }
   this.doButtonClick= function(el){
     if (el.value=="Save"){
-      return this.sendPkg( {text:el.form.ta1.value}, this.tsNum );
-    } else if (el.value=="Preview"){
+      this.sendPkg( {text:el.form.ta1.value}, this.tsNum );
+    } else if (el.value=="Preview")
       new AutoLink().show( el.form.ta1.value, this.div );
-    }
   }
   this.gotNewPkg= function(s){  //override
     this.form.ta1.value= pkg.text;
     this.form= null;
   }
 }
+//-----
 AutoLink= function(){
   new AppTool().inherit( this, AppTool );
   this.lastLinkUrl= location+"{0}";
@@ -51,21 +48,19 @@ AutoLink= function(){
         this.addEl('div',el).innerHTML= (at[i])? at[i] : "&nbsp;";
       } else if (s8=='httpt://') {
         this.doLinkTemplate( at[i], this.addEl('div',el) );
-      } else {
+      } else 
         this.doLink( at[i], this.addEl('div',el) );
-      }
     }
   }
   this.doLink= function( s, el ){
-    this.addEl('a',el).innerHTML= s;
-    this._.href= this.lastLinkUrl= s;
+    var res= s.replace('#h',location.hostname);
+    this.addEl('a',el).innerHTML= res;
+    this._.href= this.lastLinkUrl= res;
   }
   this.doLinkTemplate= function( s, el ){
-    this.addEl('a',el).innerHTML= s;
-    var res= this.lastLinkUrl;
+    var res= this.lastLinkUrl+'', tx= this.addEl('a',el).innerHTML= s;
     for (var i=2,j=0,at=s.split("/"); i<at.length; i++,j++)
-      while (res.indexOf("{"+j+"}") >= 0)
-        res= res.replace( "{"+j+"}", at[i] );
+      while (res.indexOf("{"+j+"}") >= 0)  res= res.replace( "{"+j+"}", at[i] );
     this._.href = res;
   }
 }
