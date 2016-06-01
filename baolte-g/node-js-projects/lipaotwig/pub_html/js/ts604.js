@@ -1,0 +1,100 @@
+Enter file contents here//6-1-2016 jchoy v0.263 config
+//5-18-2016 jchoy v0.117 js604.appTool
+//-----
+SnAppFdn= function(){
+  this.inherit= function( inst, base, a, b, c, d, e ){
+    inst.cstr= base;  inst.cstr(a, b, c, d, e);
+  }
+  this.cgi= function(k,def,qy){
+    var at=(qy+"").split(new RegExp("[\&\?]"+k+"="));
+    return (at.length==1)?def:at[1].split("&")[0];
+  }
+  this.addEl= function( tag, par ){
+	if (!par) par= document.body;
+	return this._=par.appendChild( document.createElement(tag) );
+  }
+  this.exposeClassNames= function(obj){
+    for (var m in obj){
+      window[this._=m.charAt(0).toUpperCase()+m.substr(1)]= obj[m].constructor;
+      console.log( this._+" class name is now defined.");
+    } //TODO: check for native code, window/global
+  }
+}
+SnAppLoader= function(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  var $t= this;
+  this.sendPkgUrl= "/ts/set/?i={0}";
+  this.textPkgUrl= "/ts/text/?i={0}";
+  this.setNotification= function($fcn){
+    $t.chainNotify= null;
+    try{ $t.chainNotify= _n } catch(e) {};
+    _n= function(){ _n=$t.chainNotify; $fcn(); setTimeout('if(_n)_n()',100) }
+  }
+  this.loadJs= function($s){
+    var hd0= document.getElementsByTagName('head')[0];
+    try {$t.pkgBefore= pkg} catch(e) {}
+    this.setNotification( function(){ $t.checkPkg($s) } );
+    if ($s) this.addEl('script', hd0 ).src= this.textPkgUrl.replace('{0}',$s); 
+  }
+  this.checkPkg= function($s){
+    if ($t.pkgBefore == pkg) return $t.setNotification( function(){ $t.checkPkg($s) } );
+    $t.pkgBefore=pkg;
+    $t.gotNewPkg($s);
+  }
+  this.gotNewPkg= function(s){  //override this
+    pkg.starter.start();  //or specific action based on s
+  }
+  this.sendPkg= function(json, num){
+    var im=new Image(), res= "pkg="+ JSON.stringify(json) +"\nif(_n)_n()";
+    im.src= this.sendPkgUrl.replace('{0}',num) +"&data="+escape(res);
+  }
+}
+//-----
+Counter= function(){
+    this.add= function(key){
+      if (!this.data[key]) this.data[key]=0;
+      this.data[key]++;
+    }
+    this.restart= function(){
+      this.data= {};
+      this.startTime = new Date();
+    }
+    this.count= function(key){
+      return (this.data[key])? this.data[key] : 0;
+    }
+    this.elapsedTimeSecs= function(){
+      return ((new Date()).valueOf()-this.startTime.valueOf())/1000;
+    }
+    this.restart();
+}
+
+//-----
+SnApp= function(){
+  new SnAppFdn().inherit( this, SnAppLoader);
+  this.start= function(cfg){
+    //this.addEl('div').innerHTML= 'start 604';
+    console.log( 'start 604' );
+    for (var m in cfg.topLevel) this[m]= cfg.topLevel[m];
+    this.loadJs( this.cgi('js','',location) );
+  }
+}
+//-----
+pkg={
+   snAppFdn: new SnAppFdn()
+  ,appTool:  new SnAppLoader()
+  ,snAppLoader:  new SnAppLoader()
+  ,counter:  new Counter()
+  ,starter:  new SnApp()
+}
+
+//----- client usage
+cfg= { color:'blue'
+  ,topLevel:{ sendPkgUrl: "/ts/set/?i={0}"
+             ,textPkgUrl: "/ts/text/?i={0}"}
+}
+js604= pkg;
+js604.appTool.exposeClassNames( js604 );
+js604.starter.start(cfg);
+
+//_n= function(){ fanPkg=pkg; fanPkg.starter.start() }
+//if(_n)_n();
