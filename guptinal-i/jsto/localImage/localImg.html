@@ -5,6 +5,7 @@
 </body>
 <script src=js/ts604.js></script>
 <script>
+//6-6-2016 jchoy v0.124 resize
 //5-26-2016 jchoy v0.112 local image
 //-----
 SnApp= function(){
@@ -23,6 +24,11 @@ SnApp= function(){
     var fm = $t.addEl( 'form', $t.div );
     $t.addEl( 'input', fm ).type= 'file';
     $t._.onchange= function(){$t.useFile(this.files)};
+    this.addEl('br',fm);
+    this.addEl('input',fm).name= "size";
+    this.addEl('input').innerHTML= "% Resize";
+    this._.onclick= function(){$t.doResize(this)}
+    this.addEl('br');
     return fm;
   }
   this.useFile= function(files){
@@ -42,6 +48,9 @@ SnApp= function(){
         function(evt){$t.cnvClick(evt)} );
       this.cnv.getContext('2d').drawImage(this.img,0,0);
     } else this.isSecondImg= true;
+  }
+  this.doResize= function(el){
+    alert(el.form.size.value);
   }
   this.cnvClick= function(evt){
     var pos= this.getEventPos(evt);
