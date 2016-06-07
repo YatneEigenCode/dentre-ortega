@@ -5,7 +5,7 @@
 </body>
 <script src=js/ts604.js></script>
 <script>
-//6-6-2016 jchoy v0.124 resize
+//6-6-2016 jchoy v0.128 resize
 //5-26-2016 jchoy v0.112 local image
 //-----
 SnApp= function(){
@@ -25,8 +25,9 @@ SnApp= function(){
     $t.addEl( 'input', fm ).type= 'file';
     $t._.onchange= function(){$t.useFile(this.files)};
     this.addEl('br',fm);
-    this.addEl('input',fm).name= "size";
-    this.addEl('input').innerHTML= "% Resize";
+    this.addEl('input',fm).name= "pctScale";
+    this.addEl('input',fm).type= "button";
+    this._.value= "% Resize";
     this._.onclick= function(){$t.doResize(this)}
     this.addEl('br');
     return fm;
@@ -50,7 +51,12 @@ SnApp= function(){
     } else this.isSecondImg= true;
   }
   this.doResize= function(el){
-    alert(el.form.size.value);
+      var sca= parseFloat(el.form.pctScale.value)/100;
+      this.cnv.width=  this.img.width * sca;
+      this.cnv.height= this.img.height * sca;
+      this.cnv.addEventListener('mousedown',
+        function(evt){$t.cnvClick(evt)} );
+      this.cnv.getContext('2d').drawImage(this.img, 0,0, this.cnv.width, this.cnv.height);
   }
   this.cnvClick= function(evt){
     var pos= this.getEventPos(evt);
@@ -73,12 +79,9 @@ SnApp= function(){
   this.gotNewPkg= function(s){  //override
   }
 }
-
 js610=pkg={};
 pkg.starter= new SnApp();
 pkg.starter.exposeClassNames( pkg );
-
-
 pkg.starter.start();
 </script>
 </html>
