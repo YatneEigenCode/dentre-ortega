@@ -5,7 +5,7 @@
 </body>
 <script src=js/ts604.js></script>
 <script>
-//6-6-2016 jchoy v0.128 resize
+//6-6-2016 jchoy v0.129 resize
 //5-26-2016 jchoy v0.112 local image
 //-----
 SnApp= function(){
@@ -45,7 +45,7 @@ SnApp= function(){
     if (!this.cnv) {
       this.addEl('canvas',this.div).width=this.img.width;
       (this.cnv=$t._).height=this.img.height;
-      this.cnv.addEventListener('mousedown',
+      this.cnv.addEventListener('mouseup',
         function(evt){$t.cnvClick(evt)} );
       this.cnv.getContext('2d').drawImage(this.img,0,0);
     } else this.isSecondImg= true;
