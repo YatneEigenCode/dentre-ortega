@@ -1,4 +1,4 @@
-Enter file contents here//6-1-2016 jchoy v0.263 config
+//6-12-2016 jchoy v0.285 SnCurly.cfgJsLoader
 //5-18-2016 jchoy v0.117 js604.appTool
 //-----
 SnAppFdn= function(){
@@ -29,6 +29,10 @@ SnAppLoader= function(){
     $t.chainNotify= null;
     try{ $t.chainNotify= _n } catch(e) {};
     _n= function(){ _n=$t.chainNotify; $fcn(); setTimeout('if(_n)_n()',100) }
+  }
+  this.cfgJsLoader= function( nm ){
+    var cfg= (window[nm])? window[nm] : {};
+    for (var m in cfg.topLevel) this[m]= cfg.topLevel[m];
   }
   this.loadJs= function($s){
     var hd0= document.getElementsByTagName('head')[0];
@@ -69,13 +73,33 @@ Counter= function(){
 }
 
 //-----
+SnCurly= function(){
+  new SnAppFdn().inherit( this, SnAppLoader);
+  var $t= this;
+  this.start= function( csvTs, csvCN, fcn ){
+    this.startParms= [csvCN.split(','), fcn];
+    this.cfgJsLoader( 'cfg' );
+    for (var i=0,at=csvTs.split(','); i<at.length; i++)  this.loadJs( at[i] );
+    this.count= 55;
+    this.timer= setInterval( function(){ $t.doStart(); $t.count-- }, 100 );
+  }
+  this.checkPkg= function(){}
+  this.doStart= function(){
+    if (this.count<=0) clearInterval( this.timer );
+    for (var i=0,at=this.startParms[0]; i<at.length; i++) if ( !window[at[i]] ) return;
+    clearInterval( this.timer );
+    this.startParms[1]();
+  }
+}
+
+//-----
 SnApp= function(){
   new SnAppFdn().inherit( this, SnAppLoader);
-  this.start= function(cfg){
+  this.start= function(){
     //this.addEl('div').innerHTML= 'start 604';
     console.log( 'start 604' );
-    for (var m in cfg.topLevel) this[m]= cfg.topLevel[m];
-    this.loadJs( this.cgi('js','',location) );
+    this.cfgJsLoader( 'cfg' );
+    this.loadJs( this.cgi('js','610',location) );
   }
 }
 //-----
@@ -83,6 +107,7 @@ pkg={
    snAppFdn: new SnAppFdn()
   ,appTool:  new SnAppLoader()
   ,snAppLoader:  new SnAppLoader()
+  ,snCurly: new SnCurly()
   ,counter:  new Counter()
   ,starter:  new SnApp()
 }
@@ -94,7 +119,7 @@ cfg= { color:'blue'
 }
 js604= pkg;
 js604.appTool.exposeClassNames( js604 );
-js604.starter.start(cfg);
+js604.starter.start();
 
 //_n= function(){ fanPkg=pkg; fanPkg.starter.start() }
 //if(_n)_n();
