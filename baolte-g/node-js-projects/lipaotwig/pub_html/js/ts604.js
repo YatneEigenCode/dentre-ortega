@@ -1,4 +1,4 @@
-//6-12-2016 jchoy v0.285 SnCurly.cfgJsLoader
+//6-12-2016 jchoy v0.285a SnCurly.cfgJsLoader
 //5-18-2016 jchoy v0.117 js604.appTool
 //-----
 SnAppFdn= function(){
@@ -112,14 +112,6 @@ pkg={
   ,starter:  new SnApp()
 }
 
-//----- client usage
-cfg= { color:'blue'
-  ,topLevel:{ sendPkgUrl: "/ts/set/?i={0}"
-             ,textPkgUrl: "/ts/text/?i={0}"}
-}
-js604= pkg;
-js604.appTool.exposeClassNames( js604 );
-js604.starter.start();
 
 //_n= function(){ fanPkg=pkg; fanPkg.starter.start() }
 //if(_n)_n();
