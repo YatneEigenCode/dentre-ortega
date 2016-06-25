@@ -1,6 +1,7 @@
 //5-16-2016 jchoy v1.231 - mapPathsToFN
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextSstoreCgi works with node-router, TextStoreWebApp works with http
+//TODO: TextStoreExpressApp to work with express
 //-----
 TextStore = function(){
   this.assets= {}
@@ -47,7 +48,7 @@ TextStoreCgi= function(){
   }
 }
 //----- works with http orig package
-BumWebApp= function(){
+XBumWebApp= function(){
   var $svr= this;
   this.pathBums= new Array();
   this.reqHandler = function( req, res ){
