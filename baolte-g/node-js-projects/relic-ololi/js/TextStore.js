@@ -1,4 +1,4 @@
-//5-16-2016 jchoy v1.231 - mapPathsToFN
+//6-25-2016 jchoy v1.232 - TextStoreExpApp
 //5-8-2016 jchoy v1.211 textStore.js - TextStore js on server side: TextStoreCgi, BumWebApp, TextStoreWebApp
 //TextStore works with express, TextSstoreCgi works with node-router, TextStoreWebApp works with http
 //-----
@@ -60,4 +60,20 @@ TextStoreWebApp= function(){
       $t.sendText( response, 200, ""+$t.get(request.url));
       console.log( new Date()+" /ts/text "+$t._ );
   });
+}
+//-----
+TextStoreExpApp= function(){
+  (function(t,c){t.c=c;t.c()})(this,TextStoreCgi);
+  (function(t,c){t.c=c;t.c()})(this,BumWebApp);
+
+  this.startServer= function( server ){
+    var $t= this;
+    server.get("/ts/set/", function (request, response) {
+      $t.save( request.url );
+      $t.sendText( response, 200, "Saved to "+$t._);
+    });
+    server.get("/ts/text/", function (request, response) {
+      $t.sendText( response, 200, ""+$t.get(request.url));
+    });
+  }
 }

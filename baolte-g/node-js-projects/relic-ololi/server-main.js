@@ -6,7 +6,7 @@ require( './js/TextStore.js' );
 require( './js/BumWebApp.js' );
 require( './js/Relic.js' );
 var server = http.createServer(app);
-var tsc = new TextStoreCgi();
+var tsc = new TextStoreExpApp();
 tsc.startServer(app);
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
