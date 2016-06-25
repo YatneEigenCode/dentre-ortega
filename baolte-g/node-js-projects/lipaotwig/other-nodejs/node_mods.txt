@@ -1,0 +1,5 @@
+installed into node_modules/ folder on 5/7/2016
+3 modules from git
+git clone git://github.com/creationix/node-router.git
+git clone git://github.com/creationix/haml-js.git
+git clone git://github.com/creationix/proto.git
