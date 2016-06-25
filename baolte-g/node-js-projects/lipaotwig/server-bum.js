@@ -1,4 +1,4 @@
-//5-18-2016 jchoy v0.317 bum._ commit message
+//6-12-2016 jchoy v0.319 twigbud.html, ts604.js
 //5-8-2916 jchoy server-bum.js - to use with bare nodejs on android ice cold server
 var http = require('http');
 require( './js/TextStore.js' );
@@ -20,7 +20,10 @@ bum.mapPathsToFN( [
     ,['/helpdev.txt',   'pub_html/']
     ,['/RecentList.js', 'pub_html/js/']
     ,['/ok88.element.base.js',  'pub_html/js/']
-    ,['/twigbud.htm',   'pub_html/']
+    ,['/twigbud.htm',   'pub_html/twigbud.html']
+    ,['/twigbud.html',   'pub_html/']
+    ,['/js/ts604.js',   'pub_html/']
+    ,['/js/ts602.js',   'pub_html/']
     ], 
     function(fn){ return fs.readFileSync(fn); }
 )
