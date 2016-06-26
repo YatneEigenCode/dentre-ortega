@@ -1,6 +1,7 @@
-//6-26-2016 jchoy v0.117 jsonpkg in sendRespMsg
+//6-26-2016 jchoy v0.119 fix bug in findReq
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
-
+//TODO: one static startup html file per group
+//TODO: limits
 //-----
 RelicReq = function( url ){
   this.url= url;
@@ -34,12 +35,12 @@ Relic = function(){
   //-----
   this.findReq= function(token){
     for (var i=0; i<this.cliReqs.length; i++)
-      if (this.cliReqs[i].token= token) return this.cliReqs[i];
+      if (this.cliReqs[i].token==token) return this.cliReqs[i];
     return null;
   }
   this.sendRespMsg= function( response, text, token ){
       var pkg= {text:text, token:token};
-      var res= JSON.stringify(pkg) +"\n_n();"
+      var res= 'pkg='+JSON.stringify(pkg) +"\n_n();"
       this.sendText( response, 200, res );
       console.log( text+": "+token );
   }
@@ -107,7 +108,7 @@ Relic = function(){
       item.setStatus('COMP');
       item.relicResponse = resp;
       //msg: response registered successfully
-      this.sendRespMsg( htres, "response registered successfully", token);
+      this.sendRespMsg( htres, "response registered successfully-", item.token);
     }
   }
   //-----
