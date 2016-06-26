@@ -1,4 +1,4 @@
-//6-25-2016 jchoy v0.114 tested
+//6-25-2016 jchoy v0.115 ping
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 
 //-----
@@ -17,7 +17,7 @@ RelicReq = function( url ){
       this.expiry = new Date( new Date().valueOf() + this.lifespanMs );
   }
   this.isExpired = function(){
-      return new Date().valueOf > this.expiry.valueOf();
+      return new Date().valueOf() > this.expiry.valueOf();
   }
   this.recTimestamp = new Date()
   this.setStatus( 'RECD' );
@@ -91,15 +91,25 @@ Relic = function(){
     }
   }
   //-----
+  this.ping= function( req, res ){
+      var payload= this.cgi("payload","default",req.url);
+      this.sendText( res, 200, "payload is "+payload)
+  }
+  this.count= function( req, resp ){
+    var res='', counts= {RECD:0, PROG:0, COMP:0, SHIP:0, EXP:0, DEL:0};
+    for (var i=0,at=this.cliReqs; i<at.length; i++)
+      counts[at[i].status]++;
+    for (var m in counts) res+= m+':'+counts[m]+' ';
+    this.sendText( resp, 200, res );
+  }
+  //-----
   this.startServer= function( server ){
     var $t= this;
     server.get("/relic/req", function (request, response) {
       $t.addRequest( request, response );
-      console.log( "addRequest "+request.url );
     });
     server.get("/relic/check", function (request, response) {
       $t.getResponse( request, response );
-      console.log( "getResponse "+request.url );
     });
     server.get("/relic/work", function (request, response) {
       $t.startWork(request, response);
@@ -108,6 +118,12 @@ Relic = function(){
     server.get("/relic/comp", function (request, response) {
       $t.compWork(request, response);
       console.log( "compWork "+request.url );
+    });
+    server.get("/ping", function (request, response) {
+      $t.ping(request, response);
+    });
+    server.get("/relic/count", function (request, response) {
+      $t.count(request, response);
     });
   }
 }
