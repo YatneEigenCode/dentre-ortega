@@ -1,4 +1,4 @@
-//6-25-2016 jchoy v0.115 ping
+//6-26-2016 jchoy v0.117 jsonpkg in sendRespMsg
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 
 //-----
@@ -24,6 +24,7 @@ RelicReq = function( url ){
 }
 RelicReq.lastToken= 1000;
 
+//-----
 Relic = function(){
   (function(t,c){t.c=c;t.c()})(this,TextStore);
   (function(t,c){t.c=c;t.c()})(this,BumWebApp);
@@ -37,8 +38,27 @@ Relic = function(){
     return null;
   }
   this.sendRespMsg= function( response, text, token ){
-      this.sendText( response, 200, text+": "+token );
+      var pkg= {text:text, token:token};
+      var res= JSON.stringify(pkg) +"\n_n();"
+      this.sendText( response, 200, res );
       console.log( text+": "+token );
+  }
+  this.ping= function( req, res ){
+      var payload= this.cgi("payload","default",req.url);
+      this.sendRespMsg( res, "payload is "+payload, 'NA');
+  }
+  this.count= function( req, resp ){
+    var res='', counts= {RECD:[], PROG:[], COMP:[], SHIP:[], EXP:[], DEL:[]};
+    for (var i=0,at=this.cliReqs; i<at.length; i++)
+      counts[at[i].status].push(at[i].token);
+    for (var m in counts)    res+= m+'='+counts[m].length+' ';
+    if (true) for (var m in counts) 
+      if (counts[m].length <= 5){
+        if (counts[m].length > 0) res+= '\n'+m+': ';
+        for (var i=0; i<counts[m].length; i++)
+          res+= counts[m][i]+',';
+      }
+    this.sendRespMsg( resp, res, 'NA' );
   }
   //-----
   this.addRequest= function( req, res ){
@@ -59,7 +79,7 @@ Relic = function(){
     } else if (item.relicResponse) {
       item.setStatus('SHIP');
       //send json response
-      this.sendText( resp, 200, ""+item.relicResponse);
+      this.sendRespMsg( resp, item.relicResponse, item.token);
     }
   }
   //-----
@@ -91,18 +111,6 @@ Relic = function(){
     }
   }
   //-----
-  this.ping= function( req, res ){
-      var payload= this.cgi("payload","default",req.url);
-      this.sendText( res, 200, "payload is "+payload)
-  }
-  this.count= function( req, resp ){
-    var res='', counts= {RECD:0, PROG:0, COMP:0, SHIP:0, EXP:0, DEL:0};
-    for (var i=0,at=this.cliReqs; i<at.length; i++)
-      counts[at[i].status]++;
-    for (var m in counts) res+= m+':'+counts[m]+' ';
-    this.sendText( resp, 200, res );
-  }
-  //-----
   this.startServer= function( server ){
     var $t= this;
     server.get("/relic/req", function (request, response) {
@@ -113,11 +121,9 @@ Relic = function(){
     });
     server.get("/relic/work", function (request, response) {
       $t.startWork(request, response);
-      console.log( "startWork "+request.url );
     });
     server.get("/relic/comp", function (request, response) {
       $t.compWork(request, response);
-      console.log( "compWork "+request.url );
     });
     server.get("/ping", function (request, response) {
       $t.ping(request, response);
