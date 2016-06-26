@@ -1,4 +1,4 @@
-//6-25-2016 jchoy v0.113 Relic - RelicReq
+//6-25-2016 jchoy v0.114 tested
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 
 //-----
@@ -72,7 +72,7 @@ Relic = function(){
         at[i].setStatus('EXP');
       } else {
         item= at[i];
-        this.sendRespMsg( resp, item.url, token);
+        this.sendRespMsg( resp, item.url, item.token);
         item.setStatus('PROG');
         i= at.length;
       }
@@ -81,7 +81,7 @@ Relic = function(){
     var token= this.cgi( "id", "99", req.url );
     var resp = this.cgi( "result", "unknown", req.url );
     var item= this.findReq(token);
-    if (!res) {
+    if (!item) {
       //thread not found
     } else {
       item.setStatus('COMP');
@@ -94,16 +94,20 @@ Relic = function(){
   this.startServer= function( server ){
     var $t= this;
     server.get("/relic/req", function (request, response) {
-      this.addRequest( request, response );
+      $t.addRequest( request, response );
+      console.log( "addRequest "+request.url );
     });
     server.get("/relic/check", function (request, response) {
-      this.getResponse( request, response );
+      $t.getResponse( request, response );
+      console.log( "getResponse "+request.url );
     });
-    server.get("/relic/work/", function (request, response) {
-      this.startWork(request, response);
+    server.get("/relic/work", function (request, response) {
+      $t.startWork(request, response);
+      console.log( "startWork "+request.url );
     });
-    server.get("/relic/comp/", function (request, response) {
-      this.compWork(request, response);
+    server.get("/relic/comp", function (request, response) {
+      $t.compWork(request, response);
+      console.log( "compWork "+request.url );
     });
   }
 }

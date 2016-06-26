@@ -8,6 +8,8 @@ require( './js/Relic.js' );
 var server = http.createServer(app);
 var tsc = new TextStoreExpApp();
 tsc.startServer(app);
+var relic = new Relic();
+relic.startServer(app);
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
