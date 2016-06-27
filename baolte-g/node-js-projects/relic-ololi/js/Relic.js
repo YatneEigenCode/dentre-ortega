@@ -1,7 +1,7 @@
-//6-26-2016 jchoy v0.125 sendRespErr()
+//6-26-2016 jchoy v0.126 limits
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 //TODO: one static startup html file per group
-//TODO: limits
+//TODO: limits, nonJson option for check
 //-----
 RelicReq = function( url ){
   this.url= url;
@@ -31,6 +31,7 @@ Relic = function(){
   (function(t,c){t.c=c;t.c()})(this,BumWebApp);
   this.cfg= {};
   this.cliReqs= [];
+  this.limits= {maxReqs:5000};
   this.lastWorkTimestamp= new Date();
   //-----
   this.findReq= function(token){
@@ -74,13 +75,16 @@ Relic = function(){
   }
   //-----
   this.addRequest= function( req, res ){
-    var relicReq = new RelicReq(req.url);
-    this.cliReqs.push( relicReq );
-    this.sendRespMsg( res, "request queued", relicReq.token );
+    if (this.cliReqs.length < this.limits.maxReqs) {
+      var relicReq = new RelicReq(req.url);
+      this.cliReqs.push( relicReq );
+      this.sendRespMsg( res, "request queued", relicReq.token );
+    } else
+      this.sendRespErr( res, "queue is full", "NA" );
     this.cleanUp();
   }
   this.getResponse= function( req, resp ){
-    var token= this.cgi( "id", "99", req.url );
+    var token= this.cgi( "id", "-99", req.url );
     var item = this.findReq(token);
     if (!item) {
       this.sendRespErr( resp, "thread not found", token)
@@ -106,7 +110,7 @@ Relic = function(){
         item.setStatus('PROG');
         return;
       }
-    this.sendRespErr( resp, "no reqs to work on", item.token)
+    this.sendRespErr( resp, "no reqs to work on", "NA")
 
   }
   this.compWork= function( req, htres ){
@@ -114,7 +118,7 @@ Relic = function(){
     var resp = this.cgi( "result", "unknown", req.url );
     var item= this.findReq(token);
     if (!item) {
-      this.sendRespErr( resp, "thread not found", item.token)
+      this.sendRespErr( htres, "thread not found", token)
     } else {
       item.setStatus('COMP');
       item.relicResponse = resp;
