@@ -1,4 +1,4 @@
-//6-26-2016 jchoy v0.124 cleanUp
+//6-26-2016 jchoy v0.125 sendRespErr()
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 //TODO: one static startup html file per group
 //TODO: limits
@@ -46,8 +46,11 @@ Relic = function(){
       } else if (at[i].isExpired()) 
         at[i].setStatus('EXP');
   }
-  this.sendRespMsg= function( response, text, token ){
-      var pkg= {text:text, token:token};
+  this.sendRespErr= function( response, text, token ){
+      this.sendRespMsg( response, text, token, 9 );
+  }
+  this.sendRespMsg= function( response, text, token, erCd ){
+      var pkg= {text:text, token:token, errCode: ((erCd)? erCd:0)};
       var res= 'pkg='+JSON.stringify(pkg) +"\n_n();"
       this.sendText( response, 200, res );
       console.log( text+": "+token );
@@ -80,13 +83,13 @@ Relic = function(){
     var token= this.cgi( "id", "99", req.url );
     var item = this.findReq(token);
     if (!item) {
-      this.sendRespMsg( resp, "thread not found", token)
+      this.sendRespErr( resp, "thread not found", token)
     } else if (item.relicResponse) {
       item.setStatus('SHIP');
       //send json response
       this.sendRespMsg( resp, item.relicResponse, item.token);
     } else {
-      this.sendRespMsg( resp, "no response yet", item.token)
+      this.sendRespErr( resp, "no response yet", item.token)
     }
   }
   //-----
@@ -101,20 +104,22 @@ Relic = function(){
         item= at[i];
         this.sendRespMsg( resp, item.url, item.token);
         item.setStatus('PROG');
-        i= at.length;
+        return;
       }
+    this.sendRespErr( resp, "no reqs to work on", item.token)
+
   }
   this.compWork= function( req, htres ){
     var token= this.cgi( "id", "99", req.url );
     var resp = this.cgi( "result", "unknown", req.url );
     var item= this.findReq(token);
     if (!item) {
-      //thread not found
+      this.sendRespErr( resp, "thread not found", item.token)
     } else {
       item.setStatus('COMP');
       item.relicResponse = resp;
       //msg: response registered successfully
-      this.sendRespMsg( htres, "response registered successfully-", item.token);
+      this.sendRespMsg( htres, "response registered successfully", item.token);
     }
   }
   //-----
