@@ -1,4 +1,4 @@
-//6-26-2016 jchoy v0.119 fix bug in findReq
+//6-26-2016 jchoy v0.124 cleanUp
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 //TODO: one static startup html file per group
 //TODO: limits
@@ -34,9 +34,17 @@ Relic = function(){
   this.lastWorkTimestamp= new Date();
   //-----
   this.findReq= function(token){
+    this.cleanUp();
     for (var i=0; i<this.cliReqs.length; i++)
       if (this.cliReqs[i].token==token) return this.cliReqs[i];
     return null;
+  }
+  this.cleanUp= function(){
+    for (var i=0,at=this.cliReqs; i<at.length; i++)
+      if (at[i].status=='DEL') {
+        at[i]=at.pop();
+      } else if (at[i].isExpired()) 
+        at[i].setStatus('EXP');
   }
   this.sendRespMsg= function( response, text, token ){
       var pkg= {text:text, token:token};
@@ -55,7 +63,7 @@ Relic = function(){
     for (var m in counts)    res+= m+'='+counts[m].length+' ';
     if (true) for (var m in counts) 
       if (counts[m].length <= 5){
-        if (counts[m].length > 0) res+= '\n'+m+': ';
+        if (counts[m].length > 0) res+= '<br>\n'+m+': ';
         for (var i=0; i<counts[m].length; i++)
           res+= counts[m][i]+',';
       }
@@ -65,12 +73,8 @@ Relic = function(){
   this.addRequest= function( req, res ){
     var relicReq = new RelicReq(req.url);
     this.cliReqs.push( relicReq );
-    for (var i=0,at=this.cliReqs; i<at.length; i++)
-      if (at[i].status=='DEL') {
-        at[i]=at.pop();
-      } else if (at[i].isExpired()) 
-        at[i].setStatus('EXP');
     this.sendRespMsg( res, "request queued", relicReq.token );
+    this.cleanUp();
   }
   this.getResponse= function( req, resp ){
     var token= this.cgi( "id", "99", req.url );
@@ -81,6 +85,8 @@ Relic = function(){
       item.setStatus('SHIP');
       //send json response
       this.sendRespMsg( resp, item.relicResponse, item.token);
+    } else {
+      this.sendRespMsg( resp, "no response yet", item.token)
     }
   }
   //-----
