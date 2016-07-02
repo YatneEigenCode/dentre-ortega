@@ -1,13 +1,12 @@
-//6-26-2016 jchoy v0.126 limits
+//7-1-2016 jchoy v0.131 group, version
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
-//TODO: one static startup html file per group
-//TODO: limits, nonJson option for check
+//TODO: nonJson option for check-no
 //-----
-RelicReq = function( url ){
+RelicReq = function( url, group ){
   this.url= url;
   this.token = ++RelicReq.lastToken;
   this.lifespanMs = 30000;
-  this.group = 'default';
+  this.group = group;
   this.relicResponse = null;
   this.status = 'RECD'; //PROG, COMP, SHIP, EXP, DEL
   this.setStatus = function( st ){
@@ -26,12 +25,12 @@ RelicReq = function( url ){
 RelicReq.lastToken= 1000;
 
 //-----
-Relic = function(){
+RelicEngine = function(){
   (function(t,c){t.c=c;t.c()})(this,TextStore);
   (function(t,c){t.c=c;t.c()})(this,BumWebApp);
-  this.cfg= {};
+  this.ver= 'v0.131';
   this.cliReqs= [];
-  this.limits= {maxReqs:5000};
+  this.cfg= {maxReqs:5000};
   this.lastWorkTimestamp= new Date();
   //-----
   this.findReq= function(token){
@@ -58,7 +57,10 @@ Relic = function(){
   }
   this.ping= function( req, res ){
       var payload= this.cgi("payload","default",req.url);
-      this.sendRespMsg( res, "payload is "+payload, 'NA');
+      if (payload=="version") {
+        this.sendRespMsg( res, "payload is "+payload, 'NA');
+      } else
+        this.sendRespMsg( res, this.ver, 'NA');
   }
   this.count= function( req, resp ){
     var res='', counts= {RECD:[], PROG:[], COMP:[], SHIP:[], EXP:[], DEL:[]};
@@ -75,8 +77,9 @@ Relic = function(){
   }
   //-----
   this.addRequest= function( req, res ){
-    if (this.cliReqs.length < this.limits.maxReqs) {
-      var relicReq = new RelicReq(req.url);
+    if (this.cliReqs.length < this.cfg.maxReqs) {
+      var group= this.cgi( 'g','default',req.url );
+      var relicReq = new RelicReq(req.url, group);
       this.cliReqs.push( relicReq );
       this.sendRespMsg( res, "request queued", relicReq.token );
     } else
@@ -98,12 +101,14 @@ Relic = function(){
   }
   //-----
   this.startWork= function( req, resp ){
-    var item;
+    var item, group= this.cgi( "g","default",req.url );
     for (var i=0,at=this.cliReqs; i<at.length; i++)
       if (at[i].status != 'RECD') {
         //ignore
       } else if (at[i].isExpired()) {
         at[i].setStatus('EXP');
+      } else if (at[i].group != group) {
+        //ignore
       } else {
         item= at[i];
         this.sendRespMsg( resp, item.url, item.token);
