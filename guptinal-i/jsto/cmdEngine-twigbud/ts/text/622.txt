@@ -1,0 +1,85 @@
+//7-4-2016 jchoy v1.145 CmdEngine, loadjs
+//7-2-2016 jchoy ts622 TaApp, CurlyStarter
+//TODO: checkEngine/ping, cfg, RelicCode, HiloGame, loadjs, wiggle
+//-----
+function TaApp(){
+  var $t= this;
+  var $d= document;
+  this.start= function(s, enterFcn){
+    if (enterFcn) this.enterFcn=enterFcn;
+    ta=$d.body.appendChild($d.createElement('div')).appendChild(
+      $d.createElement('textarea'));
+    ta.cols= 40;  ta.onkeypress= this.doTa;
+    if (s) ta.value=s;
+  }
+  this.doTa= function(ev){
+    for (var n=this.value.split('\n').length; n<20; n=20) this.rows=n+2;
+    if (!$t.enterFcn) {
+    } else if (ev.keyCode != 13) {
+    } else if (this.selectionEnd==this.value.length)
+      this.value+= $t.enterFcn( this );
+  }
+  this.enterFcn= function(ta){
+    if (ta.value.split('\n').pop().toLowerCase()=='exit') ta.parentNode.removeChild(ta);
+    return '\n';
+  }
+}
+//----- engine to process command lines
+function CmdEngine(){
+  var $t= $ce= this;
+  this.assets= {};
+  this.addCmd= function(s, fcn){ this.assets[s]=fcn };
+  this.assets['defcmd']= function(at){
+    if (at.length < 3) return 'syntax: defcmd name class';
+    var $cn= at[2];
+    $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
+    return 'ok';
+  }
+  //this.assets['jsping']= function(at){  }
+  this.addCmd( 'help', function(at){ 
+    var s='';
+    for (var m in $ce.assets) s+=' '+m;
+    return 'available commands:'+s;
+  } );
+  this.addCmd( 'date', function(at){ return new Date(); } );
+  this.addCmd( 'nop', function(at){ return 0; } );
+  this.addCmd( 'log', function(at){ at.shift(); console.log(at.join(' ')); return 'ok'; } );
+  this.addCmd( 'showclass', function(at){ return window[at[1]] } );
+  this.addCmd( 'loadjs', function(at){
+    if (at.length<2) return 'usage: loadjs url';
+    var apt = new AppTool();
+    var hd0= document.getElementsByTagName('head')[0];
+    apt.addEl('script', hd0 ).src= at[1];
+    return 'loading asynchronously: '+at[1];
+  } );
+
+  this.parse= function(taval){
+    var args= taval.split('\n').pop().split(' '), res=this._='';
+    var fn= this.assets[args[0]];
+    if (fn) this._= this.crWrap( fn(args) );
+    return (fn)? true : false;
+  }
+  this.crWrap= function(s){ return '\n'+s+'\n'; }
+}
+//-----
+function CurlyStarter(){
+  new AppTool().inherit( this, AppTool );
+  new AppTool().inherit( this, TaApp );
+  var $t= this;
+  this.ver= 'v1.145';
+  this.cmdEngine= new CmdEngine();
+  this.start= function(){
+    new ConSpool().start();
+    document.title= 'CETB'
+    this.addEl('textarea').cols= 40;
+    this._.onkeypress= this.doTa;
+    this.addEl('br');
+  }
+  this.enterFcn= function(ta){
+    var s=ta.value.split('\n').pop().toLowerCase();
+    if (s=='ver') return '\n'+this.ver+'\n';
+    if (s=='console.view') return '\n'+console.conspool.view()+'\n';
+    if (this.cmdEngine.parse(ta.value)) return this.cmdEngine._;
+    return '\nError - Valid Commands: ver, console.view \n';
+  }
+}

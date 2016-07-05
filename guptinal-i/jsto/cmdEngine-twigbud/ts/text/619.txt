@@ -1,0 +1,13 @@
+//7-2-2016 jchoy v0.118 CurlyStarter, cgi
+//6-10-2016 jchoy v0.114 use SnCurly
+
+var sc= new SnCurly();
+if (sc.cgi("bn","",location)=="relic"){
+  new SnCurly().start( "620,621"
+      ,"Foo620,TestRig,RelicClient,RelicPServer,ConSpool"
+      ,function(){ new Foo620().start() }
+    );
+} else sc.start( sc.cgi("cts","620,621",location)
+      , sc.cgi("ccn","CurlyStarter,ConSpool",location)
+      , function(){ new CurlyStarter().start() }
+    );

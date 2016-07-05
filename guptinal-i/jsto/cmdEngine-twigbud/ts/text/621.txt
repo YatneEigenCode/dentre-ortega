@@ -1,0 +1,54 @@
+//7-4-2016 jchoy v1.117 Counter
+//6-30-2016 jchoy v1.115 ConSpool
+//-----
+function ConSpool(){
+  this.spool= [];
+  this.cfg= {max:1000,sep:'\n'};
+  this.state= {isActive:true};
+  var $d= document;
+  this.start= function(){
+    if (this.oldcon==console) return;
+    this.oldcon= console;
+    console= {log:function(s){this.conspool.log(s)},conspool:this};
+    console.log( 'conspool started' );
+  }
+  this.TaApp= function(){
+    this.start= function(s){
+      var ta=$d.body.appendChild($d.createElement('div')).appendChild(
+        $d.createElement('textarea') );
+      ta.value=s; ta.rows=10; ta.cols=50;
+    }
+  }
+  this.log= function(s){
+    this.spool.push([new Date(), s]);
+    if (this.spool.length>this.cfg.max) this.spool.shift();
+    this.oldcon.log(s);
+  }
+  this.view= function(){
+    var res='';
+    for (var i=0,at=this.spool; i<at.length; i++)
+      res+= at[i].join(' ')+this.cfg.sep;
+    try { new TaApp().start(res) 
+    } catch(e) { new this.TaApp().start(res); }
+  }
+  this.clear= function(){this.spool.length=0}
+  this.pause= function(v){this.state.isActive=(!v)?false:true}
+}
+//-----
+Counter= function(){
+    this.add= function(key){
+      if (!this.data[key]) this.data[key]=0;
+      this.data[key]++;
+    }
+    this.restart= function(){
+      this.data= {};
+      this.startTime = new Date();
+    }
+    this.count= function(key){
+      return (this.data[key])? this.data[key] : 0;
+    }
+    this.elapsedTimeSecs= function(){
+      return ((new Date()).valueOf()-this.startTime.valueOf())/1000;
+    }
+    this.restart();
+}
