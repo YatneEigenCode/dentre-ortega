@@ -1,4 +1,4 @@
-//7-1-2016 jchoy v0.131 group, version
+//7-5-2016 jchoy v0.132 group, version/ping
 //6–25-2016 jchoy v0.112 Relic - remote pseudo listener engine
 //TODO: nonJson option for check-no
 //-----
@@ -28,7 +28,7 @@ RelicReq.lastToken= 1000;
 RelicEngine = function(){
   (function(t,c){t.c=c;t.c()})(this,TextStore);
   (function(t,c){t.c=c;t.c()})(this,BumWebApp);
-  this.ver= 'v0.131';
+  this.ver= 'v0.132';
   this.cliReqs= [];
   this.cfg= {maxReqs:5000};
   this.lastWorkTimestamp= new Date();
@@ -58,9 +58,9 @@ RelicEngine = function(){
   this.ping= function( req, res ){
       var payload= this.cgi("payload","default",req.url);
       if (payload=="version") {
-        this.sendRespMsg( res, "payload is "+payload, 'NA');
-      } else
         this.sendRespMsg( res, this.ver, 'NA');
+      } else
+        this.sendRespMsg( res, "payload is "+payload, 'NA');
   }
   this.count= function( req, resp ){
     var res='', counts= {RECD:[], PROG:[], COMP:[], SHIP:[], EXP:[], DEL:[]};
