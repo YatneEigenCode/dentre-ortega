@@ -1,5 +1,5 @@
 //8-5-2016 jchoy 
-pkg= pkg9901= { ver:'0.124' };
+pkg= pkg9901= { ver:'0.125' };
 
 //-----
 pkg.StoDir=function(){
@@ -15,14 +15,13 @@ pkg.contents=[
    ,text:"defcmd dir StoDir"
  }
 ,{ name:"pkg9901notes"
-   ,text:"v0.124\n8/5/2016"
+   ,text:"v0.125\n8/5/2016"
  }
 ]
 pkg.CeStarter9901=function(){
-  var $p=pkg9901, $su=pkg9901.contents[0];
+  var $p=pkg9901;
   this.start=function(){
     new PkgTool().start($p, $p.contents);
-    $ce.parse( $su.text );
   }
 }
 new PkgTool().start(pkg);

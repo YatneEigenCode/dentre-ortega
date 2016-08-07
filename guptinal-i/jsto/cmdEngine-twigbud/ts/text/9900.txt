@@ -1,14 +1,20 @@
 //8-5-2016 jchoy 
-pkg= pkg9900= { ver:'0.119' };
+//PkgTool.ceParse
+pkg= pkg9900= { ver:'0.132' };
 
 //-----
 pkg.PkgTool= function(){
   this.start= function(pkg, at){
-    for (var m in pkg)
-      if (m.match(/^[A-Z]/))
-window[m]=pkg[m];
+    for (var m in pkg) if (m.match(/^[A-Z]/))
+      window[m]=pkg[m];
     if (at) for (var i=0; i<at.length; i++)
       localStorage.setItem( at[i].name, at[i].text );
+    if (at) this.ceParse(at[0]);
+  }
+  this.ceParse= function(ci){
+    if (ci.name != 'pkg.startup') return;
+    for (var i=0,at=ci.text.split('\n');i<at.length;)
+      $ce.parse(at[i++])
   }
 }
 pkg.LoadJsc= function(){
