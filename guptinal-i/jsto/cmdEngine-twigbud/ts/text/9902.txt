@@ -1,0 +1,57 @@
+//8-5-2016 jchoy
+pkg=pkg9902= {ver:'v0.213'} //OutStatus, DomAni
+
+pkg.OurStatus=function (){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.hist=[''];
+  this.start= function(at){
+    this.gName= at[1]; this.pName= at[2];
+    var outerDiv= this.addEl( 'div' );
+    this.addEl('span', outerDiv).innerHTML= '[x] ';
+    this._.onclick= function(){ outerDiv.parentNode.removeChild(outerDiv) }
+    this.span = this.addEl('span', outerDiv);
+    return ['ok',this.update()][0];
+  }
+  this.update= function(){
+    if (!document.contains(this.span)) return;
+    this.hist.unshift( window[this.gName][this.pName] );
+    if (this.hist.pop() != this.hist[0]) new DomAni().odoChange(this.span, this.hist[0]);
+    setTimeout( function(){$t.update()}, 2000 ); 
+  }
+}
+//----
+pkg.DomAni= function(){
+  var $raf=requestAnimationFrame;
+  this.odoChange= function( el, s ){
+    var n=0, z=el.offsetHeight, es=el.style, x= el.parentNode.style.overflow= 'hidden';
+    (function fa(){ es.top=n--; $raf((n>-z)?fa:fm);})(es.position='relative')
+    function fm(){ el.innerHTML=s; fb() }
+    function fb(){ es.top=n++; $raf((n<0)?fb:fz) }
+    function fz(){ es.position='static' }
+  }
+  this.fadeDel= function( el ){
+    this.fadeOut( el, function(){ el.parentNode.removeChild(el) }, el.style.opacity=0.8 ) }
+  this.fadeChange= function( el, s ){
+    this.fadeOut(el, function(){ el.innerHTML=s; $t.fadeIn(el) }, el.style.opacity=1 ); }
+  this.fadeIn= function( el, fnz ){
+    (function fr(){ el.style.opacity-= -.01; $raf((el.style.opacity<1)?fr:fnz) })(); }
+  this.fadeOut= function( el, fnz ){
+    (function fr(){ el.style.opacity-= .01; $raf((el.style.opacity>0)?fr:fnz);})() }
+}
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:"defcmd statbox OurStatus"
+ }
+,{ name:"pkg9902notes"
+   ,text:"v0.213\n8/5/2016"
+ }
+]
+pkg.CeStarter9902=function(){
+  var $p=pkg9902, $su=pkg9902.contents[0];
+  this.start=function(){
+    new PkgTool().start($p, $p.contents);
+    $ce.parse( $su.text );
+  }
+}
+new PkgTool().start(pkg);

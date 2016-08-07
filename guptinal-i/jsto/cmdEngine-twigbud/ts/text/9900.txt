@@ -1,0 +1,26 @@
+//8-5-2016 jchoy 
+pkg= pkg9900= { ver:'0.119' };
+
+//-----
+pkg.PkgTool= function(){
+  this.start= function(pkg, at){
+    for (var m in pkg)
+      if (m.match(/^[A-Z]/))
+window[m]=pkg[m];
+    if (at) for (var i=0; i<at.length; i++)
+      localStorage.setItem( at[i].name, at[i].text );
+  }
+}
+pkg.LoadJsc= function(){
+  //ce usage: loadjs num className
+  this.start=function(at){
+      var $pn= 'CeStarter'+at[1];
+      new SnCurly().start(
+       at[1], at[2], function(){
+         var cls= window[$pn];
+         new (cls)().start(pkg); });
+      return 'Ok';
+  }
+}
+
+new pkg.PkgTool().start(pkg);

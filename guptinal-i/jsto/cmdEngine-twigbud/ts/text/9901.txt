@@ -1,0 +1,28 @@
+//8-5-2016 jchoy 
+pkg= pkg9901= { ver:'0.124' };
+
+//-----
+pkg.StoDir=function(){
+  //new AppTool().inherit( this, AppTool );
+  this.start=function(at){
+    var s="";
+    for (var m in localStorage) s+=m+' ';
+    return s;
+  }
+}
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:"defcmd dir StoDir"
+ }
+,{ name:"pkg9901notes"
+   ,text:"v0.124\n8/5/2016"
+ }
+]
+pkg.CeStarter9901=function(){
+  var $p=pkg9901, $su=pkg9901.contents[0];
+  this.start=function(){
+    new PkgTool().start($p, $p.contents);
+    $ce.parse( $su.text );
+  }
+}
+new PkgTool().start(pkg);
