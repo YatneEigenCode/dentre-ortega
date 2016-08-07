@@ -1,15 +1,139 @@
-//7-4-2016 jchoy v1.145 CmdEngine, loadjs
-//7-2-2016 jchoy ts622 TaApp, CurlyStarter
-//TODO: checkEngine/ping, cfg, RelicCode, HiloGame, loadjs, wiggle
-//-----
-function TaApp(){
+//7-28-2016 jchoy v1.292 CmdEngine, GrabBagStop
+//7-2-2016 jchoy TaApp, CurlyStarter
+pkg= pkg622={ver:'CETB 1.292'}
+//----
+pkg.Pulse= Pulse=function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.start= function(at){
+    this.tsNum = (at.length>1)? at[1] : 'default';
+    if (typeof(w_pulse) === 'undefined') w_pulse= {};
+    new OurStatus().start(['','w_pulse','status_'+this.tsNum]);
+    return ['ok (v1.258)', this.sendPing()][0];
+  }
+  this.sendPing= function(){
+    w_pulse['status_'+this.tsNum] = this.hiliteText('OFFLINE','red');
+    this.loadJs( this.tsNum );
+    setTimeout( function(){ $t.sendPing() }, 60*1000 );
+  }
+  this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
+  this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
+}
+GrabBagLoop=function(){
+  new AppTool().inherit( this, GrabBag );
+  this.isLoop= true;
+}
+GrabBagStop=function(){
+  this.start= function(at){
+	if (at.length>1) new GrabBag().item('ev_stop_'+at[1])(); return 'ok' }
+}
+GrabBag=function(){
+  if (typeof(w_grabBag)==='undefined') w_grabBag={};
+  var $t=this;
+  this.item= function(k,v){if (v){w_grabBag[k]=v}; return w_grabBag[k]}
+  this.start= function(at){
+	if ((at.length>2) && (at[2].charAt(0)=='<')) return this.pipeFile(at[1],at[2]);
+	return ['ok',this.item(at[1], at.slice(2).join(' '))][0];
+  }
+  this.pipeFile=function( k, fn ){
+	if (!new Sto().isOk) return 'No Storage';
+	if (this.isLoop) this.item( 'ev_stop_'+k, function(){$t.isLoop=false} );
+	var at= localStorage.getItem( fn.substr(1) ).split('\n');
+	return [this.pfLine(k,at), 'ok '][1];
+  }
+  this.pfLine=function( k, at ){
+	if (this.isLoop) at.push(at[0]);
+	this.item(k, at.shift());
+	if (at.length>0) setTimeout( function(){ $t.pfLine(k,at) }, 2000 );
+  }
+}
+//----
+pkg.OurStatus= OurStatus=function (){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.hist=[''];
+  this.start= function(at){
+    this.gName= at[1]; this.pName= at[2];
+    var outerDiv= this.addEl( 'div' );
+    this.addEl('span', outerDiv).innerHTML= '[x] ';
+    this._.onclick= function(){ outerDiv.parentNode.removeChild(outerDiv) }
+    this.span = this.addEl('span', outerDiv);
+    return ['ok',this.update()][0];
+  }
+  this.update= function(){
+    if (!document.contains(this.span)) return;
+    this.hist.unshift( window[this.gName][this.pName] );
+    if (this.hist.pop() != this.hist[0]) new DomAni().odoChange(this.span, this.hist[0]);
+    setTimeout( function(){$t.update()}, 2000 ); 
+  }
+}
+//----
+DomAni= function(){
+  var $raf=requestAnimationFrame;
+  this.odoChange= function( el, s ){
+    var n=0, z=el.offsetHeight, es=el.style, x= el.parentNode.style.overflow= 'hidden';
+    (function fa(){ es.top=n--; $raf((n>-z)?fa:fm);})(es.position='relative')
+    function fm(){ el.innerHTML=s; fb() }
+    function fb(){ es.top=n++; $raf((n<0)?fb:fz) }
+    function fz(){ es.position='static' }
+  }
+  this.fadeDel= function( el ){
+    this.fadeOut( el, function(){ el.parentNode.removeChild(el) }, el.style.opacity=0.8 ) }
+  this.fadeChange= function( el, s ){
+    this.fadeOut(el, function(){ el.innerHTML=s; $t.fadeIn(el) }, el.style.opacity=1 ); }
+  this.fadeIn= function( el, fnz ){
+    (function fr(){ el.style.opacity-= -.01; $raf((el.style.opacity<1)?fr:fnz) })(); }
+  this.fadeOut= function( el, fnz ){
+    (function fr(){ el.style.opacity-= .01; $raf((el.style.opacity>0)?fr:fnz);})() }
+}
+pkg.LinkMaker= LinkMaker= function(){
+  new AppTool().inherit( this, AppTool );
+  this.start= function(at){
+    this.addEl('a', this.addEl('div')).href= at[1];
+    this._.innerHTML= at[1];
+    return ['ok',this.wrapCloser( this._ )][0];
+  }
+  this.wrapCloser= function(el, isBr){
+    this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
+    this._.onclick= function(){ new DomAni().fadeDel(this.parentNode) }
+    if (isBr) this.addEl('br',this._.parentNode);
+    this._.parentNode.appendChild(el);
+  }
+}
+//----
+pkg.StoEdit= StoEdit= function(){
+  this.start= function(at){
+    if (!new Sto().isOk) return 'error';
+    return ['ok', new TaAutoSave().init(at[1]).start( localStorage.getItem(at[1]), null )][0];
+  }
+}
+//----
+pkg.EvalJs= EvalJs= function(){
+  new AppTool().inherit( this, AppTool );
+  this.sc= "MyClass=function(){\n  this.start=function(at){\n  }\n}";
+  this.start= function(at){
+    if (at.length>1) this.sc= at[1]+'='+window[at[1]];
+    else if (new Sto().isOk) this.sc= localStorage.getItem( "evaljs_data" ) || this.sc;
+    new TaApp().start( this.sc, function(ta){
+      if (new Sto().isOk) localStorage.setItem( "evaljs_data", ta.value );
+      if (ta.value.split('\n').pop().toLowerCase() != '//evaljs') return '\nusage: //evaljs';
+      try { eval( ta.value ); } catch (e) { return '\nError '+e.message; }
+      return '-ok';
+    });
+    return 'ok';
+  }
+}
+//----
+pkg.TaApp= TaApp= function(){
   var $t= this;
   var $d= document;
   this.start= function(s, enterFcn){
     if (enterFcn) this.enterFcn=enterFcn;
-    ta=$d.body.appendChild($d.createElement('div')).appendChild(
+    var ta=$d.body.appendChild($d.createElement('div')).appendChild(
       $d.createElement('textarea'));
     ta.cols= 40;  ta.onkeypress= this.doTa;
+    ta.onfocus= function(){if (this.rows==2)this.rows=8}
+    new LinkMaker().wrapCloser(ta,1);
     if (s) ta.value=s;
   }
   this.doTa= function(ev){
@@ -19,66 +143,89 @@ function TaApp(){
     } else if (this.selectionEnd==this.value.length)
       this.value+= $t.enterFcn( this );
   }
-  this.enterFcn= function(ta){
-    if (ta.value.split('\n').pop().toLowerCase()=='exit') ta.parentNode.removeChild(ta);
-    return '\n';
+  this.enterFcn= function(ta){  return '\n'; }
+}
+pkg.TaAutoSave= TaAutoSave= function(){
+  new AppTool().inherit( this, TaApp );
+  var $t= this;
+  this.hist= ['']; this.counter= new Counter();
+  this.init= function( storeName ){
+    if (new Sto().isOk) this.storeName= storeName; return this; }
+  this.doTa= function(ev){
+    var ta= this, x=$t.counter.restart();
+    setTimeout( function(){ $t.saveTa3(ta) }, 3000 );
+  }
+  this.saveTa3= function(ta){
+    if ((this.counter.elapsedTimeMs() < 3000) || (!this.storeName)) return;
+    if (document.contains(ta)) return localStorage.setItem( this.storeName, ta.value );
   }
 }
-//----- engine to process command lines
-function CmdEngine(){
+//----
+pkg.Sto= Sto= function(){
+  this.isOk= (typeof(Storage) !== "undefined"); }
+pkg.CmdAutostart= CmdAutostart= function(){
+  this.start= function(ce){
+    if (!new Sto().isOk) return;
+    if (!(this.sc= localStorage.getItem('startup'))) return;
+    for (var i=0,at=this.sc.split('\n'); i<at.length; i++)  ce.parse(at[i]);
+  }
+}
+//----
+pkg.CmdEngine= CmdEngine= function(){
   var $t= $ce= this;
   this.assets= {};
   this.addCmd= function(s, fcn){ this.assets[s]=fcn };
-  this.assets['defcmd']= function(at){
-    if (at.length < 3) return 'syntax: defcmd name class';
-    var $cn= at[2];
-    $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
-    return 'ok';
-  }
-  //this.assets['jsping']= function(at){  }
-  this.addCmd( 'help', function(at){ 
-    var s='';
-    for (var m in $ce.assets) s+=' '+m;
-    return 'available commands:'+s;
-  } );
-  this.addCmd( 'date', function(at){ return new Date(); } );
-  this.addCmd( 'nop', function(at){ return 0; } );
-  this.addCmd( 'log', function(at){ at.shift(); console.log(at.join(' ')); return 'ok'; } );
-  this.addCmd( 'showclass', function(at){ return window[at[1]] } );
-  this.addCmd( 'loadjs', function(at){
-    if (at.length<2) return 'usage: loadjs url';
-    var apt = new AppTool();
-    var hd0= document.getElementsByTagName('head')[0];
-    apt.addEl('script', hd0 ).src= at[1];
-    return 'loading asynchronously: '+at[1];
-  } );
-
+  this.addCmd( 'date', function(at){ return new Date().toLocaleString(); } );
+  this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
+  this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
+  this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
   this.parse= function(taval){
     var args= taval.split('\n').pop().split(' '), res=this._='';
-    var fn= this.assets[args[0]];
+    var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
+    if (!fn) fn= this.assets[args[0].toLowerCase()];
     if (fn) this._= this.crWrap( fn(args) );
     return (fn)? true : false;
   }
   this.crWrap= function(s){ return '\n'+s+'\n'; }
+  this.init= function(){
+    this.assets['defcmd']= function(at){
+      if (at.length < 3) return 'syntax: defcmd name class';
+      var $cn= at[2];
+      $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
+      return 'ok';
+    }
+    this.addCmd( 'log', function(at){ at.shift(); console.log(at.join(' ')); return 'ok'; } );
+    this.addCmd( 'loadjs', function(at){
+      if (at.length<2) return 'usage: loadjs url';
+      new AppTool().addEl('script', document.getElementsByTagName('head')[0] ).src= at[1];
+      return ['loading asynchronously: '+at[1], console.log( 'loadjs '+at[1] )][0];
+    } );
+    this.addCmd( 'help', function(at){ 
+      var s=''; for (var m in $ce.assets) s+=' '+m;
+      return 'available commands:'+s;
+    } );
+    return this;
+  }
 }
-//-----
-function CurlyStarter(){
+//----
+pkg.CurlyStarter= CurlyStarter= function(){
   new AppTool().inherit( this, AppTool );
   new AppTool().inherit( this, TaApp );
   var $t= this;
-  this.ver= 'v1.145';
-  this.cmdEngine= new CmdEngine();
+  this.ver= pkg622.ver;
+  this.cmdEngine= new CmdEngine().init();
   this.start= function(){
     new ConSpool().start();
     document.title= 'CETB'
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
     this.addEl('br');
+    setTimeout( function(){ new CmdAutostart().start($ce) }, 400 );
   }
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
     if (s=='ver') return '\n'+this.ver+'\n';
-    if (s=='console.view') return '\n'+console.conspool.view()+'\n';
+    if (s=='console.view') { console.conspool.view(); return '\nok\n' };
     if (this.cmdEngine.parse(ta.value)) return this.cmdEngine._;
     return '\nError - Valid Commands: ver, console.view \n';
   }
