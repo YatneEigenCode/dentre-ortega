@@ -1,10 +1,9 @@
-//7-4-2016 jchoy v1.117 Counter
+//7-27-2016 jchoy v1.128 Counter, quickDate(fix2), elapsedFmt/neg nums, TimeoutMark
 //6-30-2016 jchoy v1.115 ConSpool
 //-----
 function ConSpool(){
-  this.spool= [];
+  this.spool= [];  this.state= {isActive:true};
   this.cfg= {max:1000,sep:'\n'};
-  this.state= {isActive:true};
   var $d= document;
   this.start= function(){
     if (this.oldcon==console) return;
@@ -20,35 +19,48 @@ function ConSpool(){
     }
   }
   this.log= function(s){
-    this.spool.push([new Date(), s]);
+    this.spool.push([new Date().toLocaleString(), s]);
     if (this.spool.length>this.cfg.max) this.spool.shift();
     this.oldcon.log(s);
   }
   this.view= function(){
     var res='';
-    for (var i=0,at=this.spool; i<at.length; i++)
-      res+= at[i].join(' ')+this.cfg.sep;
-    try { new TaApp().start(res) 
-    } catch(e) { new this.TaApp().start(res); }
+    for (var i=0,at=this.spool; i<at.length; i++) res+= at[i].join(' ')+this.cfg.sep;
+    try { new TaApp().start(res) } catch(e) { new this.TaApp().start(res); }
   }
   this.clear= function(){this.spool.length=0}
   this.pause= function(v){this.state.isActive=(!v)?false:true}
 }
 //-----
 Counter= function(){
-    this.add= function(key){
-      if (!this.data[key]) this.data[key]=0;
-      this.data[key]++;
-    }
-    this.restart= function(){
-      this.data= {};
-      this.startTime = new Date();
-    }
-    this.count= function(key){
-      return (this.data[key])? this.data[key] : 0;
-    }
-    this.elapsedTimeSecs= function(){
-      return ((new Date()).valueOf()-this.startTime.valueOf())/1000;
-    }
+    this.add= function(key){  if (!this.data[key]) this.data[key]=0;   this.data[key]++;  }
+    this.restart= function(){  this.data= {};  this.startTime = new Date(); }
+    this.count= function(key){  return (this.data[key])? this.data[key] : 0;  }
+    this.elapsedTimeSeconds= function(){ return this.elapsedTimeMs()/1000 }
+    this.elapsedTimeMs= function(){  return new Date().valueOf()-this.startTime.valueOf(); }
     this.restart();
+}
+Counter.quickDate=function(s){ //converts shorthands with just time or date to valid1
+    var res= new Date(new Date().toLocaleDateString()+','+s);
+    if (!isNaN(res.valueOf())) return res.toLocaleString();
+    if (!isNaN(new Date(s+',6:00:00').valueOf())) return s+',6:00:00';
+    return s;
+}
+Counter.elapsedFmt= function(ms){
+    if (ms < 0) return "0:00:00";
+    return Math.floor(ms/3600/24000)+' day(s)'+new Date(ms).toUTCString().split(' 197')[1].substr(1,9);
+}
+//----
+TimeoutMark= function(){
+  var $t= this;
+  this.start = function( sec, $tag ){
+    this.isDone = false;
+    console.log( 'TimeoutMark '+$tag );
+    setTimeout( function(){
+      if (!$t.isDone) console.log('timed out: '+$tag)
+      $t.isDone=true;
+    }, sec*1000 );
+    return this;
+  }
+  this.checkIsDone= function(){ return (this.isDone) || !(this.isDone=true); }
 }
