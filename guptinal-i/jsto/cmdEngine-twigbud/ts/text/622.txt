@@ -1,33 +1,16 @@
-//8-9-2016 jchoy - sleep in Autostart, StoLog
+//8-9-2016 jchoy - StoLog, PkgTool.log, LoadJsc
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.336'}
+pkg= pkg622={ver:'CETB 1.345'}
 //----
-pkg.Pulse= Pulse=function(){
-  new AppTool().inherit( this, AppTool );
-  var $t= this;
-  this.start= function(at){
-    this.tsNum = (at.length>1)? at[1] : 'default';
-    if (typeof(w_pulse) === 'undefined') w_pulse= {};
-    new OurStatus().start(['','w_pulse','status_'+this.tsNum]);
-    return ['ok (v1.258)', this.sendPing()][0];
-  }
-  this.sendPing= function(){
-    w_pulse['status_'+this.tsNum] = this.hiliteText('OFFLINE','red');
-    this.loadJs( this.tsNum );
-    setTimeout( function(){ $t.sendPing() }, 60*1000 );
-  }
-  this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
-  this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
-}
-GrabBagLoop=function(){
+pkg.GrabBagLoop=function(){
   new AppTool().inherit( this, GrabBag );
   this.isLoop= true;
 }
-GrabBagStop=function(){
+pkg.GrabBagStop=function(){
   this.start= function(at){
 	if (at.length>1) new GrabBag().item('ev_stop_'+at[1])(); return 'ok' }
 }
-GrabBag=function(){
+pkg.GrabBag=function(){
   if (typeof(w_grabBag)==='undefined') w_grabBag={};
   var $t=this;
   this.item= function(k,v){if (v){w_grabBag[k]=v}; return w_grabBag[k]}
@@ -47,7 +30,7 @@ GrabBag=function(){
 	if (at.length>0) setTimeout( function(){ $t.pfLine(k,at) }, 2000 );
   }
 }
-pkg.LinkMaker= LinkMaker= function(){
+pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
     this.addEl('a', this.addEl('div')).href= at[1];
@@ -61,18 +44,19 @@ pkg.LinkMaker= LinkMaker= function(){
     this._.parentNode.appendChild(el);
   }
 }
-DomAni= function(){
-  this.fadeDel= function(el){ el.parentNode.removeChild(el) }
+pkg.DomAni= function(){
+  this.fadeDel=function(el){ el.parentNode.removeChild(el) }
 }
 //----
-pkg.StoEdit= StoEdit= function(){
+pkg.StoEdit= function(){
   this.start= function(at){
-    if (!new Sto().isOk) return 'error';
-    return ['ok', new TaAutoSave().init(at[1]).start( localStorage.getItem(at[1]), null )][0];
+    var st=new Sto();
+    if (!st.isOk) return 'error';
+    return ['ok', new TaAutoSave().init(at[1]).start( st.lo.getItem(at[1]), null )][0];
   }
 }
 //----
-pkg.EvalJs= EvalJs= function(){
+pkg.EvalJs= function(){
   new AppTool().inherit( this, AppTool );
   this.sc= "MyClass=function(){\n  this.start=function(at){\n  }\n}";
   this.start= function(at){
@@ -89,7 +73,7 @@ pkg.EvalJs= EvalJs= function(){
   }
 }
 //----
-pkg.TaApp= TaApp= function(){
+pkg.TaApp= function(){
   var $t= this;
   var $d= document;
   this.start= function(s, enterFcn){
@@ -110,7 +94,7 @@ pkg.TaApp= TaApp= function(){
   }
   this.enterFcn= function(ta){  return '\n'; }
 }
-pkg.TaAutoSave= TaAutoSave= function(){
+pkg.TaAutoSave= function(){
   new AppTool().inherit( this, TaApp );
   var $t= this, $st=new Sto();
   this.counter= new Counter();
@@ -130,7 +114,7 @@ pkg.Sto= Sto= function(){
   this.isOk= (typeof(Storage) !== "undefined"); 
   this.lo= (this.isOk)? localStorage : null;
 }
-pkg.StoLog= StoLog= function(fn){
+pkg.StoLog= function(fn){
   var $t=this;
   this.cfg= {st:new Sto(), nm:((fn)?fn:'sto.log'), tsPipe:['']};
   this.chkPipe= function(s){
@@ -139,15 +123,15 @@ pkg.StoLog= StoLog= function(fn){
   this.log= function(s){
     var ts= $t.chkPipe(new Date().toLocaleString());
     var pl, fn=$t.cfg.nm, lo=$t.cfg.st.lo;
-    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-99999)+'\n'+ts;
+    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-63999)+'\n'+ts;
     return [lo.setItem(fn, pl+'\n'+s), s][1];
   }
   if (!this.cfg.st.isOk) this.log= function(s){ return s }
 }
-pkg.CmdAutostart= CmdAutostart= function(){
+pkg.CmdAutostart= function(){
   var $t=this;
-  this.cfg= {sl:new StoLog('autostart.log'), nc:'startup'};
   this.start= function(ce){
+    this.cfg= {sl:new StoLog('autostart.log'), nc:'startup'};
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
     if (!st.isOk) return;
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
@@ -164,11 +148,10 @@ pkg.CmdAutostart= CmdAutostart= function(){
   }
 }
 //----
-pkg.CmdEngine= CmdEngine= function(){
+pkg.CmdEngine= function(){
   var $t= $ce= this;
   this.assets= {};
   this.addCmd= function(s, fcn){ this.assets[s]=fcn };
-  this.addCmd( 'date', function(at){ return new Date().toLocaleString(); } );
   this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
   this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
   this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
@@ -200,8 +183,33 @@ pkg.CmdEngine= CmdEngine= function(){
     return this;
   }
 }
+//-----
+pkg.PkgTool=function(){
+  this.start= function(pkg, at){
+    for (var m in pkg) if (m.match(/^[A-Z]/))
+      window[m]=pkg[m];
+    if (at) for (var i=0,st=new Sto(); (i<at.length) && (st.isOk); i++)
+      st.lo.setItem( at[i].name, at[i].text );
+    if (at) this.ceParse( at[0] );
+  }
+  this.ceParse= function(ci){
+    if (ci.name != 'pkg.startup') return;
+    for (var i=0,sl=new StoLog('pt.log'), at=ci.text.split('\n');i<at.length;)
+      $ce.parse( sl.log(at[i++]) );
+  }
+}
+pkg.LoadJsc=function(){
+  this.start=function(at){
+      var $pn= 'CeStarter'+at[1];
+      new SnCurly().start(
+       at[1], at[2], function(){
+         var cls= window[$pn];
+         new (cls)().start(pkg); });
+      return 'Ok';
+  }
+}
 //----
-pkg.CurlyStarter= CurlyStarter= function(){
+pkg.CurlyStarter= function(){
   new AppTool().inherit( this, AppTool );
   new AppTool().inherit( this, TaApp );
   var $t= this;
@@ -225,3 +233,4 @@ pkg.CurlyStarter= CurlyStarter= function(){
     return '\nError - Valid Commands: ver, console.view \n';
   }
 }
+new pkg.PkgTool().start(pkg);
