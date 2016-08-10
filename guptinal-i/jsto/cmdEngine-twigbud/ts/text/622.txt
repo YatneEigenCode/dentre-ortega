@@ -1,7 +1,6 @@
-//8-6-2016 jchoy v1.312 sleep in Autostart
-//7-28-2016 jchoy v1.292 CmdEngine, GrabBagStop
+//8-9-2016 jchoy - sleep in Autostart, StoLog
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.312'}
+pkg= pkg622={ver:'CETB 1.336'}
 //----
 pkg.Pulse= Pulse=function(){
   new AppTool().inherit( this, AppTool );
@@ -48,7 +47,6 @@ GrabBag=function(){
 	if (at.length>0) setTimeout( function(){ $t.pfLine(k,at) }, 2000 );
   }
 }
-//----
 pkg.LinkMaker= LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
@@ -63,6 +61,9 @@ pkg.LinkMaker= LinkMaker= function(){
     this._.parentNode.appendChild(el);
   }
 }
+DomAni= function(){
+  this.fadeDel= function(el){ el.parentNode.removeChild(el) }
+}
 //----
 pkg.StoEdit= StoEdit= function(){
   this.start= function(at){
@@ -75,10 +76,11 @@ pkg.EvalJs= EvalJs= function(){
   new AppTool().inherit( this, AppTool );
   this.sc= "MyClass=function(){\n  this.start=function(at){\n  }\n}";
   this.start= function(at){
+    var $st= new Sto();
     if (at.length>1) this.sc= at[1]+'='+window[at[1]];
-    else if (new Sto().isOk) this.sc= localStorage.getItem( "evaljs_data" ) || this.sc;
+    else if ($st.isOk) this.sc= $st.lo.getItem( "evaljs_data" ) || this.sc;
     new TaApp().start( this.sc, function(ta){
-      if (new Sto().isOk) localStorage.setItem( "evaljs_data", ta.value );
+      if ($st.isOk) $st.lo.setItem( "evaljs_data", ta.value );
       if (ta.value.split('\n').pop().toLowerCase() != '//evaljs') return '\nusage: //evaljs';
       try { eval( ta.value ); } catch (e) { return '\nError '+e.message; }
       return '-ok';
@@ -110,39 +112,55 @@ pkg.TaApp= TaApp= function(){
 }
 pkg.TaAutoSave= TaAutoSave= function(){
   new AppTool().inherit( this, TaApp );
-  var $t= this;
-  this.hist= ['']; this.counter= new Counter();
+  var $t= this, $st=new Sto();
+  this.counter= new Counter();
   this.init= function( storeName ){
-    if (new Sto().isOk) this.storeName= storeName; return this; }
+    if ($st.isOk) this.storeName= storeName; return this; }
   this.doTa= function(ev){
     var ta= this, x=$t.counter.restart();
-    setTimeout( function(){ $t.saveTa3(ta) }, 3000 );
+    if ($st.isOk) setTimeout( function(){ $t.saveTa3(ta) }, 3000 );
   }
   this.saveTa3= function(ta){
     if ((this.counter.elapsedTimeMs() < 3000) || (!this.storeName)) return;
-    if (document.contains(ta)) return localStorage.setItem( this.storeName, ta.value );
+    if (document.contains(ta)) return $st.lo.setItem( this.storeName, ta.value );
   }
 }
 //----
 pkg.Sto= Sto= function(){
-  this.isOk= (typeof(Storage) !== "undefined"); }
+  this.isOk= (typeof(Storage) !== "undefined"); 
+  this.lo= (this.isOk)? localStorage : null;
+}
+pkg.StoLog= StoLog= function(fn){
+  var $t=this;
+  this.cfg= {st:new Sto(), nm:((fn)?fn:'sto.log'), tsPipe:['']};
+  this.chkPipe= function(s){
+    this.cfg.tsPipe.push(s); return (this.cfg.tsPipe.shift()==s)? '':s;
+  }
+  this.log= function(s){
+    var ts= $t.chkPipe(new Date().toLocaleString());
+    var pl, fn=$t.cfg.nm, lo=$t.cfg.st.lo;
+    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-99999)+'\n'+ts;
+    return [lo.setItem(fn, pl+'\n'+s), s][1];
+  }
+  if (!this.cfg.st.isOk) this.log= function(s){ return s }
+}
 pkg.CmdAutostart= CmdAutostart= function(){
   var $t=this;
+  this.cfg= {sl:new StoLog('autostart.log'), nc:'startup'};
   this.start= function(ce){
-    if (!new Sto().isOk) return;
-    if (this.sc= localStorage.getItem('startup'))
-      this.parse(ce, this.sc);
+    var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
+    if (!st.isOk) return;
+    if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
   }
   this.parse= function(ce,sf){
-    for (var i=0,at=sf.split('\n'); i<at.length; i++) 
+    for (var i=0,at=sf.split('\n'); i<at.length; i++)
       if (!this.doSleep(ce, at[i], at, i)) { return;
-      } else ce.parse(at[i]);
+      } else ce.parse( this.cfg.sl.log(at[i]) );
   }
   this.doSleep= function(ce, it, at, i){
     if (!it.match(/^sleep/i)) return true;
-    var sf= at.slice(i+1).join('\n');
-    setTimeout( function(){ $t.parse( ce, sf ); }
-        , parseInt(it.substr(5))*1000 );
+    var sf= at.slice(i+1).join('\n'), ms=parseInt(it.substr(5))*1000;
+    setTimeout( function(){ $t.parse( ce, sf ); }, ms );
   }
 }
 //----
@@ -190,6 +208,8 @@ pkg.CurlyStarter= CurlyStarter= function(){
   this.ver= pkg622.ver;
   this.cmdEngine= new CmdEngine().init();
   this.start= function(){
+    this.sl= new StoLog('err.log');
+    window.onerror= function(e,u,l){ $t.sl.log(e) }
     new ConSpool().start();
     document.title= 'CETB'
     this.addEl('textarea').cols= 40;
