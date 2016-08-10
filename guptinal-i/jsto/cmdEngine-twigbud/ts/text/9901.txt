@@ -1,5 +1,5 @@
-//8-5-2016 jchoy 
-pkg= pkg9901= { ver:'0.125' };
+//8-9-2016 jchoy Pulse
+pkg= pkg9901= { ver:'0.131' };
 
 //-----
 pkg.StoDir=function(){
@@ -10,12 +10,30 @@ pkg.StoDir=function(){
     return s;
   }
 }
+pkg.Pulse=function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.start= function(at){
+    this.tsNum = (at.length>1)? at[1] : 'default';
+    if (typeof(w_pulse) === 'undefined') w_pulse= {};
+    new OurStatus().start(['','w_pulse','status_'+this.tsNum]);
+    return ['ok (v1.258)', this.sendPing()][0];
+  }
+  this.sendPing= function(){
+    w_pulse['status_'+this.tsNum] = this.hiliteText('OFFLINE','red');
+    this.loadJs( this.tsNum );
+    setTimeout( function(){ $t.sendPing() }, 60*1000 );
+  }
+  this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
+  this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
+}
+
 pkg.contents=[
  { name:"pkg.startup"
-   ,text:"defcmd dir StoDir"
+   ,text:"defcmd dir StoDir\ndefcmd pulse Pulse"
  }
 ,{ name:"pkg9901notes"
-   ,text:"v0.125\n8/5/2016"
+   ,text:"v0.131\n8/9/2016"
  }
 ]
 pkg.CeStarter9901=function(){
