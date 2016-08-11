@@ -1,5 +1,5 @@
-//8-5-2016 jchoy
-pkg=pkg9902= {ver:'v0.213'} //OutStatus, DomAni
+//8-10-2016 jchoy
+pkg=pkg9902= {ver:'v0.214'} //OutStatus, DomAni.pinchDel
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -30,6 +30,13 @@ pkg.DomAni= function(){
     function fb(){ es.top=n++; $raf((n<0)?fb:fz) }
     function fz(){ es.position='static' }
   }
+  this.pinchDel= function( el ){
+    var $ph= el.parentNode.insertBefore(document.createElement('div'),el);
+    var dz, z=el.offsetHeight, es=$ph.style, x= $ph.style.overflow= 'hidden';
+    $ph.appendChild(el); dz= (z>20)?5:2; 
+    (function fa(){ es.height=z-=dz; $raf((z>1)?fa:fz);})(el.position='relative')
+    function fz(){ $ph.parentNode.removeChild($ph) }
+  }
   this.fadeDel= function( el ){
     this.fadeOut( el, function(){ el.parentNode.removeChild(el) }, el.style.opacity=0.8 ) }
   this.fadeChange= function( el, s ){
@@ -38,13 +45,14 @@ pkg.DomAni= function(){
     (function fr(){ el.style.opacity-= -.01; $raf((el.style.opacity<1)?fr:fnz) })(); }
   this.fadeOut= function( el, fnz ){
     (function fr(){ el.style.opacity-= .01; $raf((el.style.opacity>0)?fr:fnz);})() }
+  this.delEl= function(el){ this.pinchDel(el) }
 }
 pkg.contents=[
  { name:"pkg.startup"
    ,text:"defcmd statbox OurStatus"
  }
 ,{ name:"pkg9902notes"
-   ,text:"v0.213\n8/5/2016"
+   ,text:"v0.214\n8/10/2016\nDomAni.pinchDel, delEl"
  }
 ]
 pkg.CeStarter9902=function(){
