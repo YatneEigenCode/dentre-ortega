@@ -1,6 +1,6 @@
-//8-10-2016 jchoy - PkgTool.log, LoadJsc, delEl
+//8-11-2016 jchoy - LoadJsc, delEl, LinkMaker $date
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.347'}
+pkg= pkg622={ver:'CETB 1.348'}
 //----
 pkg.GrabBagLoop=function(){
   new AppTool().inherit( this, GrabBag );
@@ -33,9 +33,12 @@ pkg.GrabBag=function(){
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
-    this.addEl('a', this.addEl('div')).href= at[1];
-    this._.innerHTML= at[1];
-    return ['ok',this.wrapCloser( this._ )][0];
+    if (at[1] != '.') {
+      this.addEl('a', this.addEl('div')).href= at[1];
+      this._.innerHTML= at[1];
+    } else this.addEl('span').innerHTML= at.slice(2,99).join(' ');
+    var rs= this._.innerHTML.replace(/\$date/i,new Date().toLocaleString());
+    return ['ok',this._.innerHTML=rs,this.wrapCloser( this._ )][0];
   }
   this.wrapCloser= function(el, isBr){
     this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
@@ -201,11 +204,10 @@ pkg.PkgTool=function(){
 pkg.LoadJsc=function(){
   this.start=function(at){
       var $pn= 'CeStarter'+at[1];
-      new SnCurly().start(
-       at[1], at[2], function(){
+      return ['OK', new SnCurly().start( at[1], at[2],
+        function(){
          var cls= window[$pn];
-         new (cls)().start(pkg); });
-      return 'Ok';
+         new (cls)().start(pkg); })][0];
   }
 }
 //----
