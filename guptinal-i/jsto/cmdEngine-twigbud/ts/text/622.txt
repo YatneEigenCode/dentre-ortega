@@ -1,6 +1,6 @@
-//8-9-2016 jchoy - StoLog, PkgTool.log, LoadJsc
+//8-10-2016 jchoy - PkgTool.log, LoadJsc, delEl
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.345'}
+pkg= pkg622={ver:'CETB 1.347'}
 //----
 pkg.GrabBagLoop=function(){
   new AppTool().inherit( this, GrabBag );
@@ -39,13 +39,13 @@ pkg.LinkMaker= function(){
   }
   this.wrapCloser= function(el, isBr){
     this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
-    this._.onclick= function(){ new DomAni().fadeDel(this.parentNode) }
+    this._.onclick= function(){ new DomAni().delEl(this.parentNode) }
     if (isBr) this.addEl('br',this._.parentNode);
     this._.parentNode.appendChild(el);
   }
 }
 pkg.DomAni= function(){
-  this.fadeDel=function(el){ el.parentNode.removeChild(el) }
+  this.delEl=function(el){ el.parentNode.removeChild(el) }
 }
 //----
 pkg.StoEdit= function(){
