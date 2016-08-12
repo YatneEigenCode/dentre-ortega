@@ -1,3 +1,4 @@
+//5-21-2016 jchoy v0.414 js612 getFromOtherZones
 //5-21-2016 jchoy v0.391 js612 SvgOverlay
 //TODO: viewPort, gravity, proximity, spin, background parallax
 //-----
@@ -49,9 +50,14 @@ IconMaker= function(){
   this.drawImg= function(ctx, s){
     ctx.arc(0,0,this.size.width/2,0,Math.PI*2,true);
     ctx.fill();
-    ctx.textAlign='center';
     var imd= ctx.getImageData( this.size.width/2,2,2,2 );
-    ctx.fillStyle= (imd.data[0]+imd.data[1]+imd.data[2] < 255)? "white" : "blue";
+    var inv=(imd.data[0]+imd.data[1]+imd.data[2] < 255)? "white" : "blue";
+    ctx.strokeStyle= inv;
+    ctx.arc(0,0,this.size.width/2,0,Math.PI*2,true);
+    ctx.stroke();
+
+    ctx.textAlign='center';
+    ctx.fillStyle= inv;
     ctx.scale( 3*this.size.width/50, 3*this.size.height/50 );
     ctx.fillText(s, 0, 4.5);
   }
@@ -87,11 +93,50 @@ SvgElOverlay= function(){
     return res;
   }
 }
+//-----
+Zoner= function(){
+  this.zoneSize = 60;
+  this.buckets= {};
+  this.setZone= function(el){
+    for (var i=0,g=this.zoneSize; i<99; i++,g+=this.zoneSize)
+      if (el.pos[0]<g) return this.setZone2(el,i);
+    this.setZone2(el, 99);
+  }
+  this.setZone2= function(el,m){
+    for (var i=0,g=this.zoneSize; i<99; i++,g+=this.zoneSize)
+      if (el.pos[1]<g) return this.book(el, el.zone="_"+m+"_"+i);
+    return this.book(el, el.zone="_"+m+"_99");
+  }
+  this.book= function( el, zn ){
+    if (!this.buckets.hasOwnProperty(zn)) this.buckets[zn]=[];
+    this.buckets[zn].push(el);
+    el.zoner= this;
+  }
+  this.getFromOtherZones= function( zone ){
+    var res=[];
+    for (var m in this.buckets)
+      if (m != zone)  this.addTo( res, m );
+    return res;
+  }
+  this.getNearby= function( zone ){
+    var res=[], at= zone.split('_');
+    at[1]= parseInt(at[1]);   at[2]= parseInt(at[2]);
+    for (var cz,i=-1; i<2; i++)
+      for (var j=-1; j<2; j++)
+        this.addTo( res, "_"+(at[1]+i)+"_"+(at[2]+j) );
+    return res;
+  }
+  this.addTo= function( ar, cz ){
+    if (!this.buckets[cz]) return;
+    for (var i=0,at=this.buckets[cz]; i<at.length; i++) ar.push( at[i] );
+  }
+}
 
 js612=pkg={};
 pkg.svgMotion= new SvgMotion();
 pkg.iconMaker= new IconMaker();
+pkg.svgElOverlay= new SvgElOverlay();
+pkg.zoner= new Zoner();
 pkg.svgMotion.exposeClassNames( pkg );
-
 
 if (_n)_n();

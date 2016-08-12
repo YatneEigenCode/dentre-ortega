@@ -1,4 +1,4 @@
-//5-21-2016 jchoy v0.573 js609 bounce
+//5-24-2016 jchoy v0.595 js609 findTeammate
 //5-19-2016 jchoy v0.118 js609.starter
 //TODO: viewPort, gravity, proximity, spin, background parallax, bounce collide
 //-----
@@ -64,17 +64,24 @@ SvgEl = function(img, x, y){
   this.img= img;
   this.isVisible = true;
   this.changeDir= function( oVel, dir ){
-    if ((dir[0]==0) && (dir[1]==0)) return oVel;
+    if ((dir[0]==0) || (dir[1]==0)) return oVel;
     var spd= Math.sqrt( (oVel[0]*oVel[0] + oVel[1]*oVel[1]) /
       (dir[0]*dir[0]   + dir[1]*dir[1]) );
     oVel[0]= Math.ceil(spd * dir[0]);
     oVel[1]= Math.ceil(spd * dir[1]);
+    for (var i=0; (this.speedLimit) && (i<2); i++)
+      if (oVel[i]>this.speedLimit) {
+        console.log( "reduce speed! "+ oVel[i] );
+        oVel[i]=this.speedLimit;
+      }
   }
 }
 //-----
 GamePiece = function(img, x, y){
   new AppTool().inherit( this, SvgEl, img, x, y );
   this.health= 10;
+  this.speedLimit= 20;
+  this.prevPos10=0;
   this.hitWall= function( j, pz ){
     var pj2= this.pos[j]+this.pos[j];
     if ((pj2>pz) && (this.vel[j]>0)) this.vel[j]=-this.vel[j];
@@ -83,33 +90,41 @@ GamePiece = function(img, x, y){
   this.collide= function(){
     if (!this.zoner) return;
     if (!this.isVisible) return;
+    var isHit= false;
     for (var i=0,at=this.zoner.getNearby(this.zone); i<at.length; i++)
       if ((at[i] == this) || (!at[i].isVisible)) {
       } else if (this.distanceFrom(at[i])>this.img.width) {
-        this.towardTeammate();
       } else {
+        isHit= true;
         if (at[i].team==this.team) {
           this.health= 10;
-        } else 
+        } else {
           this.health--;
-        this.changeDir( this.vel, [this.pos[0]-at[i].pos[0],this.pos[1]-at[i].pos[1]] );
-        console.log( [this.team,at[i].team,'h',this.health, 'd',this.distanceFrom(at[i])].join('*') )
+          this.changeDir( this.vel, [this.pos[0]-at[i].pos[0],this.pos[1]-at[i].pos[1]] );
+        //console.log( [this.team,at[i].team,'h',this.health, 'd',this.distanceFrom(at[i])].join('*') )
+        }
       }
+    this.towardTeammate();
     if (this.health <= 0) this.isVisible= false;
     this.seo.applyOverlay( this, 'dot'+this.health );
   }
   this.towardTeammate= function(){
     var tmate, dist=999, p0=this.pos[0], p1=this.pos[1];
-    for (var i=0,at=this.zoner.getNearby(this.zone); i<at.length; i++)
+    if (this.prevPos10 != p1+p0) 
+      return this.prevPos10 = p1+p0;
+    for (var i=0,at=this.zoner.getFromOtherZones(this.zone); i<at.length; i++)
       if ((at[i].team==this.team) && (at[i]!=this)) {
         var di = this.distanceFrom(at[i]);
         if (di<dist) {tmate= at[i];  dist= di; }
       }
     if (!tmate) return;
     if (this.health<7) {
-      this.changeDir( this.vel, [tmate.pos[0]-p0, tmate.pos[1]-p1] );          
-    } else
+      this.changeDir( this.vel, [tmate.pos[0]-p0, tmate.pos[1]-p1] );  
+      console.log( "go toward "+this.team );        
+    } else {
       this.changeDir( this.vel, [p0-tmate.pos[0], p1-tmate.pos[1]] );
+      console.log( "go away from "+this.team );
+    }
   }
   this.distanceFrom= function(el){
     return [el.pos[0]-this.pos[0],this.pos[0]-el.pos[0],
