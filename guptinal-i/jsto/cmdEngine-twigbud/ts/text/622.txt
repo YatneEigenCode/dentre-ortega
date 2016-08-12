@@ -1,6 +1,6 @@
-//8-11-2016 jchoy - LoadJsc, delEl, LinkMaker $date
+//8-11-2016 jchoy - delEl, LinkMaker $date, predef loadjsc
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.348'}
+pkg= pkg622={ver:'CETB 1.351'}
 //----
 pkg.GrabBagLoop=function(){
   new AppTool().inherit( this, GrabBag );
@@ -158,6 +158,7 @@ pkg.CmdEngine= function(){
   this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
   this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
   this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
+  this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
   this.parse= function(taval){
     var args= taval.split('\n').pop().split(' '), res=this._='';
     var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
@@ -203,11 +204,9 @@ pkg.PkgTool=function(){
 }
 pkg.LoadJsc=function(){
   this.start=function(at){
-      var $pn= 'CeStarter'+at[1];
-      return ['OK', new SnCurly().start( at[1], at[2],
-        function(){
-         var cls= window[$pn];
-         new (cls)().start(pkg); })][0];
+    var $pn= 'CeStarter'+at[1];
+    return ['Ok',new SnCurly().start( at[1], at[2],
+      function(){ new (window[$pn])().start(pkg); })][0];
   }
 }
 //----
