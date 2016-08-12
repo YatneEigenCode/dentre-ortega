@@ -1,4 +1,4 @@
-//6-12-2016 jchoy v0.285a SnCurly.cfgJsLoader
+//7-8-2016 jchoy v0.286 SnCurly.cfgJsLoader, del Counter
 //5-18-2016 jchoy v0.117 js604.appTool
 //-----
 SnAppFdn= function(){
@@ -53,24 +53,6 @@ SnAppLoader= function(){
     im.src= this.sendPkgUrl.replace('{0}',num) +"&data="+escape(res);
   }
 }
-//-----
-Counter= function(){
-    this.add= function(key){
-      if (!this.data[key]) this.data[key]=0;
-      this.data[key]++;
-    }
-    this.restart= function(){
-      this.data= {};
-      this.startTime = new Date();
-    }
-    this.count= function(key){
-      return (this.data[key])? this.data[key] : 0;
-    }
-    this.elapsedTimeSecs= function(){
-      return ((new Date()).valueOf()-this.startTime.valueOf())/1000;
-    }
-    this.restart();
-}
 
 //-----
 SnCurly= function(){
@@ -108,10 +90,17 @@ pkg={
   ,appTool:  new SnAppLoader()
   ,snAppLoader:  new SnAppLoader()
   ,snCurly: new SnCurly()
-  ,counter:  new Counter()
   ,starter:  new SnApp()
 }
 
+//----- client usage
+cfg= { color:'blue'
+  ,topLevel:{ sendPkgUrl: "/ts/set/?i={0}"
+             ,textPkgUrl: "/ts/text/?i={0}"}
+}
+js604= pkg;
+js604.appTool.exposeClassNames( js604 );
+js604.starter.start();
 
 //_n= function(){ fanPkg=pkg; fanPkg.starter.start() }
 //if(_n)_n();
