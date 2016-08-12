@@ -1,6 +1,6 @@
-//8-11-2016 jchoy - delEl, LinkMaker $date, predef loadjsc
+//8-11-2016 jchoy - predef loadjsc, removed conspool, LoadJs using SnLiteLoader
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.351'}
+pkg= pkg622={ver:'CETB 1.358'}
 //----
 pkg.GrabBagLoop=function(){
   new AppTool().inherit( this, GrabBag );
@@ -126,7 +126,7 @@ pkg.StoLog= function(fn){
   this.log= function(s){
     var ts= $t.chkPipe(new Date().toLocaleString());
     var pl, fn=$t.cfg.nm, lo=$t.cfg.st.lo;
-    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-63999)+'\n'+ts;
+    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-15999)+'\n'+ts;
     return [lo.setItem(fn, pl+'\n'+s), s][1];
   }
   if (!this.cfg.st.isOk) this.log= function(s){ return s }
@@ -159,6 +159,7 @@ pkg.CmdEngine= function(){
   this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
   this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
   this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
+  this.addCmd( 'loadjs', function(at){ return new LoadJs().start(at); } );
   this.parse= function(taval){
     var args= taval.split('\n').pop().split(' '), res=this._='';
     var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
@@ -174,12 +175,6 @@ pkg.CmdEngine= function(){
       $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
       return 'ok';
     }
-    this.addCmd( 'log', function(at){ at.shift(); console.log(at.join(' ')); return 'ok'; } );
-    this.addCmd( 'loadjs', function(at){
-      if (at.length<2) return 'usage: loadjs url';
-      new AppTool().addEl('script', document.getElementsByTagName('head')[0] ).src= at[1];
-      return ['loading asynchronously: '+at[1], console.log( 'loadjs '+at[1] )][0];
-    } );
     this.addCmd( 'help', function(at){ 
       var s=''; for (var m in $ce.assets) s+=' '+m;
       return 'available commands:'+s;
@@ -204,10 +199,12 @@ pkg.PkgTool=function(){
 }
 pkg.LoadJsc=function(){
   this.start=function(at){
-    var $pn= 'CeStarter'+at[1];
-    return ['Ok',new SnCurly().start( at[1], at[2],
-      function(){ new (window[$pn])().start(pkg); })][0];
+    var $fn=function(){ new (window['CeStarter'+at[1]])().start(pkg); };
+    return ['Ok',new SnCurly().start( at[1], at[2], $fn )][0];
   }
+}
+pkg.LoadJs= function(){
+  this.start=function(at){ return ['Ok',new SnLiteLoader().loadJs( at[1] )][0] }
 }
 //----
 pkg.CurlyStarter= function(){
@@ -219,7 +216,6 @@ pkg.CurlyStarter= function(){
   this.start= function(){
     this.sl= new StoLog('err.log');
     window.onerror= function(e,u,l){ $t.sl.log(e) }
-    new ConSpool().start();
     document.title= 'CETB'
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
@@ -229,9 +225,8 @@ pkg.CurlyStarter= function(){
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
     if (s=='ver') return '\n'+this.ver+'\n';
-    if (s=='console.view') { console.conspool.view(); return '\nok\n' };
     if (this.cmdEngine.parse(ta.value)) return this.cmdEngine._;
-    return '\nError - Valid Commands: ver, console.view \n';
+    return '\nError - Valid Commands: ver, help \n';
   }
 }
 new pkg.PkgTool().start(pkg);
