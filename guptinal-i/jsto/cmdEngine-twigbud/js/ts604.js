@@ -98,9 +98,10 @@ cfg= { color:'blue'
   ,topLevel:{ sendPkgUrl: "/ts/set/?i={0}"
              ,textPkgUrl: "/ts/text/?i={0}"}
 }
+/*
 js604= pkg;
 js604.appTool.exposeClassNames( js604 );
 js604.starter.start();
-
+*/
 //_n= function(){ fanPkg=pkg; fanPkg.starter.start() }
 //if(_n)_n();
