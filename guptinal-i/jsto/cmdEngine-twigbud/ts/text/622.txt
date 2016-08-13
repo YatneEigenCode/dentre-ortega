@@ -1,35 +1,7 @@
-//8-11-2016 jchoy - predef loadjsc, removed conspool, LoadJs using SnLiteLoader
+//8-11-2016 jchoy - LoadJs using SnLiteLoader, removed grabBag
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.358'}
+pkg= pkg622={ver:'CETB 1.361'}
 //----
-pkg.GrabBagLoop=function(){
-  new AppTool().inherit( this, GrabBag );
-  this.isLoop= true;
-}
-pkg.GrabBagStop=function(){
-  this.start= function(at){
-	if (at.length>1) new GrabBag().item('ev_stop_'+at[1])(); return 'ok' }
-}
-pkg.GrabBag=function(){
-  if (typeof(w_grabBag)==='undefined') w_grabBag={};
-  var $t=this;
-  this.item= function(k,v){if (v){w_grabBag[k]=v}; return w_grabBag[k]}
-  this.start= function(at){
-	if ((at.length>2) && (at[2].charAt(0)=='<')) return this.pipeFile(at[1],at[2]);
-	return ['ok',this.item(at[1], at.slice(2).join(' '))][0];
-  }
-  this.pipeFile=function( k, fn ){
-	if (!new Sto().isOk) return 'No Storage';
-	if (this.isLoop) this.item( 'ev_stop_'+k, function(){$t.isLoop=false} );
-	var at= localStorage.getItem( fn.substr(1) ).split('\n');
-	return [this.pfLine(k,at), 'ok '][1];
-  }
-  this.pfLine=function( k, at ){
-	if (this.isLoop) at.push(at[0]);
-	this.item(k, at.shift());
-	if (at.length>0) setTimeout( function(){ $t.pfLine(k,at) }, 2000 );
-  }
-}
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
