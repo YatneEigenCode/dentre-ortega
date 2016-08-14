@@ -1,5 +1,5 @@
-//8-13-2016 jchoy 
-pkg= pkg9901= { ver:'0.179' }; //sort dir, StoTab
+//8-14-2016 jchoy 
+pkg= pkg9901= { ver:'0.186' }; //autoLink, StoTab
 
 //-----
 pkg.StoDir=function(){
@@ -53,7 +53,6 @@ pkg.AppTableTool= function(){
   }
 }
 pkg.StoTab=function(){
-//todo: scroll, more:insRow,insCol,domAni,autoSave
   new AppTool().inherit( this, AppTableTool );
   var $t= this;
   this.asset= [['name','link','search','note'],['hello'],['phone']];
@@ -77,7 +76,7 @@ pkg.StoTab=function(){
   this.fillTable= function(tbl){
     for (var i=0,at=this.asset; i<at.length; i++)
       for (var j=0,r=tbl.insertRow(i); j<at[i].length; j++)
-        r.insertCell(j).innerHTML= at[i][j];
+        this.autoLink( r.insertCell(j), at[i][j] );
     for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
     tbl.rForm= this.prepForm(this.asset[0] );
   }
@@ -86,6 +85,9 @@ pkg.StoTab=function(){
     this._.style.backgroundColor= 'lightgray';
     this._.onclick= this.rowClick;
   }
+  this.autoLink= function( el, sh ){
+    el.innerHTML= (sh.match(/^...p\:\/\//))? sh.link(sh) : sh;
+  }
   this.rowClick= function(){
     var trn, tbl= $t.mpn(this,4), n2=parseInt(this.innerHTML);
     var ap= tbl.rForm.clearForm();
@@ -93,8 +95,8 @@ pkg.StoTab=function(){
       tbl.deleteRow(trn);
       for (var r= tbl.rows[trn-1]; r.cells.length>1;) r.deleteCell(1);
       for (var i=0; i<ap.length; i++) 
-        tbl.rows[trn-1].insertCell(i+1).innerHTML= 
-          $t.assetVal( trn-1,i,ap[i] );
+        $t.autoLink( tbl.rows[trn-1].insertCell(i+1),
+          $t.assetVal(trn-1,i,ap[i]) );
       $t.saveAsset();
     }
     var ce=tbl.insertRow($t.rn=n2+1).insertCell();
@@ -105,7 +107,7 @@ pkg.StoTab=function(){
   }
   this.assetVal= function(row,col,val){
     if (row>=this.asset.length) return '';
-    if (val) this.asset[row][col]= val;
+    if (typeof(val)!=='undefined') this.asset[row][col]= val;
     return (col>=this.asset[row].length)? '':this.asset[row][col];
   }
 }
