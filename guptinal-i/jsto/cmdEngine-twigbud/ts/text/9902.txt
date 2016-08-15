@@ -1,5 +1,5 @@
-//8-10-2016 jchoy
-pkg=pkg9902= {ver:'v0.214'} //OutStatus, DomAni.pinchDel
+//8-14-2016 jchoy
+pkg=pkg9902= {ver:'v0.219'} //DomAni.pinchOpen
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -29,6 +29,16 @@ pkg.DomAni= function(){
     function fm(){ el.innerHTML=s; fb() }
     function fb(){ es.top=n++; $raf((n<0)?fb:fz) }
     function fz(){ es.position='static' }
+  }
+  this.pinchOpen= function( el, pr ){
+    var $ph=pr.appendChild(document.createElement('div')), z=el.offsetHeight;
+    var w=$ph.appendChild(el), v= el.position='relative';
+    this.pinchRaf( $ph.style, -5, 1, function(v){return v<z},
+      function(){ pr.insertBefore(el,$ph); pr.removeChild($ph) } );
+  }
+  this.pinchRaf= function( es, dz, za, fc, fz ){
+    var z=za, x= es.overflow= 'hidden';
+    (function fa(){ es.height=z-=dz; $raf( (fc(z))? fa:fz );})()
   }
   this.pinchDel= function( el ){
     var $ph= el.parentNode.insertBefore(document.createElement('div'),el);
