@@ -1,5 +1,5 @@
 //8-14-2016 jchoy 
-pkg= pkg9901= { ver:'0.186' }; //autoLink, StoTab
+pkg= pkg9901= { ver:'0.252' }; //putForm, CsvBud
 
 //-----
 pkg.StoDir=function(){
@@ -26,7 +26,29 @@ pkg.Pulse=function(){
   this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
   this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
 }
-pkg.AppTableTool= function(){
+//----
+pkg.CsvBud=function(){
+  new AppTool().inherit( this, AppTool );
+  this.asset= [['name','link','search','note'],['hello'],['phone']];
+  this.getAsset= function(fn){
+    if ((!(this.sto=new Sto()).isOk) || (!fn)) return;
+    var sf= this.sto.lo.getItem(fn), aa=[], i=0;
+    if (sf) for (var at=sf.split('\n'),x=this.asset=aa; i<at.length; i++)
+      aa.push( at[i].split(',') );
+  }
+  this.saveAsset= function(){
+    if (!this.sto.isOk) return;
+    var ar=[];
+    for (var i=0,at=this.asset; i<at.length; i++) ar.push(at[i].join(','));
+    this.sto.lo.setItem( this.fn, ar.join('\n') );
+  }
+  this.assetVal= function(row,col,val){
+    if (row>=this.asset.length) return '';
+    if (typeof(val)!=='undefined') this.asset[row][col]= val;
+    return (col>=this.asset[row].length)? '':this.asset[row][col];
+  }
+}
+pkg.StoTabBud= function(){
   new AppTool().inherit( this, AppTool );
   this.mpn= function(el,n){
     for (var i=0,x=this._=el; i<n; i++) this._=this._.parentNode;
@@ -51,27 +73,19 @@ pkg.AppTableTool= function(){
     }
     return tbl2.parentNode;
   }
+  this.autoLink= function( el, sh )
+   { el.innerHTML= (sh.match(/^.+\:\/\//))? sh.link(sh) : sh; }
+  this.insertAfter= function(nu,ref,par)
+   { par.insertBefore(nu,ref);   par.insertBefore(ref,nu); }
 }
 pkg.StoTab=function(){
-  new AppTool().inherit( this, AppTableTool );
+  new AppTool().inherit( this, StoTabBud );
+  new AppTool().inherit( this, CsvBud );
   var $t= this;
-  this.asset= [['name','link','search','note'],['hello'],['phone']];
   this.start= function(at){
     var tbl, x=this.getAsset( this.fn= at[1] );
-    new LinkMaker().wrapCloser(tbl=this.addEl('table'));
+    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'));
     return ['ok', this.fillTable(tbl), tbl.border='1'][0];
-  }
-  this.getAsset= function(fn){
-    if ((!(this.sto=new Sto()).isOk) || (!fn)) return;
-    var sf= this.sto.lo.getItem(fn), aa=[], i=0;
-    if (sf) for (var at=sf.split('\n'),x=this.asset=aa; i<at.length; i++)
-      aa.push( at[i].split(',') );
-  }
-  this.saveAsset= function(){
-    if (!this.sto.isOk) return;
-    var ar=[];
-    for (var i=0,at=this.asset; i<at.length; i++) ar.push(at[i].join(','));
-    this.sto.lo.setItem( this.fn, ar.join('\n') );
   }
   this.fillTable= function(tbl){
     for (var i=0,at=this.asset; i<at.length; i++)
@@ -85,30 +99,24 @@ pkg.StoTab=function(){
     this._.style.backgroundColor= 'lightgray';
     this._.onclick= this.rowClick;
   }
-  this.autoLink= function( el, sh ){
-    el.innerHTML= (sh.match(/^...p\:\/\//))? sh.link(sh) : sh;
-  }
   this.rowClick= function(){
-    var trn, tbl= $t.mpn(this,4), n2=parseInt(this.innerHTML);
-    var ap= tbl.rForm.clearForm();
-    if (trn=$t.rn) {
-      tbl.deleteRow(trn);
-      for (var r= tbl.rows[trn-1]; r.cells.length>1;) r.deleteCell(1);
-      for (var i=0; i<ap.length; i++) 
-        $t.autoLink( tbl.rows[trn-1].insertCell(i+1),
-          $t.assetVal(trn-1,i,ap[i]) );
-      $t.saveAsset();
+    var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
+    if (ii=tbl.rForm.rowNum) {
+        for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
+        for (var j=0; j<ap.length; j++) 
+          $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
+        $t.saveAsset( tbl.deleteRow(ii+1) );
     }
-    var ce=tbl.insertRow($t.rn=n2+1).insertCell();
-    ce.setAttribute( 'colspan',tbl.rForm.count+1);
-    ce.appendChild( tbl.rForm );
-    for (var i=0,at=$t.mpn(this,2).cells; i<at.length; i++)
-      tbl.rForm['tb'+i].value= $t.assetVal(n2,i);
+    for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
+    $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
   }
-  this.assetVal= function(row,col,val){
-    if (row>=this.asset.length) return '';
-    if (typeof(val)!=='undefined') this.asset[row][col]= val;
-    return (col>=this.asset[row].length)? '':this.asset[row][col];
+  this.putForm= function( ce, fm, elc ){
+    var n2= fm.rowNum= parseInt(elc.innerHTML);
+    this.insertAfter(ce.parentNode,$t.mpn(elc,2), $t.mpn(elc,3));
+    ce.setAttribute( 'colspan', fm.count+1);
+    this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
+    new DomAni().pinchOpen( fm.parentNode, ce );
+    for (var i=0; i<fm.count; i++) fm['tb'+i].value= $t.assetVal(n2,i);
   }
 }
 
