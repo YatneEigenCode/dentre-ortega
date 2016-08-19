@@ -1,6 +1,6 @@
-//8-11-2016 jchoy - LoadJs using SnLiteLoader, removed grabBag
+//8-18-2016 jchoy - wrapCloser title, LoadJs using SnLiteLoader
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.361'}
+pkg= pkg622={ver:'CETB 1.363'}
 //----
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
@@ -12,9 +12,10 @@ pkg.LinkMaker= function(){
     var rs= this._.innerHTML.replace(/\$date/i,new Date().toLocaleString());
     return ['ok',this._.innerHTML=rs,this.wrapCloser( this._ )][0];
   }
-  this.wrapCloser= function(el, isBr){
+  this.wrapCloser= function(el, isBr, title){
     this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
     this._.onclick= function(){ new DomAni().delEl(this.parentNode) }
+    if (title) this.addEl('span',this._).innerHTML= title;
     if (isBr) this.addEl('br',this._.parentNode);
     this._.parentNode.appendChild(el);
   }
@@ -27,7 +28,7 @@ pkg.StoEdit= function(){
   this.start= function(at){
     var st=new Sto();
     if (!st.isOk) return 'error';
-    return ['ok', new TaAutoSave().init(at[1]).start( st.lo.getItem(at[1]), null )][0];
+    return ['ok', new TaAutoSave().init(at[1]).start( st.lo.getItem(at[1]), null, at[1] )][0];
   }
 }
 //----
@@ -43,7 +44,7 @@ pkg.EvalJs= function(){
       if (ta.value.split('\n').pop().toLowerCase() != '//evaljs') return '\nusage: //evaljs';
       try { eval( ta.value ); } catch (e) { return '\nError '+e.message; }
       return '-ok';
-    });
+    }, at[1]);
     return 'ok';
   }
 }
@@ -51,13 +52,13 @@ pkg.EvalJs= function(){
 pkg.TaApp= function(){
   var $t= this;
   var $d= document;
-  this.start= function(s, enterFcn){
+  this.start= function(s, enterFcn, title){
     if (enterFcn) this.enterFcn=enterFcn;
     var ta=$d.body.appendChild($d.createElement('div')).appendChild(
       $d.createElement('textarea'));
     ta.cols= 40;  ta.onkeypress= this.doTa;
     ta.onfocus= function(){if (this.rows==2)this.rows=8}
-    new LinkMaker().wrapCloser(ta,1);
+    new LinkMaker().wrapCloser(ta,1,title);
     if (s) ta.value=s;
   }
   this.doTa= function(ev){
