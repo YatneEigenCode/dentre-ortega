@@ -1,5 +1,5 @@
-//8-17-2016 jchoy 
-pkg= pkg9900= { ver:'1.137' }; //autolink width; border-collapse
+//8-18-2016 jchoy 
+pkg= pkg9900= { ver:'1.139' }; //StoTab title, autolink width
 
 //----
 pkg.CsvBud=function(){
@@ -86,7 +86,7 @@ pkg.StoTab=function(){
   var $t= this;
   this.start= function(at){
     var tbl, x=this.getAsset( this.fn= at[1] );
-    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'));
+    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,at[1]);
     return ['ok', this.fillTable(tbl), tbl.border='1'][0];
   }
   this.fillTable= function(tbl){
