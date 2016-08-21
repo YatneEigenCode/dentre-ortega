@@ -1,5 +1,5 @@
-//8-14-2016 jchoy
-pkg=pkg9902= {ver:'v0.219'} //DomAni.pinchOpen
+//8-20-2016 jchoy
+pkg=pkg9902= {ver:'v0.232'} //Sto2Rip, DomAni.pinchOpen
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -57,12 +57,29 @@ pkg.DomAni= function(){
     (function fr(){ el.style.opacity-= .01; $raf((el.style.opacity>0)?fr:fnz);})() }
   this.delEl= function(el){ this.pinchDel(el) }
 }
+//----
+pkg.Sto2Rip= function(){
+  new AppTool().inherit( this, SnLiteLoader );
+  new AppTool().inherit( this, CsvBud );
+  this.sendPkgUrl= "http://rip.okdaily.com/mad/textStore.php?f=set&i={0}";
+  this.maxlen= 500;
+  this.sto= new Sto();
+  this.start= function (ap){
+    if (!this.sto.isOk) return 'err - old browser not supported';
+    this.getAssetQ( this.sto.lo.getItem(ap[1]) );
+    var len= JSON.stringify(this.asset).length
+    if (len>this.maxlen) return 'err - size '+len+' exceeds limit';
+    this.sendPkg( {asset:this.asset}, ap[2] );
+    return 'ok';
+  }
+}
+
 pkg.contents=[
  { name:"pkg.startup"
-   ,text:"defcmd statbox OurStatus"
+   ,text:"defcmd statbox OurStatus\ndefcmd saverip Sto2Rip"
  }
 ,{ name:"pkg9902notes"
-   ,text:"v0.214\n8/10/2016\nDomAni.pinchDel, delEl"
+   ,text:"v0.223\n8/20/2016\nSto2Rip, DomAni.pinchOpen, delEl"
  }
 ]
 pkg.CeStarter9902=function(){
