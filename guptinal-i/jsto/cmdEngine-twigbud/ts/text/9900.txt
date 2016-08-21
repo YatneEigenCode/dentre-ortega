@@ -1,5 +1,5 @@
-//8-18-2016 jchoy 
-pkg= pkg9900= { ver:'1.139' }; //StoTab title, autolink width
+//8-20-2016 jchoy 
+pkg= pkg9900= { ver:'1.164' }; //StoTab.webGet, StoTab title
 
 //----
 pkg.CsvBud=function(){
@@ -85,9 +85,17 @@ pkg.StoTab=function(){
   new AppTool().inherit( this, CsvBud );
   var $t= this;
   this.start= function(at){
+    if (at[1]=='/web') return ['ok',this.webGet( at[2] )][0];
     var tbl, x=this.getAsset( this.fn= at[1] );
     ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,at[1]);
-    return ['ok', this.fillTable(tbl), tbl.border='1'][0];
+    return ['ok', this.fillTable(tbl)][0];
+  }
+  this.webGet= function(url){
+    var tbl, x=this.asset=[['loading...']], x2=window.pkg=null, sn=new SnCurly();
+    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,url);
+    var x3=this.fillTable(tbl), x4=sn.textPkgUrl="{0}", x5=sn.cfgJsLoader= function(){}
+    sn.start( url, 'pkg', function(){
+      $t.asset= window.pkg.asset; tbl.deleteRow(0); $t.fillTable(tbl); } );
   }
   this.fillTable= function(tbl){
     for (var i=0,at=this.asset; i<at.length; i++)
@@ -95,6 +103,7 @@ pkg.StoTab=function(){
         this.autoLink( r.insertCell(j), (i==0)?at[i][j].split(':')[0]:at[i][j] );
     for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
     tbl.rows[0].style.backgroundColor= 'lightgray';
+    tbl.border='1';
     tbl.style.borderCollapse= 'collapse';
     tbl.rForm= this.prepForm(this.asset[0] );
   }
