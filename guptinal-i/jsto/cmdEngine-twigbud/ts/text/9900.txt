@@ -1,5 +1,5 @@
-//8-21-2016 jchoy 
-pkg= pkg9900= { ver:'1.175' }; //CsvBud.getSto, avail pinchOpen
+//8-22-2016 jchoy 
+pkg= pkg9900= { ver:'1.179' }; //StoTabLo tabtemp_web.csv, CsvBud.getSto
 
 //----
 pkg.CsvBud=function(){
@@ -82,6 +82,23 @@ pkg.StoTabBud= function(){
   }
 }
 pkg.StoTab=function(){
+  new AppTool().inherit( this, StoTabLo );
+  var $t= this;
+  this.fn= "tabtemp_web.csv";
+  this.webGet= function(url){
+    var $tbl, i1=this.asset=[['loading...']], ttl= url.split(/[\/\=]/).pop();
+    if (!document.title) document.title= ttl;
+    ($t.lm=new LinkMaker()).wrapCloser($tbl=this.addEl('table'),0,ttl);
+    var i2=window.pkg=null, i3=this.fillTable($tbl);
+    this.prepSn().start( url, 'pkg', function(){
+      $t.asset= window.pkg.asset; $tbl.deleteRow(0); $t.fillTable($tbl); } );
+  }
+  this.prepSn= function(){
+    var sn= new SnCurly(); 
+    return [sn, sn.textPkgUrl="{0}", sn.cfgJsLoader=function(){}][0];
+  }
+}
+pkg.StoTabLo=function(){
   new AppTool().inherit( this, StoTabBud );
   new AppTool().inherit( this, CsvBud );
   var $t= this;
@@ -91,14 +108,6 @@ pkg.StoTab=function(){
     var tbl, x=this.getAsset( this.fn= at[1] );
     ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,at[1]);
     return ['ok', this.fillTable(tbl)][0];
-  }
-  this.webGet= function(url){
-    var tbl, x=this.asset=[['loading...']], x2=window.pkg=null, sn=new SnCurly();
-    var i6= document.title= url.split(/[\/\=]/).pop();
-    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,i6);
-    var i3=this.fillTable(tbl), i4=sn.textPkgUrl="{0}", i5=sn.cfgJsLoader= function(){}
-    sn.start( url, 'pkg', function(){
-      $t.asset= window.pkg.asset; tbl.deleteRow(0); $t.fillTable(tbl); } );
   }
   this.fillTable= function(tbl){
     for (var i=0,at=this.asset; i<at.length; i++)
@@ -132,7 +141,7 @@ pkg.StoTab=function(){
     ce.setAttribute( 'colspan', fm.count+1);
     this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
     if (i3) {$t.da.pinchOpen(fm.parentNode, ce)
-    } else { ce.appendChild(fm.parentNode) }
+    } else {ce.appendChild(fm.parentNode)}
     for (var i=0; i<fm.count; i++) fm['tb'+i].value= $t.assetVal(n2,i);
   }
 }
