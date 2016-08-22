@@ -1,12 +1,13 @@
-//8-20-2016 jchoy 
-pkg= pkg9900= { ver:'1.164' }; //StoTab.webGet, StoTab title
+//8-21-2016 jchoy 
+pkg= pkg9900= { ver:'1.175' }; //CsvBud.getSto, avail pinchOpen
 
 //----
 pkg.CsvBud=function(){
   new AppTool().inherit( this, AppTool );
   this.asset= [['name','link','search','note'],['hello'],['phone']];
+  this.getSto= function(){ if (!this.sto)this.sto=new Sto(); return this.sto }
   this.getAsset= function(fn){
-    if ((!(this.sto=new Sto()).isOk) || (!fn)) return;
+    if ((!this.getSto().isOk) || (!fn)) return;
     var sf= this.sto.lo.getItem(fn), aa=[], i=0;
     if ((sf) && (sf.charAt(0)=='"')) return this.getAssetQ(sf);
     if (sf) for (var at=sf.split('\n'),x=this.asset=aa; i<at.length; i++)
@@ -17,7 +18,7 @@ pkg.CsvBud=function(){
       this.asset.push( at[i].substr(1,at[i].length-2).split('","') );
   }
   this.saveAsset= function(){
-    if (!this.sto.isOk) return;
+    if (!this.getSto().isOk) return;
     var ar=[];
     for (var i=0,at=this.asset; i<at.length; i++) ar.push('"'+at[i].join('","')+'"');
     this.sto.lo.setItem( this.fn, ar.join('\n') );
@@ -84,6 +85,7 @@ pkg.StoTab=function(){
   new AppTool().inherit( this, StoTabBud );
   new AppTool().inherit( this, CsvBud );
   var $t= this;
+  this.da= new DomAni();
   this.start= function(at){
     if (at[1]=='/web') return ['ok',this.webGet( at[2] )][0];
     var tbl, x=this.getAsset( this.fn= at[1] );
@@ -92,8 +94,9 @@ pkg.StoTab=function(){
   }
   this.webGet= function(url){
     var tbl, x=this.asset=[['loading...']], x2=window.pkg=null, sn=new SnCurly();
-    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,url);
-    var x3=this.fillTable(tbl), x4=sn.textPkgUrl="{0}", x5=sn.cfgJsLoader= function(){}
+    var i6= document.title= url.split(/[\/\=]/).pop();
+    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,i6);
+    var i3=this.fillTable(tbl), i4=sn.textPkgUrl="{0}", i5=sn.cfgJsLoader= function(){}
     sn.start( url, 'pkg', function(){
       $t.asset= window.pkg.asset; tbl.deleteRow(0); $t.fillTable(tbl); } );
   }
@@ -124,11 +127,12 @@ pkg.StoTab=function(){
     $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
   }
   this.putForm= function( ce, fm, elc ){
-    var n2= fm.rowNum= parseInt(elc.innerHTML);
+    var n2= fm.rowNum= parseInt(elc.innerHTML), i3=this.da.pinchOpen;
     this.insertAfter(ce.parentNode,$t.mpn(elc,2), $t.mpn(elc,3));
     ce.setAttribute( 'colspan', fm.count+1);
     this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
-    new DomAni().pinchOpen( fm.parentNode, ce );
+    if (i3) {$t.da.pinchOpen(fm.parentNode, ce)
+    } else { ce.appendChild(fm.parentNode) }
     for (var i=0; i<fm.count; i++) fm['tb'+i].value= $t.assetVal(n2,i);
   }
 }
