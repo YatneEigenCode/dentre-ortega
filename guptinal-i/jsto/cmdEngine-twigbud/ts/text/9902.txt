@@ -1,5 +1,5 @@
-//8-20-2016 jchoy
-pkg=pkg9902= {ver:'v0.232'} //Sto2Rip, DomAni.pinchOpen
+//8-22-2016 jchoy
+pkg=pkg9902= {ver:'v0.234'} //limit, Sto2Rip
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -67,8 +67,8 @@ pkg.Sto2Rip= function(){
   this.start= function (ap){
     if (!this.sto.isOk) return 'err - old browser not supported';
     this.getAssetQ( this.sto.lo.getItem(ap[1]) );
-    var len= JSON.stringify(this.asset).length
-    if (len>this.maxlen) return 'err - size '+len+' exceeds limit';
+    var len= JSON.stringify(this.asset).length, mx=this.maxlen;
+    if (len>mx) return 'err - size '+len+' over limit '+mx;
     this.sendPkg( {asset:this.asset}, ap[2] );
     return 'ok';
   }
