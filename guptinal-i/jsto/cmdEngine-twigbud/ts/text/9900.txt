@@ -1,5 +1,5 @@
 //8-22-2016 jchoy 
-pkg= pkg9900= { ver:'1.179' }; //StoTabLo tabtemp_web.csv, CsvBud.getSto
+pkg= pkg9900= { ver:'1.186' }; //StoTabEnv, StoTabLo tabtemp_web.csv
 
 //----
 pkg.CsvBud=function(){
@@ -29,9 +29,22 @@ pkg.CsvBud=function(){
     return (col>=this.asset[row].length)? '':this.asset[row][col];
   }
 }
+pkg.StoTabEnv= function(){
+  new AppTool().inherit( this, CsvBud );
+  this.asset= [];
+  this.fileName= 'tabenv.csv';
+  this.exp= function(so){
+    if (!this.getSto().isOk) return so;
+    var res=so, i1=this.getAsset(this.fileName);
+    for (var i=1, ae=this.asset; i<ae.length; i++)
+      res=res.replace('{'+ae[i][0]+'}',ae[i][1]);
+    return res;
+  }
+}
 pkg.StoTabBud= function(){
   new AppTool().inherit( this, AppTool );
   var $t= this;
+  this.stoEnv= new StoTabEnv();
   this.mpn= function(el,n){
     for (var i=0,x=this._=el; i<n; i++) this._=this._.parentNode;
     return this._;
@@ -65,9 +78,11 @@ pkg.StoTabBud= function(){
     btn.value= val;
     btn.onclick= function(){ $t.doButton(this) }
   }
-  this.autoLink= function( el, sh )
-   { el.innerHTML= (sh.match(/^.+\:\/\//))? sh.replace(/\//g,'/ ').link(sh) : sh; 
-     if (sh.length>60) el.width="300" }
+  this.autoLink= function( el, so ) {
+    var sh= this.stoEnv.exp( so );
+    el.innerHTML= (sh.match(/^.+\:\/\//))? sh.replace(/\//g,'/ ').link(sh) : sh; 
+    if (sh.length>60) el.width="300";
+  }
   this.insertAfter= function(nu,ref,par)
    { par.insertBefore(nu,ref);  par.insertBefore(ref,nu); }
   this.doButton= function( el ){
@@ -86,7 +101,8 @@ pkg.StoTab=function(){
   var $t= this;
   this.fn= "tabtemp_web.csv";
   this.webGet= function(url){
-    var $tbl, i1=this.asset=[['loading...']], ttl= url.split(/[\/\=]/).pop();
+    var $tbl, url=this.stoEnv.exp(url);
+    var i1=this.asset=[['loading...']], ttl= url.split(/[\/\=]/).pop();
     if (!document.title) document.title= ttl;
     ($t.lm=new LinkMaker()).wrapCloser($tbl=this.addEl('table'),0,ttl);
     var i2=window.pkg=null, i3=this.fillTable($tbl);
