@@ -1,4 +1,4 @@
-//8-20-2016 jchoy v0.124 bn-tabweb, 622, CurlyStarter
+//8-22-2016 jchoy v0.128 tsurl, bn-tabweb, +622
 //6-10-2016 jchoy v0.114 use SnCurly
 
 var sc= new SnCurly();
@@ -11,9 +11,11 @@ if (sc.cgi("bn","",location)=="relic"){
   sc.start( sc.cgi("cts","622,621,9900",location)
     , sc.cgi("ccn","CmdEngine,StoTab,ConSpool",location)
     , function(){ 
-        var bu= sc.cgi("bit","2brB0OJ",location), x=window.$ce=new CmdEngine().init();
+        var bu= "tab /web http://bit.ly/"+sc.cgi("bit","2brB0OJ",location);
+        if (sc.cgi('tts','',location)) bu="tab /web {tsurl}"+sc.cgi('tts','',location);
+        window.$ce=new CmdEngine().init();
         setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
-        setTimeout( function(){ $ce.parse( "tab /web http://bit.ly/"+bu ) }, 1200 );
+        setTimeout( function(){ $ce.parse( bu ) }, 1200 );
       }
     );
 } else sc.start( sc.cgi("cts","622,621",location)
