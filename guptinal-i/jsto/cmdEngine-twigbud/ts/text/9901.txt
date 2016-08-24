@@ -1,12 +1,16 @@
-//8-14-2016 jchoy 
-pkg= pkg9901= { ver:'0.252' }; //putForm, CsvBud
+//8-23-2016 jchoy 
+pkg= pkg9901= { ver:'0.271' }; //column dir
 
 //-----
-pkg.StoDir=function(){
-  this.start=function(at){
-    var at=[];
-    for (var m in localStorage) at.push(m);
-    return at.sort().join(' ');
+StoDir=function (){
+  this.start=function(ap){
+    var mz, at=[], mat=(ap.length>1)?ap[1]:null;
+    for (var m in localStorage) 
+      if ((!mat) || (m.indexOf(mat)>=0)) at.push(m);
+    mz=at.sort(function(a,b){return (a.length>b.length)?-1:1})[0];
+    for (var i=0, sz=mz.replace(/./g,' '); i<at.length; i++)
+      at[i]= (at[i]+sz).substr(0,sz.length);
+    return at.sort().join('  ');
   }
 }
 pkg.Pulse=function(){
@@ -26,104 +30,10 @@ pkg.Pulse=function(){
   this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
   this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
 }
-//----
-pkg.CsvBud=function(){
-  new AppTool().inherit( this, AppTool );
-  this.asset= [['name','link','search','note'],['hello'],['phone']];
-  this.getAsset= function(fn){
-    if ((!(this.sto=new Sto()).isOk) || (!fn)) return;
-    var sf= this.sto.lo.getItem(fn), aa=[], i=0;
-    if (sf) for (var at=sf.split('\n'),x=this.asset=aa; i<at.length; i++)
-      aa.push( at[i].split(',') );
-  }
-  this.saveAsset= function(){
-    if (!this.sto.isOk) return;
-    var ar=[];
-    for (var i=0,at=this.asset; i<at.length; i++) ar.push(at[i].join(','));
-    this.sto.lo.setItem( this.fn, ar.join('\n') );
-  }
-  this.assetVal= function(row,col,val){
-    if (row>=this.asset.length) return '';
-    if (typeof(val)!=='undefined') this.asset[row][col]= val;
-    return (col>=this.asset[row].length)? '':this.asset[row][col];
-  }
-}
-pkg.StoTabBud= function(){
-  new AppTool().inherit( this, AppTool );
-  this.mpn= function(el,n){
-    for (var i=0,x=this._=el; i<n; i++) this._=this._.parentNode;
-    return this._;
-  }
-  this.vForm= function( ar0 ){
-    var fm= this.addEl('form');
-    fm.parentNode.removeChild(fm).count= ar0.length;
-    fm.clearForm= function(){
-      var res= [];
-      for (var i=0; i<this.count; i++) res.push(this['tb'+i].value);
-      for (var i=0; i<this.count; i++) this['tb'+i].value='';
-      return res;
-    }
-    return fm;
-  }
-  this.prepForm= function( r0 ){
-    var tbl2= this.addEl('table', this.vForm(r0));
-    for (var r,i=0; i<r0.length; i++){
-      (r= tbl2.insertRow(i)).insertCell(0).innerHTML= r0[i];
-      this.addEl('input',r.insertCell(1)).name= 'tb'+i;
-    }
-    return tbl2.parentNode;
-  }
-  this.autoLink= function( el, sh )
-   { el.innerHTML= (sh.match(/^.+\:\/\//))? sh.link(sh) : sh; }
-  this.insertAfter= function(nu,ref,par)
-   { par.insertBefore(nu,ref);   par.insertBefore(ref,nu); }
-}
-pkg.StoTab=function(){
-  new AppTool().inherit( this, StoTabBud );
-  new AppTool().inherit( this, CsvBud );
-  var $t= this;
-  this.start= function(at){
-    var tbl, x=this.getAsset( this.fn= at[1] );
-    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'));
-    return ['ok', this.fillTable(tbl), tbl.border='1'][0];
-  }
-  this.fillTable= function(tbl){
-    for (var i=0,at=this.asset; i<at.length; i++)
-      for (var j=0,r=tbl.insertRow(i); j<at[i].length; j++)
-        this.autoLink( r.insertCell(j), at[i][j] );
-    for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
-    tbl.rForm= this.prepForm(this.asset[0] );
-  }
-  this.prepRow= function(row,i){
-    this.addEl( 'div',row.insertCell(0) ).innerHTML= i;
-    this._.style.backgroundColor= 'lightgray';
-    this._.onclick= this.rowClick;
-  }
-  this.rowClick= function(){
-    var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
-    if (ii=tbl.rForm.rowNum) {
-        for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
-        for (var j=0; j<ap.length; j++) 
-          $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
-        $t.saveAsset( tbl.deleteRow(ii+1) );
-    }
-    for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
-    $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
-  }
-  this.putForm= function( ce, fm, elc ){
-    var n2= fm.rowNum= parseInt(elc.innerHTML);
-    this.insertAfter(ce.parentNode,$t.mpn(elc,2), $t.mpn(elc,3));
-    ce.setAttribute( 'colspan', fm.count+1);
-    this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
-    new DomAni().pinchOpen( fm.parentNode, ce );
-    for (var i=0; i<fm.count; i++) fm['tb'+i].value= $t.assetVal(n2,i);
-  }
-}
 
 pkg.contents=[
  { name:"pkg.startup"
-   ,text:"defcmd dir StoDir\ndefcmd pulse Pulse\n"
-     +"defcmd tab StoTab"
+   ,text:"defcmd dir StoDir\ndefcmd pulse Pulse"
  }
 ,{ name:"pkg9901notes"
    ,text:"v"+pkg.ver
@@ -131,8 +41,6 @@ pkg.contents=[
 ]
 pkg.CeStarter9901=function(){
   var $p=pkg9901;
-  this.start=function(){
-    new PkgTool().start($p, $p.contents);
-  }
+  this.start=function(){ new PkgTool().start($p, $p.contents); }
 }
 new PkgTool().start(pkg);
