@@ -1,11 +1,21 @@
-//8-22-2016 jchoy v0.128 tsurl, bn-tabweb, +622
+//8-23-2016 jchoy v0.131 tts, tsurl, bn-tabweb
 //6-10-2016 jchoy v0.114 use SnCurly
 
-var sc= new SnCurly();
+var pv, sc= new SnCurly();
 if (sc.cgi("bn","",location)=="relic"){
   new SnCurly().start( "620,621"
       ,"Foo620,TestRig,RelicClient,RelicPServer,ConSpool"
       ,function(){ new Foo620().start() }
+    );
+} else if (pv=sc.cgi("tts","",location)){
+  sc.start( sc.cgi("cts","622,621,9900",location)
+    , sc.cgi("ccn","CmdEngine,StoTab,ConSpool",location)
+    , function(){ 
+        var bu="tab /web {tsurl}"+pv;
+        window.$ce=new CmdEngine().init();
+        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
+        setTimeout( function(){ $ce.parse( bu ) }, 1200 );
+      }
     );
 } else if (sc.cgi("bn","",location)=="tabweb"){
   sc.start( sc.cgi("cts","622,621,9900",location)
