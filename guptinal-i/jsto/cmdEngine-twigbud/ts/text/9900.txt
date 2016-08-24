@@ -1,5 +1,5 @@
-//8-22-2016 jchoy 
-pkg= pkg9900= { ver:'1.186' }; //StoTabEnv, StoTabLo tabtemp_web.csv
+//8-23-2016 jchoy 
+pkg= pkg9900= { ver:'1.189' }; //dirtybit, StoTabEnv
 
 //----
 pkg.CsvBud=function(){
@@ -142,7 +142,7 @@ pkg.StoTabLo=function(){
   }
   this.rowClick= function(){
     var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
-    if (ii=tbl.rForm.rowNum) {
+    if ((ii=tbl.rForm.rowNum) && (ap.join('')!=$t.asset[ii].join(''))) {
         for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
         for (var j=0; j<ap.length; j++) 
           $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
