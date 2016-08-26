@@ -1,7 +1,21 @@
-//8-23-2016 jchoy 
-pkg= pkg9900= { ver:'1.189' }; //dirtybit, StoTabEnv
+//8-26-2016 jchoy
+pkg= pkg9900= { ver:'1.211' }; //TabKey.mo, dirtybit
 
 //----
+TabKey=function (){
+  this.morph=function(tbl){
+    this.mpn= new StoTabBud().mpn;
+    for (var i=0, ae= tbl.getElementsByTagName('a'); i<ae.length; i++) this.mo(ae[i]);
+  }
+  this.mo= function(el){
+    if ( (el.at=el.href.split('#://key/')).length<2 ) return;
+    var key= el.at[1].split('/')[0];
+    el.innerHTML= 'key='+key;
+    var aa= this.mpn(el, 3).getElementsByTagName('a');
+    for (var i=0, val= el.at[1].substr(key.length+1); i<aa.length; i++)
+        aa[i].href= aa[i].href.replace('%7B'+key+'/%7D', val);
+  }
+}
 pkg.CsvBud=function(){
   new AppTool().inherit( this, AppTool );
   this.asset= [['name','link','search','note'],['hello'],['phone']];
@@ -129,6 +143,7 @@ pkg.StoTabLo=function(){
     for (var i=0,at=this.asset; i<at.length; i++)
       for (var j=0,r=tbl.insertRow(i); j<at[i].length; j++)
         this.autoLink( r.insertCell(j), (i==0)?at[i][j].split(':')[0]:at[i][j] );
+    new TabKey().morph(tbl);
     for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
     tbl.rows[0].style.backgroundColor= 'lightgray';
     tbl.border='1';
@@ -147,6 +162,7 @@ pkg.StoTabLo=function(){
         for (var j=0; j<ap.length; j++) 
           $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
         $t.saveAsset( tbl.deleteRow(ii+1) );
+        new TabKey().morph(tbl);
     }
     for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
     $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
