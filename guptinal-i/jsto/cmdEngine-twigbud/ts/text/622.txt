@@ -1,7 +1,13 @@
-//8-18-2016 jchoy - wrapCloser title*fix, LoadJs using SnLiteLoader
+//8-26-2016 jchoy - saved msg, HashCmd
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.364'}
+pkg= pkg622={ver:'CETB 1.372'}
 //----
+pkg.HashCmd=function (){
+  this.start=function(){
+    return ['ok', window.onhashchange= function(){
+      $ce.parse(unescape(location.hash.replace('#://cmd/',''))); }][0]
+  }
+}
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
@@ -82,7 +88,10 @@ pkg.TaAutoSave= function(){
   }
   this.saveTa3= function(ta){
     if ((this.counter.elapsedTimeMs() < 3000) || (!this.storeName)) return;
-    if (document.contains(ta)) return $st.lo.setItem( this.storeName, ta.value );
+    if (document.contains(ta)) {
+      $st.lo.setItem( this.storeName, ta.value );
+      new GrabBag().start([0,'statbox00','saved '+new Date()]);
+    }
   }
 }
 //----
@@ -133,6 +142,7 @@ pkg.CmdEngine= function(){
   this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
   this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
   this.addCmd( 'loadjs', function(at){ return new LoadJs().start(at); } );
+  this.addCmd( 'hashcmd', function(at){return new HashCmd().start(at);});
   this.parse= function(taval){
     var args= taval.split('\n').pop().split(' '), res=this._='';
     var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
