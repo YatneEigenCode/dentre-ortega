@@ -1,0 +1,20 @@
+TabTmpl= function(){
+  this.hht= {};
+  this.exp= function( el, so, aa ){
+    var rc, at, tt='{v}', hd, colNo= el.parentNode.cells.length-1;
+    if ((hd=this.chkHdr(aa,colNo))=='basic') return so;
+    try {
+      rc= [hd.match(/R(\d+)/).pop(), hd.match(/C(\d+)/).pop()];
+      tt= aa[ rc[0] ][ rc[1] ];
+    } catch(e){}
+    return tt.replace(/{v}/g,so);
+  }
+  this.chkHdr= function(aa,ic){
+    if (!this.hht['c'+ic]) {
+      var hd= (ic<aa[0].length)? aa[0][ic] : 'basic';
+      var at=hd.split(':TabTmpl/');
+      this.hht['c'+ic]= (at.length<2)? 'basic' : at[1].split(':')[0];
+    }
+    return this.hht['c'+ic];
+  }
+}
