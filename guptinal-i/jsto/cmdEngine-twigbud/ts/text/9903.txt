@@ -1,0 +1,49 @@
+//8-27-2016 jchoy
+pkg=pkg9903= {ver:'v0.131'} //markRow, TabTmpl
+
+//----
+pkg.TabTmpl= function(){
+  this.hht= {};
+  this.exp= function( el, so, aa ){
+    var rc, at, tt='{v}', hd, colNo= el.parentNode.cells.length-1;
+    if (el.parentNode.parentNode.rows.length<2) return so;
+    this.markRow( (colNo-= (el.parentNode.isPrep)? 1 : 0), el, aa[0] );
+    if ((hd=this.chkHdr(aa,colNo))=='basic') return so;
+    try {
+      rc= [hd.match(/R(\d+)/).pop(), hd.match(/C(\d+)/).pop()];
+      tt= aa[ rc[0] ][ rc[1] ];
+    } catch(e){}
+    return tt.replace(/{v}/g,so);
+  }
+  this.markRow= function(ic, el, hr){
+    if (ic<hr.length-1) return;
+    var isMk, ii= (el.parentNode.isPrep)? 1 : 0;
+    isMk= (el.parentNode.cells[ii].getElementsByTagName('mk').length)
+    el.parentNode.style.backgroundColor= (isMk)? 'yellow':null;
+  }
+  this.chkHdr= function(aa,ic){
+    if (!this.hht['c'+ic]) {
+      var hd= (ic<aa[0].length)? aa[0][ic] : 'basic';
+      var at=hd.split(':TabTmpl/');
+      this.hht['c'+ic]= (at.length<2)? 'basic' : at[1].split(':')[0];
+    }
+    return this.hht['c'+ic];
+  }
+}
+
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:""
+ }
+,{ name:"pkg9903notes"
+   ,text:"v0.112\n8/26/2016 TabTmpl"
+ }
+]
+pkg.CeStarter9903=function(){
+  var $p=pkg9903, $su=pkg9903.contents[0];
+  this.start=function(){
+    new PkgTool().start($p, $p.contents);
+    $ce.parse( $su.text );
+  }
+}
+new PkgTool().start(pkg);
