@@ -1,4 +1,4 @@
-//8-24-2016 jchoy v0.135 isRip, xtts, tsurl
+\//8-26-2016 jchoy v0.138 9903isRip, xtts, tsurl
 //6-10-2016 jchoy v0.114 use SnCurly
 
 var pv, sc= new SnCurly();
@@ -8,14 +8,15 @@ if (sc.cgi("bn","",location)=="relic"){
       ,function(){ new Foo620().start() }
     );
 } else if (pv=sc.cgi("tts","",location)){
-  sc.start( sc.cgi("cts","622,621,9900",location)
-    , sc.cgi("ccn","CmdEngine,StoTab,ConSpool",location)
+  sc.start( sc.cgi("cts","622,621",location)
+    , sc.cgi("ccn","CmdEngine,ConSpool",location)
     , function(){
         var isRip= (location.host.indexOf('okdaily')>=0);
         var bu=(isRip)? "/mad/textStore.php?f=text&i=":"{tsurl}";
         bu= "tab /web "+bu+pv;
         window.$ce=new CmdEngine().init();
-        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
+        setTimeout( function(){ $ce.parse( "loadjsc 9903 NoStartup" ) }, 400 );
+        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 600 );
         setTimeout( function(){ $ce.parse( bu ) }, 1200 );
       }
     );
@@ -25,7 +26,8 @@ if (sc.cgi("bn","",location)=="relic"){
     , function(){ 
         var bu= "tab /web http://bit.ly/"+pv;
         window.$ce=new CmdEngine().init();
-        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
+        setTimeout( function(){ $ce.parse( "loadjsc 9903 NoStartup" ) }, 400 );
+        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 600 );
         setTimeout( function(){ $ce.parse( bu ) }, 1200 );
       }
     );
@@ -33,3 +35,4 @@ if (sc.cgi("bn","",location)=="relic"){
       , sc.cgi("ccn","CurlyStarter,ConSpool",location)
       , function(){ new CurlyStarter().start() }
     );
+    
