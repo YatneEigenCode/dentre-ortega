@@ -1,8 +1,8 @@
-//8-26-2016 jchoy
-pkg= pkg9900= { ver:'1.211' }; //TabKey.mo, dirtybit
+//8-27-2016 jchoy
+pkg= pkg9900= { ver:'1.219' }; //toggleMark, use TabTmpl
 
 //----
-TabKey=function (){
+pkg.TabKey=function (){
   this.morph=function(tbl){
     this.mpn= new StoTabBud().mpn;
     for (var i=0, ae= tbl.getElementsByTagName('a'); i<ae.length; i++) this.mo(ae[i]);
@@ -59,6 +59,7 @@ pkg.StoTabBud= function(){
   new AppTool().inherit( this, AppTool );
   var $t= this;
   this.stoEnv= new StoTabEnv();
+  if (typeof(TabTmpl) !== 'undefined') this.ttpl= new TabTmpl();
   this.mpn= function(el,n){
     for (var i=0,x=this._=el; i<n; i++) this._=this._.parentNode;
     return this._;
@@ -94,6 +95,7 @@ pkg.StoTabBud= function(){
   }
   this.autoLink= function( el, so ) {
     var sh= this.stoEnv.exp( so );
+    if (this.ttpl) sh= this.ttpl.exp( el, sh, this.asset );
     el.innerHTML= (sh.match(/^.+\:\/\//))? sh.replace(/\//g,'/ ').link(sh) : sh; 
     if (sh.length>60) el.width="300";
   }
@@ -154,10 +156,12 @@ pkg.StoTabLo=function(){
     this.addEl( 'div',row.insertCell(0) ).innerHTML= i;
     this._.style.backgroundColor= 'lightgray';
     this._.onclick= this.rowClick;
+    row.isPrep= true;
   }
   this.rowClick= function(){
     var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
-    if ((ii=tbl.rForm.rowNum) && (ap.join('')!=$t.asset[ii].join(''))) {
+    var isNeed= (ii=tbl.rForm.rowNum) && (ap.join('')!=$t.asset[ii].join(''));
+    if ((isNeed) || (tbl.rForm.isChgMk)) {
         for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
         for (var j=0; j<ap.length; j++) 
           $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
@@ -167,8 +171,18 @@ pkg.StoTabLo=function(){
     for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
     $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
   }
+  this.toggleMark= function(n2, fm){
+    fm.isChgMk= false;
+    if (n2 != fm.rowNum) return n2;
+    var isMk, mk="<mk />", so= $t.assetVal(n2,0);
+    isMk= (so.indexOf(mk) >= 0);
+    $t.assetVal(n2,0, (isMk)? so.replace(mk,'') : (so+mk) );
+    fm.isChgMk= true;
+    return n2;
+  }
   this.putForm= function( ce, fm, elc ){
-    var n2= fm.rowNum= parseInt(elc.innerHTML), i3=this.da.pinchOpen;
+    var n2= parseInt(elc.innerHTML), i3=this.da.pinchOpen;
+    fm.rowNum= this.toggleMark(n2,fm);
     this.insertAfter(ce.parentNode,$t.mpn(elc,2), $t.mpn(elc,3));
     ce.setAttribute( 'colspan', fm.count+1);
     this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
