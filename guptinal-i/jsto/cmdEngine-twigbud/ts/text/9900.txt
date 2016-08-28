@@ -1,21 +1,7 @@
-//8-27-2016 jchoy
-pkg= pkg9900= { ver:'1.219' }; //toggleMark, use TabTmpl
+//8-28-2016 jchoy
+pkg= pkg9900= { ver:'1.226' }; //midcate, closeForm, onFormHide
 
 //----
-pkg.TabKey=function (){
-  this.morph=function(tbl){
-    this.mpn= new StoTabBud().mpn;
-    for (var i=0, ae= tbl.getElementsByTagName('a'); i<ae.length; i++) this.mo(ae[i]);
-  }
-  this.mo= function(el){
-    if ( (el.at=el.href.split('#://key/')).length<2 ) return;
-    var key= el.at[1].split('/')[0];
-    el.innerHTML= 'key='+key;
-    var aa= this.mpn(el, 3).getElementsByTagName('a');
-    for (var i=0, val= el.at[1].substr(key.length+1); i<aa.length; i++)
-        aa[i].href= aa[i].href.replace('%7B'+key+'/%7D', val);
-  }
-}
 pkg.CsvBud=function(){
   new AppTool().inherit( this, AppTool );
   this.asset= [['name','link','search','note'],['hello'],['phone']];
@@ -73,7 +59,17 @@ pkg.StoTabBud= function(){
       for (var i=0; i<this.count; i++) this['tb'+i].value='';
       return res;
     }
+    fm.addEventListener("DOMNodeRemovedFromDocument", 
+      function(){$t.onFormHide(this)} );
     return fm;
+  }
+  this.onFormHide= function(fm){
+    if (this.mpn(fm,3).isAux) {
+      console.log( 'onFormHide inp disabled= '
+        +fm.getElementsByTagName('input')[0].disabled );
+      if (!fm.getElementsByTagName('input')[0].disabled)
+        this.closeForm( this.addEl('br', this.mpn(fm,3).cells[0]) );
+    }
   }
   this.prepForm= function( r0 ){
     var am, tbl2= this.addEl('table', this.vForm(r0));
@@ -94,16 +90,18 @@ pkg.StoTabBud= function(){
     btn.onclick= function(){ $t.doButton(this) }
   }
   this.autoLink= function( el, so ) {
-    var sh= this.stoEnv.exp( so );
+    var sn, sh= this.stoEnv.exp( so );
     if (this.ttpl) sh= this.ttpl.exp( el, sh, this.asset );
-    el.innerHTML= (sh.match(/^.+\:\/\//))? sh.replace(/\//g,'/ ').link(sh) : sh; 
+    el.innerHTML= (sh.match(/^.+\:\/\//))? $t.midcate(sh,15).link(sh) : sh; 
     if (sh.length>60) el.width="300";
   }
+  this.midcate= function(s, l2){
+    return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s; }
   this.insertAfter= function(nu,ref,par)
    { par.insertBefore(nu,ref);  par.insertBefore(ref,nu); }
   this.doButton= function( el ){
     var tbl=this.mpn(el.form,5), nn=el.form.rowNum+1;
-    while (tbl.rows.length>0) tbl.deleteRow(0);
+    while (tbl.rows.length>0) { tbl.rows[0].isAux= null; tbl.deleteRow(0); }
     if (el.value=="Add Row")
       this.asset.splice( nn, 0, el.form.clearForm());
     if (el.value=="Del Row") this.asset.splice( nn-1, 1 );
@@ -145,7 +143,6 @@ pkg.StoTabLo=function(){
     for (var i=0,at=this.asset; i<at.length; i++)
       for (var j=0,r=tbl.insertRow(i); j<at[i].length; j++)
         this.autoLink( r.insertCell(j), (i==0)?at[i][j].split(':')[0]:at[i][j] );
-    new TabKey().morph(tbl);
     for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
     tbl.rows[0].style.backgroundColor= 'lightgray';
     tbl.border='1';
@@ -158,18 +155,24 @@ pkg.StoTabLo=function(){
     this._.onclick= this.rowClick;
     row.isPrep= true;
   }
-  this.rowClick= function(){
-    var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
+  this.closeForm= function(el){
+    var ii, tbl= $t.mpn(el,4), ap= tbl.rForm.clearForm();
+    if (tbl.rForm.getElementsByTagName('input')[0].disabled) return;
+    tbl.rForm.getElementsByTagName('input')[0].disabled= true;
     var isNeed= (ii=tbl.rForm.rowNum) && (ap.join('')!=$t.asset[ii].join(''));
+    isNeed= isNeed && (tbl.rows.length>ii+1) && (tbl.rows[ii+1].isAux);
     if ((isNeed) || (tbl.rForm.isChgMk)) {
         for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
         for (var j=0; j<ap.length; j++) 
           $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
         $t.saveAsset( tbl.deleteRow(ii+1) );
-        new TabKey().morph(tbl);
     }
     for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
+  }
+  this.rowClick= function(){
+    var tbl= $t.mpn(this,4), i1= $t.closeForm(this);
     $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
+    tbl.rForm.getElementsByTagName('input')[0].disabled= false;
   }
   this.toggleMark= function(n2, fm){
     fm.isChgMk= false;
