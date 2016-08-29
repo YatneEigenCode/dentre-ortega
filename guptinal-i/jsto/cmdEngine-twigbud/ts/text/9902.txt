@@ -1,22 +1,27 @@
-//8-22-2016 jchoy
-pkg=pkg9902= {ver:'v0.234'} //limit, Sto2Rip
+//8-29-2016 jchoy
+pkg=pkg9902= {ver:'v0.238'} //cfg, limit 500, DomAni.pinchOpen
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
   var $t= this;
   this.hist=[''];
+  this.cfg= {mxl:40, l2:20, w_def:'w_grabBag'};
   this.start= function(at){
-    this.gName= at[1]; this.pName= at[2];
-    var outerDiv= this.addEl( 'div' );
+    this.gName= (at[1]=='*')?$t.cfg.w_def:a[1]; this.pName= at[2];
+    if (at.length>3) this.cfg.mxl= parseInt(at[3]);
+    var outerDiv= $t.addEl( 'div' ), l2=$t.cfg.l2= Math.floor($t.cfg.mxl/2);
     this.addEl('span', outerDiv).innerHTML= '[x] ';
     this._.onclick= function(){ outerDiv.parentNode.removeChild(outerDiv) }
     this.span = this.addEl('span', outerDiv);
     return ['ok',this.update()][0];
   }
+  this.midcate= function(s, l2){
+    return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s; }
   this.update= function(){
     if (!document.contains(this.span)) return;
     this.hist.unshift( window[this.gName][this.pName] );
-    if (this.hist.pop() != this.hist[0]) new DomAni().odoChange(this.span, this.hist[0]);
+    if (this.hist.pop() != this.hist[0])
+      new DomAni().odoChange($t.span, $t.midcate($t.hist[0],this.cfg.l2));
     setTimeout( function(){$t.update()}, 2000 ); 
   }
 }
