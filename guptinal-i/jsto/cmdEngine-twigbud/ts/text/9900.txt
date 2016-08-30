@@ -1,5 +1,5 @@
-//8-28-2016 jchoy
-pkg= pkg9900= { ver:'1.226' }; //midcate, closeForm, onFormHide
+//8-29-2016 jchoy
+pkg= pkg9900= { ver:'1.227' }; //midcate, closeForm, onFormHide, toggleMark
 
 //----
 pkg.CsvBud=function(){
@@ -51,7 +51,7 @@ pkg.StoTabBud= function(){
     return this._;
   }
   this.vForm= function( ar0 ){
-    var fm= this.addEl('form');
+    var fm=this.addEl('form'), evNm="DOMNodeRemovedFromDocument";
     fm.parentNode.removeChild(fm).count= ar0.length;
     fm.clearForm= function(){
       var res= [];
@@ -59,17 +59,15 @@ pkg.StoTabBud= function(){
       for (var i=0; i<this.count; i++) this['tb'+i].value='';
       return res;
     }
-    fm.addEventListener("DOMNodeRemovedFromDocument", 
-      function(){$t.onFormHide(this)} );
+    fm.addEventListener(evNm, function(){$t.onFormHide(this)} );
     return fm;
   }
   this.onFormHide= function(fm){
-    if (this.mpn(fm,3).isAux) {
-      console.log( 'onFormHide inp disabled= '
-        +fm.getElementsByTagName('input')[0].disabled );
-      if (!fm.getElementsByTagName('input')[0].disabled)
+    if (this.mpn(fm,3).isAux) 
+      if (!fm.getElementsByTagName('input')[0].disabled) {
         this.closeForm( this.addEl('br', this.mpn(fm,3).cells[0]) );
-    }
+        fm.rowNum= null;
+      }
   }
   this.prepForm= function( r0 ){
     var am, tbl2= this.addEl('table', this.vForm(r0));
