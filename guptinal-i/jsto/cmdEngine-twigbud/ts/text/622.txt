@@ -1,6 +1,6 @@
-//8-26-2016 jchoy - saved msg, HashCmd
+//8-29-2016 jchoy - title, saved msg, HashCmd
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.372'}
+pkg= pkg622={ver:'CETB 1.375'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -11,10 +11,14 @@ pkg.HashCmd=function (){
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
   this.start= function(at){
-    if (at[1] != '.') {
+    if (at[1] == '.') {
+      this.addEl('span').innerHTML= at.slice(2,99).join(' ');
+    } else if (at[1] == '.title') {
+      return ['ok',document.title= at.slice(2,99).join(' ')];
+    } else {
       this.addEl('a', this.addEl('div')).href= at[1];
       this._.innerHTML= at[1];
-    } else this.addEl('span').innerHTML= at.slice(2,99).join(' ');
+    }
     var rs= this._.innerHTML.replace(/\$date/i,new Date().toLocaleString());
     return ['ok',this._.innerHTML=rs,this.wrapCloser( this._ )][0];
   }
