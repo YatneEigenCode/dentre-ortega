@@ -1,5 +1,5 @@
 //8-29-2016 jchoy
-pkg=pkg9902= {ver:'v0.238'} //cfg, limit 500, DomAni.pinchOpen
+pkg=pkg9902= {ver:'v0.242'} //cfg, limit 500, DomAni.pinchOpen
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -7,7 +7,7 @@ pkg.OurStatus=function (){
   this.hist=[''];
   this.cfg= {mxl:40, l2:20, w_def:'w_grabBag'};
   this.start= function(at){
-    this.gName= (at[1]=='*')?$t.cfg.w_def:a[1]; this.pName= at[2];
+    this.gName= (at[1]=='*')?$t.cfg.w_def:at[1]; this.pName= at[2];
     if (at.length>3) this.cfg.mxl= parseInt(at[3]);
     var outerDiv= $t.addEl( 'div' ), l2=$t.cfg.l2= Math.floor($t.cfg.mxl/2);
     this.addEl('span', outerDiv).innerHTML= '[x] ';
@@ -16,7 +16,9 @@ pkg.OurStatus=function (){
     return ['ok',this.update()][0];
   }
   this.midcate= function(s, l2){
-    return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s; }
+    if (!s) return '';
+    return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s;
+  }
   this.update= function(){
     if (!document.contains(this.span)) return;
     this.hist.unshift( window[this.gName][this.pName] );
