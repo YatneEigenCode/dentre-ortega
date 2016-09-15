@@ -1,7 +1,16 @@
-//8-26-2016 jchoy v0.138 9903isRip, xtts, tsurl
+//9-13-2016 jchoy v0.142 RTI, 9903isRip, xtts, tsurl
 //6-10-2016 jchoy v0.114 use SnCurly
 
 var pv, sc= new SnCurly();
+function RTI(){
+  var $z= 10;
+  this.retryTimedIf= function( ms, test, rFn ){
+    (function rt(){ if (test() || (--$z<0)) return; rFn(); setTimeout(rt, ms); })();
+  }
+  this.anyTables= function(){
+    return document.getElementsByTagName('table').length>0 }
+}
+
 if (sc.cgi("bn","",location)=="relic"){
   new SnCurly().start( "620,621"
       ,"Foo620,TestRig,RelicClient,RelicPServer,ConSpool"
@@ -17,7 +26,8 @@ if (sc.cgi("bn","",location)=="relic"){
         window.$ce=new CmdEngine().init();
         setTimeout( function(){ $ce.parse( "loadjsc 9903 NoStartup" ) }, 400 );
         setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 600 );
-        setTimeout( function(){ $ce.parse( bu ) }, 1200 );
+        new RTI().retryTimedIf( 500, new RTI().anyTables, function(){$ce.parse(bu)} );
+        //setTimeout( function(){ $ce.parse( bu ) }, 1200 );
       }
     );
 } else if (pv=sc.cgi("bit","",location)){
