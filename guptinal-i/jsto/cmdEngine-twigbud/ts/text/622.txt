@@ -1,6 +1,6 @@
-//8-29-2016 jchoy - title, saved msg, HashCmd
+//9-13-2016 jchoy - LinkMkaer.bag, title, saved msg
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.375'}
+pkg= pkg622={ver:'CETB 1.376'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -29,6 +29,7 @@ pkg.LinkMaker= function(){
     if (isBr) this.addEl('br',this._.parentNode);
     this._.parentNode.appendChild(el);
   }
+  this.bag= function(){ var LM=LinkMaker; return (LM.bag)? LM.bag : (LM.bag={}) }
 }
 pkg.DomAni= function(){
   this.delEl=function(el){ el.parentNode.removeChild(el) }
