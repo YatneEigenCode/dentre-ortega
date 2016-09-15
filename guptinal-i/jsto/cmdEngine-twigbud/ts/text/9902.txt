@@ -1,5 +1,5 @@
-//8-29-2016 jchoy
-pkg=pkg9902= {ver:'v0.242'} //cfg, limit 500, DomAni.pinchOpen
+//9-13-2016 jchoy
+pkg=pkg9902= {ver:'v0.248'} //confirm, DomAni.aniScroll
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -40,8 +40,15 @@ pkg.DomAni= function(){
   this.pinchOpen= function( el, pr ){
     var $ph=pr.appendChild(document.createElement('div')), z=el.offsetHeight;
     var w=$ph.appendChild(el), v= el.position='relative';
+    var yst= document.body.scrollTop; document.body.scrollTop++;
+    var $saf= (yst==document.body.scrollTop)? z : 0;
     this.pinchRaf( $ph.style, -5, 1, function(v){return v<z},
-      function(){ pr.insertBefore(el,$ph); pr.removeChild($ph) } );
+      function(){ pr.insertBefore(el,$ph); pr.removeChild($ph);
+        new DomAni().aniScroll($saf) } );
+  }
+  this.aniScroll= function(saf){
+    var $bod= document.body, n=1, z=document.body.scrollTop+saf;
+    (function fa(){ $bod.scrollTop+=(n++); if ($bod.scrollTop<z) $raf(fa); })()
   }
   this.pinchRaf= function( es, dz, za, fc, fz ){
     var z=za, x= es.overflow= 'hidden';
@@ -66,6 +73,7 @@ pkg.DomAni= function(){
 }
 //----
 pkg.Sto2Rip= function(){
+  new AppTool().inherit( this, LinkMaker );
   new AppTool().inherit( this, SnLiteLoader );
   new AppTool().inherit( this, CsvBud );
   this.sendPkgUrl= "http://rip.okdaily.com/mad/textStore.php?f=set&i={0}";
@@ -76,7 +84,8 @@ pkg.Sto2Rip= function(){
     this.getAssetQ( this.sto.lo.getItem(ap[1]) );
     var len= JSON.stringify(this.asset).length, mx=this.maxlen;
     if (len>mx) return 'err - size '+len+' over limit '+mx;
-    this.sendPkg( {asset:this.asset}, ap[2] );
+    var isGo= (this.bag()[ap[2]]) ? true : confirm('Are you sure: '+ap[2]);
+    if (isGo) this.sendPkg( {asset:this.asset}, ap[2], null, this.bag()[ap[2]]=1 );
     return 'ok';
   }
 }
