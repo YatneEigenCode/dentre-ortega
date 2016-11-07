@@ -1,0 +1,687 @@
+///////////////////////////
+//619.txt
+//8-24-2016 jchoy v0.135 isRip, xtts, tsurl
+//6-10-2016 jchoy v0.114 use SnCurly
+
+var pv, sc= new SnCurly();
+if (sc.cgi("bn","",location)=="relic"){
+  new SnCurly().start( "620,621"
+      ,"Foo620,TestRig,RelicClient,RelicPServer,ConSpool"
+      ,function(){ new Foo620().start() }
+    );
+} else if (pv=sc.cgi("tts","",location)){
+  sc.start( sc.cgi("cts","622,621,9900",location)
+    , sc.cgi("ccn","CmdEngine,StoTab,ConSpool",location)
+    , function(){
+        var isRip= (location.host.indexOf('okdaily')>=0);
+        var bu=(isRip)? "/mad/textStore.php?f=text&i=":"{tsurl}";
+        bu= "tab /web "+bu+pv;
+        window.$ce=new CmdEngine().init();
+        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
+        setTimeout( function(){ $ce.parse( bu ) }, 1200 );
+      }
+    );
+} else if (pv=sc.cgi("bit","",location)){
+  sc.start( sc.cgi("cts","622,621,9900",location)
+    , sc.cgi("ccn","CmdEngine,StoTab,ConSpool",location)
+    , function(){ 
+        var bu= "tab /web http://bit.ly/"+pv;
+        window.$ce=new CmdEngine().init();
+        setTimeout( function(){ $ce.parse( "loadjsc 9900 StoTab" ) }, 400 );
+        setTimeout( function(){ $ce.parse( bu ) }, 1200 );
+      }
+    );
+} else sc.start( sc.cgi("cts","622,621",location)
+      , sc.cgi("ccn","CurlyStarter,ConSpool",location)
+      , function(){ new CurlyStarter().start() }
+    );
+
+///////////////////////////
+//621.txt
+//7-27-2016 jchoy v1.128 Counter, quickDate(fix2), elapsedFmt/neg nums, TimeoutMark
+//6-30-2016 jchoy v1.115 ConSpool
+//-----
+function ConSpool(){
+  this.spool= [];  this.state= {isActive:true};
+  this.cfg= {max:1000,sep:'\n'};
+  var $d= document;
+  this.start= function(){
+    if (this.oldcon==console) return;
+    this.oldcon= console;
+    console= {log:function(s){this.conspool.log(s)},conspool:this};
+    console.log( 'conspool started' );
+  }
+  this.TaApp= function(){
+    this.start= function(s){
+      var ta=$d.body.appendChild($d.createElement('div')).appendChild(
+        $d.createElement('textarea') );
+      ta.value=s; ta.rows=10; ta.cols=50;
+    }
+  }
+  this.log= function(s){
+    this.spool.push([new Date().toLocaleString(), s]);
+    if (this.spool.length>this.cfg.max) this.spool.shift();
+    this.oldcon.log(s);
+  }
+  this.view= function(){
+    var res='';
+    for (var i=0,at=this.spool; i<at.length; i++) res+= at[i].join(' ')+this.cfg.sep;
+    try { new TaApp().start(res) } catch(e) { new this.TaApp().start(res); }
+  }
+  this.clear= function(){this.spool.length=0}
+  this.pause= function(v){this.state.isActive=(!v)?false:true}
+}
+//-----
+Counter= function(){
+    this.add= function(key){  if (!this.data[key]) this.data[key]=0;   this.data[key]++;  }
+    this.restart= function(){  this.data= {};  this.startTime = new Date(); }
+    this.count= function(key){  return (this.data[key])? this.data[key] : 0;  }
+    this.elapsedTimeSeconds= function(){ return this.elapsedTimeMs()/1000 }
+    this.elapsedTimeMs= function(){  return new Date().valueOf()-this.startTime.valueOf(); }
+    this.restart();
+}
+Counter.quickDate=function(s){ //converts shorthands with just time or date to valid1
+    var res= new Date(new Date().toLocaleDateString()+','+s);
+    if (!isNaN(res.valueOf())) return res.toLocaleString();
+    if (!isNaN(new Date(s+',6:00:00').valueOf())) return s+',6:00:00';
+    return s;
+}
+Counter.elapsedFmt= function(ms){
+    if (ms < 0) return "0:00:00";
+    return Math.floor(ms/3600/24000)+' day(s)'+new Date(ms).toUTCString().split(' 197')[1].substr(1,9);
+}
+//----
+TimeoutMark= function(){
+  var $t= this;
+  this.start = function( sec, $tag ){
+    this.isDone = false;
+    console.log( 'TimeoutMark '+$tag );
+    setTimeout( function(){
+      if (!$t.isDone) console.log('timed out: '+$tag)
+      $t.isDone=true;
+    }, sec*1000 );
+    return this;
+  }
+  this.checkIsDone= function(){ return (this.isDone) || !(this.isDone=true); }
+}
+
+///////////////////////////
+//622.txt
+//8-26-2016 jchoy - saved msg, HashCmd
+//7-2-2016 jchoy TaApp, CurlyStarter
+pkg= pkg622={ver:'CETB 1.372'}
+//----
+pkg.HashCmd=function (){
+  this.start=function(){
+    return ['ok', window.onhashchange= function(){
+      $ce.parse(unescape(location.hash.replace('#://cmd/',''))); }][0]
+  }
+}
+pkg.LinkMaker= function(){
+  new AppTool().inherit( this, AppTool );
+  this.start= function(at){
+    if (at[1] != '.') {
+      this.addEl('a', this.addEl('div')).href= at[1];
+      this._.innerHTML= at[1];
+    } else this.addEl('span').innerHTML= at.slice(2,99).join(' ');
+    var rs= this._.innerHTML.replace(/\$date/i,new Date().toLocaleString());
+    return ['ok',this._.innerHTML=rs,this.wrapCloser( this._ )][0];
+  }
+  this.wrapCloser= function(el, isBr, title){
+    this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
+    this._.onclick= function(){ new DomAni().delEl(this.parentNode) }
+    if (title) this.addEl('span',this._.parentNode).innerHTML= title;
+    if (isBr) this.addEl('br',this._.parentNode);
+    this._.parentNode.appendChild(el);
+  }
+}
+pkg.DomAni= function(){
+  this.delEl=function(el){ el.parentNode.removeChild(el) }
+}
+//----
+pkg.StoEdit= function(){
+  this.start= function(at){
+    var st=new Sto();
+    if (!st.isOk) return 'error';
+    return ['ok', new TaAutoSave().init(at[1]).start( st.lo.getItem(at[1]), null, at[1] )][0];
+  }
+}
+//----
+pkg.EvalJs= function(){
+  new AppTool().inherit( this, AppTool );
+  this.sc= "MyClass=function(){\n  this.start=function(at){\n  }\n}";
+  this.start= function(at){
+    var $st= new Sto();
+    if (at.length>1) this.sc= at[1]+'='+window[at[1]];
+    else if ($st.isOk) this.sc= $st.lo.getItem( "evaljs_data" ) || this.sc;
+    new TaApp().start( this.sc, function(ta){
+      if ($st.isOk) $st.lo.setItem( "evaljs_data", ta.value );
+      if (ta.value.split('\n').pop().toLowerCase() != '//evaljs') return '\nusage: //evaljs';
+      try { eval( ta.value ); } catch (e) { return '\nError '+e.message; }
+      return '-ok';
+    }, at[1]);
+    return 'ok';
+  }
+}
+//----
+pkg.TaApp= function(){
+  var $t= this;
+  var $d= document;
+  this.start= function(s, enterFcn, title){
+    if (enterFcn) this.enterFcn=enterFcn;
+    var ta=$d.body.appendChild($d.createElement('div')).appendChild(
+      $d.createElement('textarea'));
+    ta.cols= 40;  ta.onkeypress= this.doTa;
+    ta.onfocus= function(){if (this.rows==2)this.rows=8}
+    new LinkMaker().wrapCloser(ta,1,title);
+    if (s) ta.value=s;
+  }
+  this.doTa= function(ev){
+    for (var n=this.value.split('\n').length; n<20; n=20) this.rows=n+2;
+    if (!$t.enterFcn) {
+    } else if (ev.keyCode != 13) {
+    } else if (this.selectionEnd==this.value.length)
+      this.value+= $t.enterFcn( this );
+  }
+  this.enterFcn= function(ta){  return '\n'; }
+}
+pkg.TaAutoSave= function(){
+  new AppTool().inherit( this, TaApp );
+  var $t= this, $st=new Sto();
+  this.counter= new Counter();
+  this.init= function( storeName ){
+    if ($st.isOk) this.storeName= storeName; return this; }
+  this.doTa= function(ev){
+    var ta= this, x=$t.counter.restart();
+    if ($st.isOk) setTimeout( function(){ $t.saveTa3(ta) }, 3000 );
+  }
+  this.saveTa3= function(ta){
+    if ((this.counter.elapsedTimeMs() < 3000) || (!this.storeName)) return;
+    if (document.contains(ta)) {
+      $st.lo.setItem( this.storeName, ta.value );
+      new GrabBag().start([0,'statbox00','saved '+new Date()]);
+    }
+  }
+}
+//----
+pkg.Sto= Sto= function(){
+  this.isOk= (typeof(Storage) !== "undefined"); 
+  this.lo= (this.isOk)? localStorage : null;
+}
+pkg.StoLog= function(fn){
+  var $t=this;
+  this.cfg= {st:new Sto(), nm:((fn)?fn:'sto.log'), tsPipe:['']};
+  this.chkPipe= function(s){
+    this.cfg.tsPipe.push(s); return (this.cfg.tsPipe.shift()==s)? '':s;
+  }
+  this.log= function(s){
+    var ts= $t.chkPipe(new Date().toLocaleString());
+    var pl, fn=$t.cfg.nm, lo=$t.cfg.st.lo;
+    if ((pl=lo.getItem(fn)) && (ts)) pl= pl.substr(-15999)+'\n'+ts;
+    return [lo.setItem(fn, pl+'\n'+s), s][1];
+  }
+  if (!this.cfg.st.isOk) this.log= function(s){ return s }
+}
+pkg.CmdAutostart= function(){
+  var $t=this;
+  this.start= function(ce){
+    this.cfg= {sl:new StoLog('autostart.log'), nc:'startup'};
+    var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
+    if (!st.isOk) return;
+    if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
+  }
+  this.parse= function(ce,sf){
+    for (var i=0,at=sf.split('\n'); i<at.length; i++)
+      if (!this.doSleep(ce, at[i], at, i)) { return;
+      } else ce.parse( this.cfg.sl.log(at[i]) );
+  }
+  this.doSleep= function(ce, it, at, i){
+    if (!it.match(/^sleep/i)) return true;
+    var sf= at.slice(i+1).join('\n'), ms=parseInt(it.substr(5))*1000;
+    setTimeout( function(){ $t.parse( ce, sf ); }, ms );
+  }
+}
+//----
+pkg.CmdEngine= function(){
+  var $t= $ce= this;
+  this.assets= {};
+  this.addCmd= function(s, fcn){ this.assets[s]=fcn };
+  this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
+  this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
+  this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
+  this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
+  this.addCmd( 'loadjs', function(at){ return new LoadJs().start(at); } );
+  this.addCmd( 'hashcmd', function(at){return new HashCmd().start(at);});
+  this.parse= function(taval){
+    var args= taval.split('\n').pop().split(' '), res=this._='';
+    var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
+    if (!fn) fn= this.assets[args[0].toLowerCase()];
+    if (fn) this._= this.crWrap( fn(args) );
+    return (fn)? true : false;
+  }
+  this.crWrap= function(s){ return '\n'+s+'\n'; }
+  this.init= function(){
+    this.assets['defcmd']= function(at){
+      if (at.length < 3) return 'syntax: defcmd name class';
+      var $cn= at[2];
+      $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
+      return 'ok';
+    }
+    this.addCmd( 'help', function(at){ 
+      var s=''; for (var m in $ce.assets) s+=' '+m;
+      return 'available commands:'+s;
+    } );
+    return this;
+  }
+}
+//-----
+pkg.PkgTool=function(){
+  this.start= function(pkg, at){
+    for (var m in pkg) if (m.match(/^[A-Z]/))
+      window[m]=pkg[m];
+    if (at) for (var i=0,st=new Sto(); (i<at.length) && (st.isOk); i++)
+      st.lo.setItem( at[i].name, at[i].text );
+    if (at) this.ceParse( at[0] );
+  }
+  this.ceParse= function(ci){
+    if (ci.name != 'pkg.startup') return;
+    for (var i=0,sl=new StoLog('pt.log'), at=ci.text.split('\n');i<at.length;)
+      $ce.parse( sl.log(at[i++]) );
+  }
+}
+pkg.LoadJsc=function(){
+  this.start=function(at){
+    var $fn=function(){ new (window['CeStarter'+at[1]])().start(pkg); };
+    return ['Ok',new SnCurly().start( at[1], at[2], $fn )][0];
+  }
+}
+pkg.LoadJs= function(){
+  this.start=function(at){ return ['Ok',new SnLiteLoader().loadJs( at[1] )][0] }
+}
+//----
+pkg.CurlyStarter= function(){
+  new AppTool().inherit( this, AppTool );
+  new AppTool().inherit( this, TaApp );
+  var $t= this;
+  this.ver= pkg622.ver;
+  this.cmdEngine= new CmdEngine().init();
+  this.start= function(){
+    this.sl= new StoLog('err.log');
+    window.onerror= function(e,u,l){ $t.sl.log(e) }
+    document.title= 'CETB'
+    this.addEl('textarea').cols= 40;
+    this._.onkeypress= this.doTa;
+    this.addEl('br');
+    setTimeout( function(){ new CmdAutostart().start($ce) }, 400 );
+  }
+  this.enterFcn= function(ta){
+    var s=ta.value.split('\n').pop().toLowerCase();
+    if (s=='ver') return '\n'+this.ver+'\n';
+    if (this.cmdEngine.parse(ta.value)) return this.cmdEngine._;
+    return '\nError - Valid Commands: ver, help \n';
+  }
+}
+new pkg.PkgTool().start(pkg);
+
+///////////////////////////
+//9900.txt
+//8-26-2016 jchoy
+pkg= pkg9900= { ver:'1.211' }; //TabKey.mo, dirtybit
+
+//----
+TabKey=function (){
+  this.morph=function(tbl){
+    this.mpn= new StoTabBud().mpn;
+    for (var i=0, ae= tbl.getElementsByTagName('a'); i<ae.length; i++) this.mo(ae[i]);
+  }
+  this.mo= function(el){
+    if ( (el.at=el.href.split('#://key/')).length<2 ) return;
+    var key= el.at[1].split('/')[0];
+    el.innerHTML= 'key='+key;
+    var aa= this.mpn(el, 3).getElementsByTagName('a');
+    for (var i=0, val= el.at[1].substr(key.length+1); i<aa.length; i++)
+        aa[i].href= aa[i].href.replace('%7B'+key+'/%7D', val);
+  }
+}
+pkg.CsvBud=function(){
+  new AppTool().inherit( this, AppTool );
+  this.asset= [['name','link','search','note'],['hello'],['phone']];
+  this.getSto= function(){ if (!this.sto)this.sto=new Sto(); return this.sto }
+  this.getAsset= function(fn){
+    if ((!this.getSto().isOk) || (!fn)) return;
+    var sf= this.sto.lo.getItem(fn), aa=[], i=0;
+    if ((sf) && (sf.charAt(0)=='"')) return this.getAssetQ(sf);
+    if (sf) for (var at=sf.split('\n'),x=this.asset=aa; i<at.length; i++)
+      aa.push( at[i].split(',') );
+  }
+  this.getAssetQ= function(sf){
+    for (var i=0,at=sf.split('\n'),x=this.asset=[]; i<at.length; i++)
+      this.asset.push( at[i].substr(1,at[i].length-2).split('","') );
+  }
+  this.saveAsset= function(){
+    if (!this.getSto().isOk) return;
+    var ar=[];
+    for (var i=0,at=this.asset; i<at.length; i++) ar.push('"'+at[i].join('","')+'"');
+    this.sto.lo.setItem( this.fn, ar.join('\n') );
+  }
+  this.assetVal= function(row,col,val){
+    if (row>=this.asset.length) return '';
+    if (typeof(val)!=='undefined') this.asset[row][col]= val;
+    return (col>=this.asset[row].length)? '':this.asset[row][col];
+  }
+}
+pkg.StoTabEnv= function(){
+  new AppTool().inherit( this, CsvBud );
+  this.asset= [];
+  this.fileName= 'tabenv.csv';
+  this.exp= function(so){
+    if (!this.getSto().isOk) return so;
+    var res=so, i1=this.getAsset(this.fileName);
+    for (var i=1, ae=this.asset; i<ae.length; i++)
+      res=res.replace('{'+ae[i][0]+'}',ae[i][1]);
+    return res;
+  }
+}
+pkg.StoTabBud= function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.stoEnv= new StoTabEnv();
+  this.mpn= function(el,n){
+    for (var i=0,x=this._=el; i<n; i++) this._=this._.parentNode;
+    return this._;
+  }
+  this.vForm= function( ar0 ){
+    var fm= this.addEl('form');
+    fm.parentNode.removeChild(fm).count= ar0.length;
+    fm.clearForm= function(){
+      var res= [];
+      for (var i=0; i<this.count; i++) res.push(this['tb'+i].value);
+      for (var i=0; i<this.count; i++) this['tb'+i].value='';
+      return res;
+    }
+    return fm;
+  }
+  this.prepForm= function( r0 ){
+    var am, tbl2= this.addEl('table', this.vForm(r0));
+    for (var r,i=0; i<r0.length; i++){
+      (r= tbl2.insertRow(i)).insertCell(0).innerHTML= r0[i].split(':')[0];
+      this.addEl('input',r.insertCell(1)).name= 'tb'+i;
+      if (am=r0[i].match(/:(\d+)/)) this._.size= parseInt(am[1]);
+    }
+    var btn, ce= tbl2.insertRow().insertCell(0);
+    this.prepButton(this.addEl('input',ce.parentNode.insertCell(1)),'Add Row');
+    this.prepButton(this.addEl('input',ce.parentNode.cells[1]),'Del Row');
+    this.prepButton(this.addEl('input',ce.parentNode.cells[1]),'Add Col');
+    return tbl2.parentNode;
+  }
+  this.prepButton= function( btn, val ){
+    btn.type= "button";
+    btn.value= val;
+    btn.onclick= function(){ $t.doButton(this) }
+  }
+  this.autoLink= function( el, so ) {
+    var sh= this.stoEnv.exp( so );
+    el.innerHTML= (sh.match(/^.+\:\/\//))? sh.replace(/\//g,'/ ').link(sh) : sh; 
+    if (sh.length>60) el.width="300";
+  }
+  this.insertAfter= function(nu,ref,par)
+   { par.insertBefore(nu,ref);  par.insertBefore(ref,nu); }
+  this.doButton= function( el ){
+    var tbl=this.mpn(el.form,5), nn=el.form.rowNum+1;
+    while (tbl.rows.length>0) tbl.deleteRow(0);
+    if (el.value=="Add Row")
+      this.asset.splice( nn, 0, el.form.clearForm());
+    if (el.value=="Del Row") this.asset.splice( nn-1, 1 );
+    if (el.value=="Add Col") 
+      { this.asset[0].push('New'); tbl.rForm=this.prepForm(this.asset[0]); }
+    this.fillTable( tbl, this.saveAsset(), el.form.rowNum=null );
+  }
+}
+pkg.StoTab=function(){
+  new AppTool().inherit( this, StoTabLo );
+  var $t= this;
+  this.fn= "tabtemp_web.csv";
+  this.webGet= function(url){
+    var $tbl, url=this.stoEnv.exp(url);
+    var i1=this.asset=[['loading...']], ttl= url.split(/[\/\=]/).pop();
+    if (!document.title) document.title= ttl;
+    ($t.lm=new LinkMaker()).wrapCloser($tbl=this.addEl('table'),0,ttl);
+    var i2=window.pkg=null, i3=this.fillTable($tbl);
+    this.prepSn().start( url, 'pkg', function(){
+      $t.asset= window.pkg.asset; $tbl.deleteRow(0); $t.fillTable($tbl); } );
+  }
+  this.prepSn= function(){
+    var sn= new SnCurly(); 
+    return [sn, sn.textPkgUrl="{0}", sn.cfgJsLoader=function(){}][0];
+  }
+}
+pkg.StoTabLo=function(){
+  new AppTool().inherit( this, StoTabBud );
+  new AppTool().inherit( this, CsvBud );
+  var $t= this;
+  this.da= new DomAni();
+  this.start= function(at){
+    if (at[1]=='/web') return ['ok',this.webGet( at[2] )][0];
+    var tbl, x=this.getAsset( this.fn= at[1] );
+    ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,at[1]);
+    return ['ok', this.fillTable(tbl)][0];
+  }
+  this.fillTable= function(tbl){
+    for (var i=0,at=this.asset; i<at.length; i++)
+      for (var j=0,r=tbl.insertRow(i); j<at[i].length; j++)
+        this.autoLink( r.insertCell(j), (i==0)?at[i][j].split(':')[0]:at[i][j] );
+    new TabKey().morph(tbl);
+    for (var i=0,at=tbl.rows; i<at.length; i++) this.prepRow(at[i],i);
+    tbl.rows[0].style.backgroundColor= 'lightgray';
+    tbl.border='1';
+    tbl.style.borderCollapse= 'collapse';
+    tbl.rForm= this.prepForm(this.asset[0] );
+  }
+  this.prepRow= function(row,i){
+    this.addEl( 'div',row.insertCell(0) ).innerHTML= i;
+    this._.style.backgroundColor= 'lightgray';
+    this._.onclick= this.rowClick;
+  }
+  this.rowClick= function(){
+    var ii, tbl= $t.mpn(this,4), ap= tbl.rForm.clearForm();
+    if ((ii=tbl.rForm.rowNum) && (ap.join('')!=$t.asset[ii].join(''))) {
+        for (var r=tbl.rows[ii]; r.cells.length>1;) r.deleteCell(1);
+        for (var j=0; j<ap.length; j++) 
+          $t.autoLink( tbl.rows[ii].insertCell(j+1), $t.assetVal(ii,j,ap[j]) );
+        $t.saveAsset( tbl.deleteRow(ii+1) );
+        new TabKey().morph(tbl);
+    }
+    for (var i=0,at=tbl.rows; i<at.length; i++) if (at[i].isAux) tbl.deleteRow(i);
+    $t.putForm( $t.addEl('tr',tbl).insertCell(), tbl.rForm, this );
+  }
+  this.putForm= function( ce, fm, elc ){
+    var n2= fm.rowNum= parseInt(elc.innerHTML), i3=this.da.pinchOpen;
+    this.insertAfter(ce.parentNode,$t.mpn(elc,2), $t.mpn(elc,3));
+    ce.setAttribute( 'colspan', fm.count+1);
+    this.lm.wrapCloser( fm, ce.parentNode.isAux=true );
+    if (i3) {$t.da.pinchOpen(fm.parentNode, ce)
+    } else {ce.appendChild(fm.parentNode)}
+    for (var i=0; i<fm.count; i++) fm['tb'+i].value= $t.assetVal(n2,i);
+  }
+}
+
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:"defcmd tab StoTab"
+ }
+,{ name:"pkg9900notes"
+   ,text:"v"+pkg.ver
+ }
+]
+pkg.CeStarter9900=function(){
+  var $p=pkg9900;
+  this.start=function(){ new PkgTool().start($p, $p.contents); }
+}
+new PkgTool().start(pkg);
+
+///////////////////////////
+//9901.txt
+//8-23-2016 jchoy 
+pkg= pkg9901= { ver:'0.271' }; //column dir
+
+//-----
+StoDir=function (){
+  this.start=function(ap){
+    var mz, at=[], mat=(ap.length>1)?ap[1]:null;
+    for (var m in localStorage) 
+      if ((!mat) || (m.indexOf(mat)>=0)) at.push(m);
+    mz=at.sort(function(a,b){return (a.length>b.length)?-1:1})[0];
+    for (var i=0, sz=mz.replace(/./g,' '); i<at.length; i++)
+      at[i]= (at[i]+sz).substr(0,sz.length);
+    return at.sort().join('  ');
+  }
+}
+pkg.Pulse=function(){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.start= function(at){
+    this.tsNum = (at.length>1)? at[1] : 'default';
+    if (typeof(w_pulse) === 'undefined') w_pulse= {};
+    new OurStatus().start(['','w_pulse','status_'+this.tsNum]);
+    return ['ok (v1.258)', this.sendPing()][0];
+  }
+  this.sendPing= function(){
+    w_pulse['status_'+this.tsNum] = this.hiliteText('OFFLINE','red');
+    this.loadJs( this.tsNum );
+    setTimeout( function(){ $t.sendPing() }, 60*1000 );
+  }
+  this.hiliteText= function(s,bgclr){ return '<span style="background-color:'+bgclr+'">'+s+'</span>' }
+  this.gotNewPkg= function(){ w_pulse['status_'+this.tsNum] =this.hiliteText('connected','lime'); }
+}
+
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:"defcmd dir StoDir\ndefcmd pulse Pulse"
+ }
+,{ name:"pkg9901notes"
+   ,text:"v"+pkg.ver
+ }
+]
+pkg.CeStarter9901=function(){
+  var $p=pkg9901;
+  this.start=function(){ new PkgTool().start($p, $p.contents); }
+}
+new PkgTool().start(pkg);
+
+///////////////////////////
+//9902.txt
+//8-22-2016 jchoy
+pkg=pkg9902= {ver:'v0.234'} //limit, Sto2Rip
+
+pkg.OurStatus=function (){
+  new AppTool().inherit( this, AppTool );
+  var $t= this;
+  this.hist=[''];
+  this.start= function(at){
+    this.gName= at[1]; this.pName= at[2];
+    var outerDiv= this.addEl( 'div' );
+    this.addEl('span', outerDiv).innerHTML= '[x] ';
+    this._.onclick= function(){ outerDiv.parentNode.removeChild(outerDiv) }
+    this.span = this.addEl('span', outerDiv);
+    return ['ok',this.update()][0];
+  }
+  this.update= function(){
+    if (!document.contains(this.span)) return;
+    this.hist.unshift( window[this.gName][this.pName] );
+    if (this.hist.pop() != this.hist[0]) new DomAni().odoChange(this.span, this.hist[0]);
+    setTimeout( function(){$t.update()}, 2000 ); 
+  }
+}
+//----
+pkg.DomAni= function(){
+  var $raf=requestAnimationFrame;
+  this.odoChange= function( el, s ){
+    var n=0, z=el.offsetHeight, es=el.style, x= el.parentNode.style.overflow= 'hidden';
+    (function fa(){ es.top=n--; $raf((n>-z)?fa:fm);})(es.position='relative')
+    function fm(){ el.innerHTML=s; fb() }
+    function fb(){ es.top=n++; $raf((n<0)?fb:fz) }
+    function fz(){ es.position='static' }
+  }
+  this.pinchOpen= function( el, pr ){
+    var $ph=pr.appendChild(document.createElement('div')), z=el.offsetHeight;
+    var w=$ph.appendChild(el), v= el.position='relative';
+    this.pinchRaf( $ph.style, -5, 1, function(v){return v<z},
+      function(){ pr.insertBefore(el,$ph); pr.removeChild($ph) } );
+  }
+  this.pinchRaf= function( es, dz, za, fc, fz ){
+    var z=za, x= es.overflow= 'hidden';
+    (function fa(){ es.height=z-=dz; $raf( (fc(z))? fa:fz );})()
+  }
+  this.pinchDel= function( el ){
+    var $ph= el.parentNode.insertBefore(document.createElement('div'),el);
+    var dz, z=el.offsetHeight, es=$ph.style, x= $ph.style.overflow= 'hidden';
+    $ph.appendChild(el); dz= (z>20)?5:2; 
+    (function fa(){ es.height=z-=dz; $raf((z>1)?fa:fz);})(el.position='relative')
+    function fz(){ $ph.parentNode.removeChild($ph) }
+  }
+  this.fadeDel= function( el ){
+    this.fadeOut( el, function(){ el.parentNode.removeChild(el) }, el.style.opacity=0.8 ) }
+  this.fadeChange= function( el, s ){
+    this.fadeOut(el, function(){ el.innerHTML=s; $t.fadeIn(el) }, el.style.opacity=1 ); }
+  this.fadeIn= function( el, fnz ){
+    (function fr(){ el.style.opacity-= -.01; $raf((el.style.opacity<1)?fr:fnz) })(); }
+  this.fadeOut= function( el, fnz ){
+    (function fr(){ el.style.opacity-= .01; $raf((el.style.opacity>0)?fr:fnz);})() }
+  this.delEl= function(el){ this.pinchDel(el) }
+}
+//----
+pkg.Sto2Rip= function(){
+  new AppTool().inherit( this, SnLiteLoader );
+  new AppTool().inherit( this, CsvBud );
+  this.sendPkgUrl= "http://rip.okdaily.com/mad/textStore.php?f=set&i={0}";
+  this.maxlen= 500;
+  this.sto= new Sto();
+  this.start= function (ap){
+    if (!this.sto.isOk) return 'err - old browser not supported';
+    this.getAssetQ( this.sto.lo.getItem(ap[1]) );
+    var len= JSON.stringify(this.asset).length, mx=this.maxlen;
+    if (len>mx) return 'err - size '+len+' over limit '+mx;
+    this.sendPkg( {asset:this.asset}, ap[2] );
+    return 'ok';
+  }
+}
+
+pkg.contents=[
+ { name:"pkg.startup"
+   ,text:"defcmd statbox OurStatus\ndefcmd saverip Sto2Rip"
+ }
+,{ name:"pkg9902notes"
+   ,text:"v0.223\n8/20/2016\nSto2Rip, DomAni.pinchOpen, delEl"
+ }
+]
+pkg.CeStarter9902=function(){
+  var $p=pkg9902, $su=pkg9902.contents[0];
+  this.start=function(){
+    new PkgTool().start($p, $p.contents);
+    $ce.parse( $su.text );
+  }
+}
+new PkgTool().start(pkg);
+
+///////////////////////////
+/*
+#suggested startup file
+link . USB Started at $date
+#link https://dl.dropboxusercontent.com/u/28448395/projects/lipao-ce/twigbud.htm?js=619&cts=621,622
+link http://lipaotwig-jcc9.c9users.io/twigbud.html?js=619&cts=622,621,623
+link twigbud.html?js=619&cts=621,622,623
+#link http://ide.c9.io/jcc9/lipaotwig
+#link https://www.dropbox.com/home/Public/projects/lipao-ce/js
+#link https://github.com/YatneEigenCode/dentre-ortega/tree/master/guptinal-i/jsto/cmdEngine-twigbud
+defcmd gbo GrabBagLoop
+#loadjsc 9901 StoDir
+#loadjsc 9902 OurStatus
+#loadjsc 9900 StoTab
+sleep 1
+gbo foo hello
+statbox w_grabBag foo
+#loadjsc 625 GrabBag
+sleep 1
+tab links.csv
+link . done
+*/
