@@ -1,0 +1,55 @@
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+<title>CT</title>
+<table></table>
+
+<script src=http://rip.okdaily.com/f/toy/lipao-ce/js/ts604.js></script>
+<script xsrc=js/ts604.js></script>
+<script>
+//1-13-17 jchoy CmdTable
+//——
+function CmdTable(){
+  new SnAppFdn().inherit( this, SnLiteLoader );
+  this.ver= '0.129';
+  this.init= function(tbl){
+    for (var m in this) tbl[m]= this[m];
+    tbl.border = "1";
+    tbl.style.borderCollapse= 'collapse';
+    this.addEl('input',tbl.writeRow('$')).size=55;
+    this._.onkeypress= function(){ tbl.doTxInput(this) };
+  }
+  this.writeRow= function(s, rn){
+    var cell= this.insertRow(rn?rn:0).insertCell(0);
+    return [cell, cell.innerHTML= s][0];
+  }
+  this.doTxInput= function(tx){
+    if (event.keyCode != 13) return;
+    this.writeRow( this.doCmd(tx.value), 1, tx.value='' );
+  }
+  this.doCmd= function( s ){
+    var at= s.split(' ');
+    if (at[0] == 'version') return this.ver;
+    if (at[0] == 'link')
+      return this.midcate(at[1],15).link(at[1]);
+    if (at[0] == 'loadjs')
+      return [this.loadJs(at[1]), 'loading '+at[1]][1]; 
+    return "error: "+s;
+  }
+  this.midcate= function(s, l2){
+    return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s;
+  }
+}
+//——
+function Starter(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  this.start= function(){
+    this.ignite( "table", CmdTable );
+  }
+  this.ignite= function( elOrTag, cls ){
+    if (typeof(elOrTag)!=="string") return new cls().init(elOrTag);
+    for (var i=0,at=this.gebtn(elOrTag); i<at.length; i++)
+      this.ignite( at[i], cls );
+  }
+  this.gebtn= function(t){ return document.getElementsByTagName(t) }
+}
+new Starter().start();
+</script>
