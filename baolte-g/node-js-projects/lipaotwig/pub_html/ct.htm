@@ -6,33 +6,39 @@
 <script xsrc=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
+//1-14-17 jchoy v0.134 writeRow multicols
 //——
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
-  this.ver= '0.129';
+  this.ver= '0.134';
   this.init= function(tbl){
     for (var m in this) tbl[m]= this[m];
     tbl.border = "1";
     tbl.style.borderCollapse= 'collapse';
     this.addEl('input',tbl.writeRow('$')).size=55;
     this._.onkeypress= function(){ tbl.doTxInput(this) };
+    this._.parentNode.colSpan = 2;
   }
-  this.writeRow= function(s, rn){
-    var cell= this.insertRow(rn?rn:0).insertCell(0);
-    return [cell, cell.innerHTML= s][0];
+  this.writeRow= function(s){
+    var cell, row= this.insertRow(this.rows.length?1:0);
+    for (var i=0; i<arguments.length; i++)
+      (cell= row.insertCell(i)).innerHTML= arguments[i];
+    return cell;
   }
   this.doTxInput= function(tx){
     if (event.keyCode != 13) return;
-    this.writeRow( this.doCmd(tx.value), 1, tx.value='' );
+    this.writeRow( tx.value, this.doCmd(tx.value, tx.value='') );
   }
   this.doCmd= function( s ){
-    var at= s.split(' ');
+    return this.doCmd00( s.split(' ') );
+  }
+  this.doCmd00= function( at ){
     if (at[0] == 'version') return this.ver;
     if (at[0] == 'link')
       return this.midcate(at[1],15).link(at[1]);
     if (at[0] == 'loadjs')
       return [this.loadJs(at[1]), 'loading '+at[1]][1]; 
-    return "error: "+s;
+    return "error: "+at.join(' ');
   }
   this.midcate= function(s, l2){
     return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s;
