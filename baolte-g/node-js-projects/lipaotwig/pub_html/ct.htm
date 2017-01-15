@@ -7,10 +7,11 @@
 <script>
 //1-13-17 jchoy CmdTable
 //1-14-17 jchoy v0.134 writeRow multicols
-//——
+//1-14-17 jchoy v0.138 LocalJs
+//——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
-  this.ver= '0.134';
+  this.ver= '0.138';
   this.init= function(tbl){
     for (var m in this) tbl[m]= this[m];
     tbl.border = "1";
@@ -27,7 +28,8 @@ function CmdTable(){
   }
   this.doTxInput= function(tx){
     if (event.keyCode != 13) return;
-    this.writeRow( tx.value, this.doCmd(tx.value, tx.value='') );
+    var cell= this.writeRow( tx.value, this.doCmd(tx.value) );
+    this.igniteDiv(cell, tx.value='');
   }
   this.doCmd= function( s ){
     return this.doCmd00( s.split(' ') );
@@ -38,13 +40,38 @@ function CmdTable(){
       return this.midcate(at[1],15).link(at[1]);
     if (at[0] == 'loadjs')
       return [this.loadJs(at[1]), 'loading '+at[1]][1]; 
+    if (at[0] == 'localjs') return "<div ignite=LocalJs />"; 
     return "error: "+at.join(' ');
   }
   this.midcate= function(s, l2){
     return (s.length>l2+l2)? [s.substr(0,l2),s.substr(-l2)].join(' ... ') : s;
   }
+  this.igniteDiv= function( cell ){
+    var ig, at= cell.getElementsByTagName("div");
+    if ((at.length>0) && (ig= at[0].getAttribute("ignite")))
+      new Starter().ignite( at[0], window[ig] );
+  }
 }
-//——
+//——-
+function LocalJs(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  var $t= this;
+  this.init= function(el){
+    for (var m in this) el[m]= this[m];
+    this.addEl( 'input', el ).type= 'file';
+    this._.onchange= function(){$t.useFile(this.files)};
+  }
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ $t.useFileContents(evt) }
+    fr.readAsDataURL(files[0]);
+  }
+  this.useFileContents= function(evt){
+    eval( atob(evt.target.result.substr(28)) );
+  }
+}
+//——-
 function Starter(){
   new SnAppFdn().inherit( this, SnAppFdn );
   this.start= function(){
