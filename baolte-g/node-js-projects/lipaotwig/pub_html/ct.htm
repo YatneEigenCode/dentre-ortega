@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-16-17 jchoy v0.158 CmdMod02
+//1-16-17 jchoy v0.168 help.txt
 //——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.158';
+  this.ver= '0.168';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -29,6 +29,7 @@ function CmdTable(){
     var cell, row= this.insertRow(this.rows.length?1:0);
     for (var i=0; i<arguments.length; i++)
       (cell= row.insertCell(i)).innerHTML= arguments[i];
+    row.style.verticalAlign= 'top';
     return cell;
   }
   this.doTxInput= function(tx){
@@ -62,8 +63,10 @@ function CmdMod01(cap){
 function CmdMod02(){
   this.doCmd= function( at ){
     var at0= at[0].toUpperCase();
-    if (at0 == 'TYPE')
-      return tmpfs.read( at[1] );
+    if (at0 == 'HELP')
+      return this.doCmd(['cat','help.txt']);
+    if (at0 == 'CAT')
+      return '<pre>'+tmpfs.read( at[1] )+'</pre>';
     if (at0 == 'WRITE'){
       var res= at.slice(2,99).join(' ')
       return [tmpfs.write(at[1], res), at[1]+' '+res.length][1];
@@ -142,6 +145,12 @@ function Starter(){
     tmpfs.write( 'cmdmods.txt','CmdMod01' );
     tmpfs.append( 'cmdmods.txt','\nCmdMod02' );
     this.ignite( "table", CmdTable );
+    tmpfs.write( 'help.txt','ver - app version'
+      +'\nlink [url] - create hyperlink'
+      +'\nloadjs [url] - src js file'
+      +'\nlocaljs - file button to load js file'
+      +'\ncat, write, append, ls - file operations' );
+    tmpfs.write( 'todo.txt','type multiline' );
   }
 }
 new Starter().start();
