@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-16-17 jchoy v0.168 help.txt
+//1-19-17 jchoy v0.169 localTxt
 //——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.168';
+  this.ver= '0.169';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -76,6 +76,16 @@ function CmdMod02(){
       return [tmpfs.append(at[1], res), at[1]+' '+res.length][1];
     }
     if (at0 == 'LS') return tmpfs.list(', '); 
+  }
+}
+//——-
+function LocalTxt(){
+  new SnAppFdn().inherit( this, LocalJs );
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ tmpfs.write(files[0].name, evt.target.result) }
+    fr.readAsText(files[0]);
   }
 }
 //——-
