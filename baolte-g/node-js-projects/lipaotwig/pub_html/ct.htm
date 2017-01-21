@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-19-17 jchoy v0.169 localTxt
+//1-20-17 jchoy v0.175 localTxt, TmpFS.log, cmdhist.txt
 //——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.169';
+  this.ver= '0.175';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -18,7 +18,7 @@ function CmdTable(){
     for (var m in this) tbl[m]= this[m];
     tbl.border = "1";
     tbl.style.borderCollapse= 'collapse';
-    this.addEl('input',tbl.writeRow('$')).size=55;
+    this.addEl('input',tbl.writeRow('$')).size=45;
     this._.onkeypress= function(){ tbl.doTxInput(this) };
     this._.parentNode.colSpan = 2;
     this._.focus();
@@ -38,9 +38,10 @@ function CmdTable(){
     this.igniteDiv(cell, tx.value='');
   }
   this.doCmd= function( s ){
+    tmpfs.log('cmd',s);
     for (var res,at=s.split(' '),i=0; i<this.cmdMods.length; i++)
       if (res= this.cmdMods[i].doCmd( at )) return res;
-    return "error: "+s;
+    return "<font color=red>error: "+s+"</font>";
   }
 }
 //——-
@@ -53,6 +54,9 @@ function CmdMod01(cap){
     if (at0 == 'LOADJS')
       return [this.cap.loadJs(at[1]), 'loading '+at[1]][1]; 
     if (at0 == 'LOCALJS') return "<div ignite=LocalJs />"; 
+    if (at0 == 'LOCALTXT') return "<div ignite=LocalTxt />";
+    if (at0 == 'EVAL') return (!tmpfs.exist(at[1]))? 'not found' :
+        [eval(tmpfs.read(at[1])), at[1]][1];
   }
   this.addCmdMods= function( fn, cap ){
     for (var i=0,at= tmpfs.read(fn).split('\n'); i<at.length; i++)
@@ -72,7 +76,8 @@ function CmdMod02(){
       return [tmpfs.write(at[1], res), at[1]+' '+res.length][1];
     }
     if (at0 == 'APPEND'){
-      var res= at.slice(2,99).join(' ')
+      var pm= (at[2]=='/c')? ['',3] : ['\n',2];
+      var res=  pm[0]+at.slice(pm[1],99).join(' ')
       return [tmpfs.append(at[1], res), at[1]+' '+res.length][1];
     }
     if (at0 == 'LS') return tmpfs.list(', '); 
@@ -102,18 +107,19 @@ function LocalJs(){
     if (files.length==0) return;
     var fr= new FileReader();
     fr.onload= function(evt){ $t.useFileContents(evt) }
-    fr.readAsDataURL(files[0]);
+    fr.readAsText(files[0]);
   }
   this.useFileContents= function(evt){
-    eval( atob(evt.target.result.substr(28)) );
+    eval( evt.target.result );
   }
 }
 //——-
 function TmpFs(){
   this.files= {};
+  this.logGroups= {log:'log.txt', err:'err.txt', cmd:'cmdhist.txt'};
   this.getInst= function(){
     if (!window['tmpfs']) tmpfs= this;
-    return tmpfs;
+    return [tmpfs,window.onerror= function(s){ tmpfs.log('err',s); }][0];
   }
   this.exist= function(fn){ return (this.files[fn])? true:false; }
   this.read= function(fn){ return this.files[fn]; }
@@ -127,6 +133,12 @@ function TmpFs(){
     var res=[];
     for (var m in this.files) res.push(m);
     return res.sort().join( sep );
+  }
+  this.log= function( grp, s ){
+    for (var m in this.logGroups) if (grp==m) (function(fn,t){
+        if (!t.exist(fn)) t.write(fn,'');
+        t.append( fn, new Date().toLocaleString()+' '+s+'\n' ); }
+      )(this.logGroups[m], this);
   }
 }
 //——-
@@ -151,7 +163,7 @@ function Bic(){
 function Starter(){
   new SnAppFdn().inherit( this, Bic );
   this.start= function(){
-    new TmpFs().getInst().write( 'log.txt', new Date() );
+    new TmpFs().getInst().log( 'log', 'start' );
     tmpfs.write( 'cmdmods.txt','CmdMod01' );
     tmpfs.append( 'cmdmods.txt','\nCmdMod02' );
     this.ignite( "table", CmdTable );
@@ -159,8 +171,9 @@ function Starter(){
       +'\nlink [url] - create hyperlink'
       +'\nloadjs [url] - src js file'
       +'\nlocaljs - file button to load js file'
+      +'\nlocaltxt, eval'
       +'\ncat, write, append, ls - file operations' );
-    tmpfs.write( 'todo.txt','type multiline' );
+    tmpfs.write( 'todo.txt','edit, clear, live, feed' );
   }
 }
 new Starter().start();
