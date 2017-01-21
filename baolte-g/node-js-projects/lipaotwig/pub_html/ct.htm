@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-20-17 jchoy v0.175 localTxt, TmpFS.log, cmdhist.txt
+//1-20-17 jchoy v0.176 localTxt, TmpFS.log, cmdhist.txt, trunc
 //——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.175';
+  this.ver= '0.176';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -127,7 +127,7 @@ function TmpFs(){
   this.append= function(fn, val){ this.files[fn]+= val; }
   this.trunc= function(fn, len){
     if ((!this.exist(fn)) || (this.files[fn].length<len)) return;
-    this.files[fn]= this.files[fn].substr(0,len);
+    this.files[fn]= this.files[fn].substr(this.files[fn].length-len);
   }
   this.list= function( sep ){
     var res=[];
@@ -137,8 +137,8 @@ function TmpFs(){
   this.log= function( grp, s ){
     for (var m in this.logGroups) if (grp==m) (function(fn,t){
         if (!t.exist(fn)) t.write(fn,'');
-        t.append( fn, new Date().toLocaleString()+' '+s+'\n' ); }
-      )(this.logGroups[m], this);
+        t.append( fn, new Date().toLocaleString()+' '+s+'\n' );
+        t.trunc(fn,10000); })(this.logGroups[m], this);
   }
 }
 //——-
