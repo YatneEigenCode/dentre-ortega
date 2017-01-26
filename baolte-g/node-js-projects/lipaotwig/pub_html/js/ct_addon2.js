@@ -37,6 +37,7 @@ ConfigEditor= function(){
       r.insertCell(0).innerHTML= at[i];
       f[at[i]]=this.addEl('input',r.cells[1]);
     }
+    
     this.pinButton( this.addEl('input',div), f );
   }
   this.pinButton= function(btn, f){
@@ -51,5 +52,35 @@ ConfigEditor= function(){
     }
   }
 }
-
 tmpfs.write( 'cmdmods.txt', 'CmdMod03' );
+
+//===
+//1-25-2017
+CmdMod05= function(){
+  this.doCmd= function(at){
+    var a0=at[0].toUpperCase();
+    if (a0=="FEED") return "<div ignite=TSFeed />"
+  }
+}
+TSFeed= function(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  var $div;
+  this.init= function(div){
+    div.innerHTML= "loading...";
+    for (var m in this) div[m] = this[m];
+    $div= div;
+    div.webget("2411","ts.cfg");
+  }
+  this.webget= function(num, fn){
+    var cfg= JSON.parse(tmpfs.read(fn));
+    tmpfs.addEventListener(this.evtFcn, "FILEMOD");
+    var ur= cfg.readverb.replace("{0}",num);
+    new SnLiteLoader().loadJs( cfg.urlbase+ur );
+  }
+  this.evtFcn= function(ev){
+    $div.innerHTML= ev.message;
+    $div.innerHTML= tmpfs.read( ev.message );
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod05");
+tmpfs.log("log","mr61");
