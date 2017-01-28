@@ -1,4 +1,4 @@
-//1-22-2017 ConfigEditor
+//1-27-2017 TSFeed check ev.message; RunOnce
 //===
 CmdMod03= function(cap){
   this.cap=cap;
@@ -55,13 +55,33 @@ ConfigEditor= function(){
 tmpfs.write( 'cmdmods.txt', 'CmdMod03' );
 
 //===
-//1-25-2017
-CmdMod05= function(){
+CmdMod05= function(cap){
+  this.cap= cap;
   this.doCmd= function(at){
     var a0=at[0].toUpperCase();
     if (a0=="FEED") return "<div ignite=TSFeed />"
+    if (a0=="RUNONCE") return new RunOnce().start(this.cap);
   }
 }
+//===
+RunOnce= function(){
+  var $t= this;
+  this.start= function(cap){
+    this.cap= cap;
+    tmpfs.addEventListener( function(e){$t.onFsMod(e)}, "FILEMOD" );
+    return "setup done";
+  }
+  this.onFsMod= function(ev){
+    if (ev.message !='runonce.txt') return;
+    if (!tmpfs.exist(ev.message)) return;
+    var at= tmpfs.read(ev.message).split("\n");
+    for (var c=this.cap,i=0; i<at.length; i++) {
+      tmpfs.log( "log", "runonce "+at[i] );
+      c.igniteDiv( c.writeRow(at[i],c.doCmd(at[i])) );
+    }
+  }
+}
+//===
 TSFeed= function(){
   new SnAppFdn().inherit( this, SnAppFdn );
   var $div;
@@ -78,9 +98,10 @@ TSFeed= function(){
     new SnLiteLoader().loadJs( cfg.urlbase+ur );
   }
   this.evtFcn= function(ev){
+    if (ev.message != "ts-data.txt") return;
     $div.innerHTML= ev.message;
     $div.innerHTML= tmpfs.read( ev.message );
   }
 }
 tmpfs.write("cmdmods.txt","CmdMod05");
-tmpfs.log("log","mr61");
+tmpfs.log("log","mt69");
