@@ -1,4 +1,4 @@
-//1-27-2017 TSFeed check ev.message; RunOnce
+//1-28-2017 t0.174 TsJs
 //===
 CmdMod03= function(cap){
   this.cap=cap;
@@ -59,7 +59,8 @@ CmdMod05= function(cap){
   this.cap= cap;
   this.doCmd= function(at){
     var a0=at[0].toUpperCase();
-    if (a0=="FEED") return "<div ignite=TSFeed />"
+    if (a0=="FEED") return "<div ignite=TSFeed num="+at[1]+" />"
+    if (a0=="TSJS") return new TsJs().start(at[1]);
     if (a0=="RUNONCE") return new RunOnce().start(this.cap);
   }
 }
@@ -82,14 +83,25 @@ RunOnce= function(){
   }
 }
 //===
+TsJs= function(){
+  new SnAppFdn().inherit( this, SnLiteLoader );
+  this.start= function(num){
+    if (!num) num="2415";
+    var cfg= JSON.parse(tmpfs.read("ts.cfg"));
+    var ur= cfg.readverb.replace("{0}",num);
+    this.loadJs( cfg.urlbase+ur );
+    return "loadjs "+num;
+  }
+}
+//===
 TSFeed= function(){
   new SnAppFdn().inherit( this, SnAppFdn );
   var $div;
   this.init= function(div){
     div.innerHTML= "loading...";
     for (var m in this) div[m] = this[m];
-    $div= div;
-    div.webget("2411","ts.cfg");
+    var res= ($div=div).getAttribute("num");
+    div.webget( (res==="undefined")? "2411":res, "ts.cfg");
   }
   this.webget= function(num, fn){
     var cfg= JSON.parse(tmpfs.read(fn));
@@ -101,7 +113,8 @@ TSFeed= function(){
     if (ev.message != "ts-data.txt") return;
     $div.innerHTML= ev.message;
     $div.innerHTML= tmpfs.read( ev.message );
+    tmpfs.removeEventListener($div.evtFcn, "FILEMOD");
   }
 }
 tmpfs.write("cmdmods.txt","CmdMod05");
-tmpfs.log("log","mt69");
+tmpfs.log("log","t0.174");
