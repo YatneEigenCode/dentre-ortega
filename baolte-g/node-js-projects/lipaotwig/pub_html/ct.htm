@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-21-17 jchoy v0.187 use tbl in addcmdmods
+//1-28-17 jchoy v0.192 RunOnce, EventCom.delEventListener
 //——-
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.187';
+  this.ver= '0.192';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -20,10 +20,10 @@ function CmdTable(){
     tbl.style.borderCollapse= 'collapse';
     this.addEl('input',tbl.writeRow('$')).size=45;
     this._.onkeypress= function(){ tbl.doTxInput(this) };
-    this._.parentNode.colSpan = 2;
-    this._.focus();
+    this._.parentNode.colSpan = [2,this._.focus()][0];
     new CmdMod01().addCmdMods( 'cmdmods.txt', $t );
     tmpfs.addEventListener( function(e){$t.onFsMod(e)}, 'FILEMOD' );
+    new RunOnce().start( $t );
     return this;
   }
   this.onFsMod= function(evt){
@@ -80,6 +80,11 @@ CmdMod02= function(){
       var res= at.slice(2,99).join(' ')
       return [tmpfs.write(at[1], res), at[1]+' '+res.length][1];
     }
+    if (at0 == 'COPY'){
+      if (!tmpfs.exist(at[1])) return ("Not found: "+at[1]).fontcolor("red");
+      if (tmpfs.exist(at[2])) return ("Failed to overwrite: "+at[2]).fontcolor("red");
+      return [tmpfs.write(at[2], tmpfs.read(at[1])), at[2]][1];
+    }
     if (at0 == 'RM'){
       return [(tmpfs.exist(at[1]))?'deleted':'not found',tmpfs.del(at[1])][0];
     }
@@ -121,7 +126,7 @@ function LocalJs(){
     eval( evt.target.result );
   }
 }
-//——-
+//===
 function TmpFs(){
   new SnAppFdn().inherit( this, EventCom );
   this.files= {};
@@ -152,19 +157,43 @@ function TmpFs(){
         t.trunc(fn,10000); })( this.logGroups[m], this );
   }
 }
-//——-
+//===
 function EventCom(){
   this.listeners= {};
   this.alertEvent= function( evtName, tgt, msg ){
     var ls= (this.listeners[evtName])? this.listeners[evtName] :[];
     for (var i=0; i<ls.length; i++) ls[i]( {target:tgt, message:msg} );
   }
+  this.removeEventListener= function( fcn, evtName ){
+    var ls= (this.listeners[evtName])? this.listeners[evtName] :[];
+    for (var i=0; i<ls.length; i++) if (fcn==ls[i]) ls.splice(i,1);
+  }
   this.addEventListener= function( fcn, evtName ){
     if (!this.listeners[evtName]) this.listeners[evtName]=[];
     this.listeners[evtName].push(fcn);
   }
 }
-//——-
+//===
+RunOnce= function(){
+  var $t= this;
+  this.start= function(cap){
+    this.cap= cap;
+    tmpfs.addEventListener( function(e){$t.onFsMod(e)}, "FILEMOD" );
+    var run= cap.cgi( "run", "", location );
+    if (run) tmpfs.write( "runonce.txt", decodeURIComponent(run) );
+    return "setup done";
+  }
+  this.onFsMod= function(ev){
+    if (ev.message !='runonce.txt') return;
+    if (!tmpfs.exist(ev.message)) return;
+    var at= tmpfs.read(ev.message).split("\n");
+    for (var c=this.cap,i=0; i<at.length; i++) {
+      tmpfs.log( "log", "runonce "+at[i] );
+      c.igniteDiv( c.writeRow(at[i],c.doCmd(at[i])) );
+    }
+  }
+}
+//===
 function Bic(){
   new SnAppFdn().inherit( this, SnAppFdn );
   this.midcate= function(s, l2){
@@ -182,7 +211,7 @@ function Bic(){
   }
   this.gebtn= function(t){ return document.getElementsByTagName(t) }
 }
-//——-
+//===
 function Starter(){
   new SnAppFdn().inherit( this, Bic );
   this.start= function(){
