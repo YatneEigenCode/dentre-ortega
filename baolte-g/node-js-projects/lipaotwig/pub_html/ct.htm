@@ -5,12 +5,12 @@
 <script src=js/ts604.js></script>
 <script>
 //1-13-17 jchoy CmdTable
-//1-31-17 jchoy v0.196 tsjs; doTxInput/midcate; addCmdMods/unshift; trim
+//1-31-17 jchoy v0.197 ct.doCmd
 //===
 function CmdTable(){
   new SnAppFdn().inherit( this, SnLiteLoader );
   new SnAppFdn().inherit( this, Bic );
-  this.ver= '0.196';
+  this.ver= '0.197';
   var $t= this;
   this.cmdMods= [ {doCmd: function(at){
       if (at[0].toLowerCase()=='ver') return $t.ver;}} ];
@@ -36,7 +36,13 @@ function CmdTable(){
     row.style.verticalAlign= 'top';
     return cell;
   }
-  this.doTxInput= this.doCmd= function(){} //override this
+  this.doCmd= function( s ){
+    tmpfs.log('cmd',s);
+    for (var res,at=s.split(' '),i=0; i<this.cmdMods.length; i++)
+      if (res= this.cmdMods[i].doCmd( at )) return res;
+    return ("error: "+s).fontcolor("red");
+  }
+  this.doTxInput= function(){} //override this
 }
 //===
 CmdMod01= function(cap){
@@ -49,7 +55,7 @@ CmdMod01= function(cap){
         [eval(tmpfs.read(at[1])), at[1]][1];
   }
   this.addCmdMods= function( fn, cap ){
-    tmpfs.log( 'log', 'addCmdMods' );
+    tmpfs.log( 'log', 'addCmdMods '+fn );
     for (var i=0,at= tmpfs.read(fn).split('\n'); i<at.length; i++)
       cap.cmdMods.unshift( new window[at[i]](cap) );
   }
@@ -158,6 +164,7 @@ function Starter(){
 }
 new Starter().start();
 </script><script>
+/*
 //========================these can be farmed out to local/remote files
 function TmpFsExt(){
   this.start= function(){
@@ -194,14 +201,7 @@ CmdMod3a= function(cap){
     var cell= this.writeRow( this.midcate(tx.value,10), this.doCmd(tx.value) );
     this.igniteDiv(cell, tx.value='');
   }
-  this._doCmd= function( s ){
-    tmpfs.log('cmd',s);
-    for (var res,at=s.split(' '),i=0; i<this.cmdMods.length; i++)
-      if (res= this.cmdMods[i].doCmd( at )) return res;
-    return ("error: "+s).fontcolor("red");
-  }
   cap.doTxInput= this.doTxInput;
-  cap.doCmd= this._doCmd;
 }
 tmpfs.write("cmdmods.txt","CmdMod3a");
 CmdMod04= function(cap){
@@ -309,9 +309,9 @@ function LocalJs(){
   }
 }
 tmpfs.write("cmdmods.txt","CmdMod7");
-tmpfs.write("runonce.txt","tsjs 2420");
+//tmpfs.write("runonce.txt","tsjs 2420");
 
-/*
+
 //===2420
 s="lslive$setcookie$CR$joinfiles";
 tmpfs.write("ideas.txt",s.split("$").join(unescape("%0A")));
