@@ -1,0 +1,171 @@
+//========================these can be farmed out to local/remote files
+function TmpFsExt(){
+  this.start= function(){
+    for (var m in this) tmpfs[m]= this[m];
+  }
+  this.del= function(fn){       delete(this.files[fn]); this.alertMod(fn); }
+  this.list= function( sep ){
+    var res=[];
+    for (var m in this.files) res.push(m);
+    return res.sort().join( sep );
+  }
+  this.trunc= function(fn, len){
+    if ((!this.exist(fn)) || (this.files[fn].length<len)) return;
+    this.files[fn]= this.files[fn].substr(this.files[fn].length-len);
+  }
+}
+new TmpFsExt().start();
+CmdMod03= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "TSJS") {
+      if (!tmpfs.exist("ts.cfg")) return "missing ts.cfg";
+      var u,c=JSON.parse(tmpfs.read("ts.cfg"));
+      u=c.readverb.replace("{0}",at[1]);
+      return ["load.."+at[1], cap.loadJs(c.urlbase+u)][0];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod03");
+CmdMod3a= function(cap){
+  this.doCmd= function(at){}
+  this.doTxInput= function(tx){
+    if (event.keyCode != 13) return;
+    var cell= this.writeRow( this.midcate(tx.value,10), this.doCmd(tx.value) );
+    this.igniteDiv(cell, tx.value='');
+  }
+  cap.doTxInput= this.doTxInput;
+}
+tmpfs.write("cmdmods.txt","CmdMod3a");
+CmdMod04= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == 'APPEND'){
+      var pm= (at[2]=='/c')? ['',3] : ['\n',2];
+      var res=  pm[0]+at.slice(pm[1],99).join(' ')
+      return [tmpfs.append(at[1], res), at[1]+' '+res.length][1];
+    }
+    if (at0 == 'LS') return tmpfs.list(', '); 
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod04");
+CmdMod05= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == 'LOCALTXT') return "<div ignite=LocalTxt />";
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod05");
+//===
+function LocalTxt(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  var $t= this;
+  this.init= function(el){
+    for (var m in this) el[m]= this[m];
+    this.addEl( 'input', el ).type= 'file';
+    this._.onchange= function(){$t.useFile(this.files)};
+    return this;
+  }
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ tmpfs.write(files[0].name, evt.target.result) }
+    fr.readAsText(files[0]);
+  }
+}
+
+//===2418
+py={"group":"ts"
+,"urlbase":"./"
+,"readverb":"ts{0}.txt"
+}
+tmpfs.write("ts.cfg",JSON.stringify(py));
+s="loadjs "+py.urlbase+py.readverb.replace("{0}","2417");
+//tmpfs.write("runonce.txt",s);
+
+//===2417
+CmdMod06= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "COPY"){
+      if (!tmpfs.exist(at[1])) return ("Not found: "+at[1]).fontcolor("red");
+      if (tmpfs.exist(at[2])) return ("Failed to overwrite: "+at[2]).fontcolor("red");
+      return [tmpfs.write(at[2], tmpfs.read(at[1])), at[2]][1];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod06");
+//tmpfs.write("runonce.txt","tsjs 2419");
+
+//===2419
+CmdMod9= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "RM"){
+      return [(tmpfs.exist(at[1]))?"deleted":"not found",tmpfs.del(at[1])][0];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod9");
+//tmpfs.write("runonce.txt","tsjs 2421");
+//===
+CmdMod19= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == 'HELP')
+      return "<pre>"+tmpfs.read("help.txt" )+"</pre>";
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod19");
+tmpfs.write( "help.txt","ver - app version"
+      +"\nlink [url] - create hyperlink"
+      +"\nloadjs [url] - src js file"
+      +"\nlocaljs, localtxt - file button to load file"
+      +"\ncat, write, append, rm, ls, eval - file operations" );
+tmpfs.write( "todo.txt","edit, clear, live, feed, serve. ls-col" );
+
+//===2421
+CmdMod7= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "LOCALJS") return "<div ignite=LocalJs />";
+  }
+}
+//===
+function LocalJs(){
+  new SnAppFdn().inherit( this, LocalTxt);
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ eval( evt.target.result ) }
+    fr.readAsText(files[0]);
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod7");
+//tmpfs.write("runonce.txt","tsjs 2420");
+
+
+//===2420
+s="lslive$setcookie$CR$joinfiles";
+tmpfs.write("ideas.txt",s.split("$").join(unescape("%0A")));
+
+CmdMod08= function(cap){
+  this.doCmd= function(at){
+    if (at[0].toUpperCase()=="CLEAR") {
+      while (cap.rows.length>1) cap.deleteRow(1);
+      return "ok";
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod08");
+tmpfs.write("runonce.txt","clear\nver\nlocaltxt");
+
+//===
+CmdMod20= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "LINK")
+      return cap.midcate(at[1],15).link(at[1]);
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod20");
