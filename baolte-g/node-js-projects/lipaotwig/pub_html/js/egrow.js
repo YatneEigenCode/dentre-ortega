@@ -1,12 +1,15 @@
-//2-2-2017 v0.119 EgRowB/onmouseout; shorten; selection, toggle
+//2-3-2017 v0.127 verbClickN, Minzer
+/*
 CmdMod05= function(cap){
   this.doCmd=function(at){
-    if (at[0]=="egrow") return [new EgRowB().init(cap), "ok"][1];
+    if (at[0]=="egrow") return [new EgRow().init(cap), "ok"][1];
   }
 }
 tmpfs.write( "cmdmods.txt", "CmdMod05" );
-tmpfs.log( "log", "m4:egrow" );
-EgRow= function(){
+tmpfs.log( "log", "m4:egrow-b" );
+*/
+EgRowA= function(){
+  this.ver= "0.127";
   this.row0= 1;
   this.init= function(tbl){
     for (var m in this) tbl[m]=this[m];
@@ -25,52 +28,114 @@ EgRow= function(){
     this.insBef(this.rows[i], this.insBef(tt.uxRow,this.rows[i]));
   }
   this.insBef= function(n,o){return o.parentNode.insertBefore(n,o)}
-  this.fillUxCell= function(cel){ cel.innerHTML="od " }
+  this.fillUxCell= function(cel){ cel.innerHTML=". . ." }
 }
-EgRowA= function(){
+EgRowB= function(){
   new SnAppFdn().inherit( this, SnAppFdn );
-  new SnAppFdn().inherit( this, EgRow );
+  new SnAppFdn().inherit( this, EgRowA );
   this.verbs= "esc".split(",");
   this.cfgBgColor= "orange";
   this.fillUxCell= function(cel){
     cel.table= this;
     cel.style.backgroundColor= this.cfgBgColor;
     for (var i=0; i<this.verbs.length; i++) this.mkVerb(this.verbs[i], cel);
+    this.isMore= false;
   }
-  this.verbClick= function(){
-    tmpfs.log("log",this.parentNode.parentNode.rowIndex+"/"+ 
-      this.parentNode.table.rows.length);
-  }
+  this.verbClick= function(){ console.log(this.innerHTML); }
   this.mkVerb= function( v, cel ){
       this.addEl( "span", cel ).innerHTML= v;
       this._.style.padding= "0 10 0 10";
-      var $cbc= this.cfgBgColor;
       this._.onmouseover=function(){this.style.backgroundColor="lightgray"}
-      this._.onmouseout= function(){this.style.backgroundColor=$cbc}
+      this._.onmouseout= function(){this.style.backgroundColor="transparent"}
       this._.onclick= this.verbClick;
+      if (this.isMore) this._.style.display="none";
+      if (this.isMore) this._.isExtra= true;
+      if (v=="...") this.isMore= true;
   }
 }
-EgRowB= function(){
-  new SnAppFdn().inherit( this, EgRowA );
-  this.verbs= "hi-light,remove,re-run,shorten,scroll,graph,min-max,cmd,help,add-note,recent*,...,[-]".split(",");
+EgRowC= function(){
+  new SnAppFdn().inherit( this, EgRowB );
+  this.lastVerbClickNum=0;
   this.verbClick= function(){
     var cel= this.parentNode, t=this.onmouseout();
     var ii= cel.parentNode.rowIndex
-    cel.table.deleteRow(ii);      
-    if (this.innerHTML=="remove") cel.table.deleteRow(ii-1);
-    if (this.innerHTML=="hi-light")
-      cel.table.toggle( cel.table.rows[ii-1].style,"backgroundColor","yellow","transparent" );
-    if (this.innerHTML=="shorten"){
-      var el=cel.table.rows[ii-1].cells[0];
-      el.innerHTML= cel.table.midcate(el.innerHTML,10);
-    }
-    if (this.innerHTML=="re-run"){
-      var c=cel.table,s= cel.table.rows[ii-1].cells[0].innerHTML;
-      c.igniteDiv( c.writeRow(s,c.doCmd(s)) );
-
-    }
+    var cn= this.parentNode.childNodes;
+    if (this.innerHTML == "...") {
+      for (var i=0; i<cn.length; i++)
+        if (cn[i].isExtra) cel.table.toggle( cn[i].style,
+          "display", "none", "inline" );
+      return;
+    } else  cel.table.deleteRow(ii);
+    for (var i=1; i<=cel.table.lastVerbClickNum; i++)
+      cel.table["verbClick"+i](this.innerHTML,ii,cel);
+    for (var i=0; i<cn.length; i++)
+      if (cn[i].isExtra) cn[i].style.display="none";
   }
   this.toggle= function( ob, nm, v1, v2 ){ ob[nm]= (ob[nm]==v1)? v2:v1; }
 }
-//new EgRowB().init( document.getElementsByTagName("table")[0] );
-tmpfs.write( "runonce.txt", "egrow");
+EgRowD= function(){
+  new SnAppFdn().inherit( this, EgRowC );
+  this.verbs= "hi-light,min,remove,add-note,note-add,...".split(",");
+  this.lastVerbClickNum=1;
+  this.verbClick1= function(verb,ii,cel){
+    if (verb=="remove") cel.table.deleteRow(ii-1);
+    if (verb=="hi-light")
+      cel.table.toggle( cel.table.rows[ii-1].style,
+        "backgroundColor","yellow","transparent" );
+  }
+}
+EgRowE= function(){
+  new SnAppFdn().inherit( this, EgRowD );
+  this.lastVerbClickNum=2;
+  this.verbClick2= function(verb,ii,cel){
+    var app= cel.table;
+    if (verb=="note-add")
+      app.rows[ii-1].insertCell(0).innerHTML= 
+        prompt("Message:");
+    if (verb=="add-note")
+      app.rows[ii-1].insertCell().innerHTML= 
+        prompt("Message:");
+    if (verb=="min")
+      for (var i=0,at=app.rows[ii-1].cells; i<at.length; i++)
+        new Minzer().init( at[i] );
+  }
+}
+EgRow= function(){
+  new SnAppFdn().inherit( this, EgRowE );
+  this.addVerbs=function(s){
+    for (var i=0,at=s.split(","); i<at.length; i++)
+      this.verbs.push(at[i]);
+  }
+  this.addVerbs("re-run,shorten,graph,scroll,cmd,eggrow?");
+  this.lastVerbClickNum=3;
+  this.verbClick3= function(verb,ii,cel){
+    var app= cel.table;
+    if (verb=="shorten"){
+      var el=app.rows[ii-1].cells[0];
+      el.innerHTML= cel.table.midcate(el.innerHTML,10);
+    }
+    if (verb=="re-run"){
+      var s= app.rows[ii-1].cells[0].innerHTML;
+      app.igniteDiv( app.writeRow(s,app.doCmd(s)) );
+    }
+    if (verb=="eggrow?") 
+      app.rows[ii-1].insertCell().innerHTML= this.ver;
+  }
+}
+Minzer= function(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  this.init=function( el ){
+    this.addEl("div").onclick= this.restore;
+    this._.innerHTML= "[+]".fontcolor("green");
+    this._.asset= el.innerHTML;
+    el.innerHTML="";
+    el.appendChild(this._);
+  }
+  this.restore= function(ev){
+    this.innerHTML= this.asset;
+    ev.stopPropagation();
+    this.onclick=null;
+  }
+}
+//new EgRow().init( document.getElementsByTagName("table")[0] );
+//tmpfs.write( "runonce.txt", "egrow");
