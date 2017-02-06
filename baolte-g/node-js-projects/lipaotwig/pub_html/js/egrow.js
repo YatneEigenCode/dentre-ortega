@@ -1,15 +1,13 @@
-//2-3-2017 v0.127 verbClickN, Minzer
-/*
+//2–5-2017 v0.131 egrowF
 CmdMod05= function(cap){
   this.doCmd=function(at){
-    if (at[0]=="egrow") return [new EgRow().init(cap), "ok"][1];
+    if (at[0]=="egrow") return [new EgRowF().init(cap), "ok"][1];
   }
 }
-tmpfs.write( "cmdmods.txt", "CmdMod05" );
-tmpfs.log( "log", "m4:egrow-b" );
-*/
+//tmpfs.write( "cmdmods.txt", "CmdMod05" );
+//tmpfs.log( "log", "m11:egrow-d" );
 EgRowA= function(){
-  this.ver= "0.127";
+  this.egrow_ver= "0.131";
   this.row0= 1;
   this.init= function(tbl){
     for (var m in this) tbl[m]=this[m];
@@ -41,7 +39,7 @@ EgRowB= function(){
     for (var i=0; i<this.verbs.length; i++) this.mkVerb(this.verbs[i], cel);
     this.isMore= false;
   }
-  this.verbClick= function(){ console.log(this.innerHTML); }
+  this.verbClick= function(){ tmpfs.log("log",this.innerHTML); }
   this.mkVerb= function( v, cel ){
       this.addEl( "span", cel ).innerHTML= v;
       this._.style.padding= "0 10 0 10";
@@ -106,9 +104,18 @@ EgRow= function(){
     for (var i=0,at=s.split(","); i<at.length; i++)
       this.verbs.push(at[i]);
   }
-  this.addVerbs("re-run,shorten,graph,scroll,cmd,eggrow?");
+  this.addVerbs("eggrow?");
   this.lastVerbClickNum=3;
   this.verbClick3= function(verb,ii,cel){
+    if (verb=="eggrow?") 
+      cel.table.rows[ii-1].insertCell().innerHTML= this.egrow_ver;
+  }
+}
+EgRowF= function(){
+  new SnAppFdn().inherit( this, EgRow );
+  this.addVerbs("re-run,shorten,graph,scroll,cmd");
+  this.lastVerbClickNum=4;
+  this.verbClick4= function(verb,ii,cel){
     var app= cel.table;
     if (verb=="shorten"){
       var el=app.rows[ii-1].cells[0];
@@ -118,8 +125,6 @@ EgRow= function(){
       var s= app.rows[ii-1].cells[0].innerHTML;
       app.igniteDiv( app.writeRow(s,app.doCmd(s)) );
     }
-    if (verb=="eggrow?") 
-      app.rows[ii-1].insertCell().innerHTML= this.ver;
   }
 }
 Minzer= function(){
