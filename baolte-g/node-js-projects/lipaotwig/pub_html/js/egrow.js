@@ -1,4 +1,4 @@
-//2–5-2017 v0.131 egrowF
+//2–13-2017 v0.135 re-run text box
 CmdMod05= function(cap){
   this.doCmd=function(at){
     if (at[0]=="egrow") return [new EgRowF().init(cap), "ok"][1];
@@ -7,7 +7,7 @@ CmdMod05= function(cap){
 //tmpfs.write( "cmdmods.txt", "CmdMod05" );
 //tmpfs.log( "log", "m11:egrow-d" );
 EgRowA= function(){
-  this.egrow_ver= "0.131";
+  this.egrow_ver= "0.135";
   this.row0= 1;
   this.init= function(tbl){
     for (var m in this) tbl[m]=this[m];
@@ -113,7 +113,7 @@ EgRow= function(){
 }
 EgRowF= function(){
   new SnAppFdn().inherit( this, EgRow );
-  this.addVerbs("re-run,shorten,graph,scroll,cmd");
+  this.addVerbs("re-run,shorten,graph,scroll,csv2tbl,autolink");
   this.lastVerbClickNum=4;
   this.verbClick4= function(verb,ii,cel){
     var app= cel.table;
@@ -121,9 +121,9 @@ EgRowF= function(){
       var el=app.rows[ii-1].cells[0];
       el.innerHTML= cel.table.midcate(el.innerHTML,10);
     }
-    if (verb=="re-run"){
-      var s= app.rows[ii-1].cells[0].innerHTML;
-      app.igniteDiv( app.writeRow(s,app.doCmd(s)) );
+    if ((verb=="re-run") && (window["tmpfs"])){
+      var tx=app.rows[0].cells[0].getElementsByTagName("input")[0];
+      tx.value= app.rows[ii-1].cells[0].innerHTML;
     }
   }
 }
