@@ -1,4 +1,4 @@
-//2–13-2017 v0.135 re-run text box
+//2–13-2017 v0.136 restore parentNode in Minzer
 CmdMod05= function(cap){
   this.doCmd=function(at){
     if (at[0]=="egrow") return [new EgRowF().init(cap), "ok"][1];
@@ -137,7 +137,7 @@ Minzer= function(){
     el.appendChild(this._);
   }
   this.restore= function(ev){
-    this.innerHTML= this.asset;
+    this.parentNode.innerHTML= this.asset;
     ev.stopPropagation();
     this.onclick=null;
   }
