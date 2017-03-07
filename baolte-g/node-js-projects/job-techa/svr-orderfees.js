@@ -1,4 +1,4 @@
-//3-6-17 jchoy OrderFeesWS, SendOrdersResult
+//3-6-17 jchoy prepOrdersFunds
 var http = require('http');
 var qs = require('querystring');
 var fs = require('fs');
@@ -14,6 +14,7 @@ OrderFeesWS = function(){
   this.sendOrdersResult= function( httpData, apiNum ){
     this.httpOrders= httpData;
     this.calcOrders( false );
+    if (apiNum==2) this.fundDistribution( false );
     return JSON.stringify( (apiNum==1)?
       this.prepOrdersTotal() : this.prepOrdersFunds() );
   }
@@ -28,7 +29,13 @@ OrderFeesWS = function(){
     return res;
   }
   this.prepOrdersFunds= function( ){
-    var res= [{"msg":"NA"}];
+    var res= [];
+    for (var i=0,at=this.orders; i<at.length; i++){
+      var order= { order_number: at[i].number };
+      order.fund_items= at[i].distFunds;
+      res.push( order );
+    }
+    return res;
   }
 }
 
