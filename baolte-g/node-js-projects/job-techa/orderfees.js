@@ -88,6 +88,7 @@ FeeTap= function(data){
 }
 
 Order= function(data){
+  (function(o,c){o.c=c;o.c()})( this, OrderDisplay );
   this.data= data;
   this.distFunds= {};
   this.number= this.data.order_number;
@@ -127,12 +128,11 @@ Order= function(data){
       if (feeTaps[i].isType(item.type))
         feeTaps[i].distributeFunds( item, this.distFunds )
   }
-  new IOBase().inherit( this, IOBase );
-  this.inherit( this, OrderDisplay );
 }
 
 //---IO methods that are data specific
 OrderDisplay= function(){
+  (function(o,c){o.c=c;o.c()})( this, IOBase );
   this.displayOrder= function( div ){
     this.write( "Order Number: "+this.number, div );
     for (var i=0,at=this.pricedItems; i<at.length; i++)
@@ -151,19 +151,22 @@ OrderDisplay= function(){
 
 //---data loading interface
 IOData= function(){
-  this.loadFees= function(){
+  this.loadFees = function( ){
     this.feeTaps= [];
-    var at= JSON.parse( document.getElementById("fees").value );
+    var at= JSON.parse( this.getStringFor("fees") );
     for (var i=0; i<at.length; i++)
       this.feeTaps.push( new FeeTap(at[i]) );
   }
-  this.loadOrders= function(){
+  this.loadOrders= function( ){
     if (!this.feeTaps) this.loadFees();
     this.orders= [];
     this.isRecalcNeeded = true;
-    var at= JSON.parse( document.getElementById("orders").value );
+    var at= JSON.parse( this.getStringFor("orders") );
     for (var i=0; i<at.length; i++)
       this.orders.push( new Order(at[i]) );
+  }
+  this.getStringFor= function(id){
+    return document.getElementById(id).value;
   }
 }
 
