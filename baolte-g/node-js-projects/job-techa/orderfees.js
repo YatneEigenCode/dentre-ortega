@@ -93,7 +93,6 @@ Order= function(data){
   this.distFunds= {};
   this.number= this.data.order_number;
   this.items= this.data.order_items;
-  this.sp2= "&nbsp;&nbsp;";
 
   //---calculate fees for each item in this order
   this.calcFees= function( feeTaps ){
@@ -133,6 +132,7 @@ Order= function(data){
 //---IO methods that are data specific
 OrderDisplay= function(){
   (function(o,c){o.c=c;o.c()})( this, IOBase );
+  this.sp2= "&nbsp;&nbsp;";
   this.displayOrder= function( div ){
     this.write( "Order Number: "+this.number, div );
     for (var i=0,at=this.pricedItems; i<at.length; i++)
@@ -159,11 +159,16 @@ IOData= function(){
   }
   this.loadOrders= function( ){
     if (!this.feeTaps) this.loadFees();
-    this.orders= [];
-    this.isRecalcNeeded = true;
-    var at= JSON.parse( this.getStringFor("orders") );
-    for (var i=0; i<at.length; i++)
-      this.orders.push( new Order(at[i]) );
+    try{
+      this.orders= [];
+      this.isRecalcNeeded = true;
+      var at= JSON.parse( this.getStringFor("orders") );
+      for (var i=0; i<at.length; i++)
+        this.orders.push( new Order(at[i]) );
+    } catch (e) {
+      this.orders= [];
+      this.isRecalcNeeded = false;      
+    }
   }
   this.getStringFor= function(id){
     return document.getElementById(id).value;
