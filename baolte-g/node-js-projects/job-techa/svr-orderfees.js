@@ -70,9 +70,9 @@ OrderFeesAPI= function(){
           var orderBag= new OrderFeesWS();
           orderBag.feeTaps= $svr.fees.feeTaps; //reuse fees data
           var formData = qs.parse(requestBody);
-          var res= orderBag.sendOrdersResult( formData.orders,
+          var out= orderBag.sendOrdersResult( formData.orders,
                 (request.url==$svr.api1)? 1:2 )
-          $svr.sendText( res, 200, res );
+          $svr.sendText( res, 200, out );
         });
       } else $svr.sendText( res, 404, "Not Found" );
     } else if(request.method == "GET") {
