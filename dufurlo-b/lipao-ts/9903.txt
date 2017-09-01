@@ -1,3 +1,5 @@
+//this is out of date
+//see newer updated v0.134 in guptinal-i/jsto/cmdEngine-twigbud
 TabTmpl= function(){
   this.hht= {};
   this.exp= function( el, so, aa ){
