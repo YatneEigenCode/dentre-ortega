@@ -1,3 +1,6 @@
+// These are used in ct.htm, which is located in
+// baolte-g/node-js-projects/lipaotwig/pub_html
+
 ////////// 2417
 CmdMod03= function(cap){
   this.doCmd= function(at){
