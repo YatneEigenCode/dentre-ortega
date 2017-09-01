@@ -1,0 +1,8 @@
+<meta name=viewport content="width=device-width; initial-scale=1.5; maximum-scale=4.0; minimum-scale=0.7;" />
+<script src=http://rip.okdaily.com/mad/textStore.php?f=text&i=1595></script>
+<script>
+//11-9-14 JChoy 2046 bootClass plus; viewport; cqTabDob; ImageShow;
+//11-25-14 JChoy JsonGet,JGetStub,MyCfg,JIOByNum,DomHelper,RoomQ
+Curly.bootClass('TS1597,TS1599,TS1630,TS1634,TS1650,TS1704,TS1712,TS1729,TS2049,TS2045,TS2054,TS2079,TS2090,TS2104,TS2055,'
+,'CqTabDob,Ajax,VRS,AutoSave,TextVE,PreviewCsds,ImageShow,WaterWall,JsonGet,JGetStub,MyCfg,JIOByNum,DomHelper,RoomQ,PageApp');
+</script>

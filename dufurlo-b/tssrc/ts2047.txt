@@ -1,0 +1,7 @@
+<meta name=viewport content="width=device-width; initial-scale=1.5; maximum-scale=4.0; minimum-scale=0.7;" />
+<script src=http://rip.okdaily.com/mad/textStore.php?f=text&i=1595></script>
+<script>
+//8-27-12 JChoy 1626 bootClass plus; viewport; cqTabDob; ImageShow;
+Curly.bootClass('TS1597,TS1599,TS1630,TS1634,TS1650,TS1704,TS1712,'
+,'CqTabDob,Ajax,VRS,AutoSave,TextVE,PreviewCsds,ImageShow,WaterWall,PageApp');
+</script>

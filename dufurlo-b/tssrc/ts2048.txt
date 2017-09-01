@@ -1,0 +1,58 @@
+//11-9-14 JChoy test stub 2048
+//url add show load help new
+//-----
+function JGetDemo2(){
+	this.constructor= JGetDemo;
+	this.constructor();
+	this.btnLabel = "--G-O--";
+}
+//-----
+function JGetDemo(){
+	this.ripurl = "http://rip.okdaily.com/mad/textStore.php?f=text&i=";
+	this.btnLabel = "--G O--";
+	this.start=function(){
+		this.tx = document.createElement("input");
+		this.btn = document.createElement("input");
+		this.btn.value = this.btnLabel;
+		this.btn.type = "button";
+		this.btn.onclick = new OOCallback(this,"btnClick").fcn;
+		this.txDiv = document.createElement("div");
+		this.div.appendChild(this.tx);
+		this.div.appendChild(this.btn);
+		this.div.appendChild(this.txDiv);
+		this.jsonRead("2036");
+
+		//new VRS().request('vrs://csds/w/?f=wtw',this);
+		//this.setId();
+		//setInterval(this.progId+".tickle()",5000);
+	}
+	this.btnClick= function(){
+		var at=this.tx.value.split(' ');
+		if (at[0]=="load") return this.jsonRead(at[1]);
+		this.txDiv.innerHTML = this.tx.value;
+	}
+	this.jsonRead= function(slotNum){
+		this.dataSlot = slotNum;
+		this.txDiv.innerHTML = "loading "+this.dataSlot;
+
+		var jg = new JsonGet("data_ts_"+this.dataSlot, this, "jGot", 5);
+		jg.srcScript( this.ripurl+this.dataSlot );
+		jg.start();
+	}
+	this.jGot= function(resJson, jg){
+		var disx = "data:image/svg+xml;charset=utf-8;base64,";
+		if (resJson) {
+			this.txDiv.innerHTML = "";
+			var fix64= resJson.text64.replace(/ /g, '+');
+			//var uu= this.cgi("url","http://www.youtube.com/watch?v=",location);
+			var uu= "http://www.youtube.com/watch?v=";
+			var at=atob(fix64).split(' ');
+			for (var i=0; i<at.length; i++){
+			  var link= document.createElement('a');
+			  link.href= uu+at[i];
+			  link.innerHTML= ' ***'+i;
+			  this.txDiv.appendChild(link);
+			}
+		}
+	}
+}

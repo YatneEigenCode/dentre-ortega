@@ -1,0 +1,21 @@
+//11-8-14 JChoy test stub 2045
+//only used during testing. Fake WaterWall class that loads another class.
+//
+//TODO: Add jsonGet as a Curly vrs service
+//-----
+//function WaterWall(){}
+function JGetStub(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	//this.pClass = "JGetDemo3";
+	this.pClass = new MyCfg().pClass;
+	this.start= function(){
+		Curly.addJS( new MyCfg().addJS );
+		//Curly.addJS( "TS2050" );
+		Curly.onReady(this.pClass, new OOCallback(this,"pStart").fcn );
+	}
+	this.pStart= function(){
+		var pr = new window[this.pClass]();
+		for (var m in pr) this[m]= pr[m];
+		this.start();
+	}
+}
