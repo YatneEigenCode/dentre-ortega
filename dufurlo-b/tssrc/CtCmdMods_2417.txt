@@ -1,0 +1,14 @@
+CmdMod03= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "TSJS") {
+      if (!tmpfs.exist("ts.cfg")) return "missing ts.cfg";
+      var u,c=JSON.parse(tmpfs.read("ts.cfg"));
+      u=c.readverb.replace("{0}",at[1]);
+      return ["load.."+at[1], cap.loadJs(c.urlbase+u)][0];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod03");
+s="ver$localtxt$ls$tsjs 2419";
+tmpfs.write("runonce.txt",s.split("$").join(unescape("%0A")));
