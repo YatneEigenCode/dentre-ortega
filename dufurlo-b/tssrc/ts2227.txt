@@ -1,30 +1,58 @@
+//8-29-15 this version saves fnCode to tag db
 CalcZooApp= function(){
- this.CalcApp= function(fnCode){
+ this.CalcApp= function(tag){
   new Ooze().extend(this,PageOff_HtmlApp);
-  this.fnCode= fnCode;
-  this.calc= new Function("x","return "+fnCode);
+  this.tag= tag;
   this.start= function(){
-	this.div = this.write( "f(x)="+this.fnCode +"; Input x:<br />");
+	this.initTagDb( "TagDa" );
+	this.div = this.write( "" );
+	this.divFc = this.div.appendChild( this.write( "f(x)=..." ) );
+	this.div.appendChild( this.write( "Input value for x:" ) );
 	this.form = this.div.appendChild( document.createElement("form") );
-	this.bake( this.form.appendChild( document.createElement("input") ), {name:"tx1"} );
-	this.bake( this.form.appendChild( document.createElement("input") ), {type:"button",name:"btn",value:"Go"} );
+	this.bake( this.form.appendChild( document.createElement("input") ), {name:"tx1",size:45} );
+	this.bake( this.form.appendChild( document.createElement("input") ), 
+		{type:"button",name:"btn",value:"Go"} ).style.margin="2 4 2 4";
 	this.form.btn.onclick= this.createCBfunction("handleClick");
+	this.setFnCode( "x" );
+	this.sd.getValByTagDb( [this.tag], this.createCBfunction("handleGetData") );
   }
   this.handleClick= function( el ){
-	if (this.form.tx1.value.split(":")[0]=="!pragma cloneme"){
-		var s= this.form.tx1.value.split(":")[1];
+	if (this.form.tx1.value=="!pragma cloneme"){
+		var s= "caz"+new Date().valueOf();
 		s="this.start= function(){new this.CalcApp('"+s+"').start();}"
 		TmpClonedCls= new Function(s+"\nthis.CalcApp="+this.constructor.toString());
 		new PageOff().storeApp("TmpClonedCls");
+	} else if (this.form.tx1.value.split(":")[0] == "!pragma learn"){
+		this.setFnCode( this.form.tx1.value.split(":")[1], true );
 	} else {
 		var inx = this.form.tx1.value;
 		this.div.appendChild( this.write( "f("+inx+")="+this.calc(inx) ) );
 	}
   }
+  this.handleGetData = function( ign0, ign1, txn, rs ){
+	if (rs.rows.length == 0) {
+		this.sd.addBlankValDb([this.tag], function(){} );
+		return this.setFnCode( "x", true );
+	} else
+		this.setFnCode( rs.rows.item(0).val );
+  }
   this.createCBfunction = function(meth,arg){
 	var $pthis = this;
 	return function(a,b,c,d){ $pthis[meth](this,arg,a,b,c,d) }
   }
+  this.setFnCode = function(s, isSave){
+	this.divFc.innerHTML= "f(x)="+ (this.fnCode = s);
+	this.calc= new Function("x","return "+this.fnCode);
+	if (isSave) this.sd.saveValByTagDb([this.fnCode, this.tag], function(){} );
+  }
+  this.initTagDb = function(dbName){
+	this.sd = new DbApp();
+	this.sd.sql.getValByTag= "SELECT val FROM tagda WHERE tag=?;"
+	this.sd.sql.saveValByTag= "UPDATE tagda SET val=? WHERE tag=?;"
+	this.sd.sql.addBlankVal= "INSERT INTO tagda (tag,val) VALUES (?,'')"
+	this.sd.sql.initTagdaTable= "CREATE TABLE IF NOT EXISTS tagda (tag VARCHAR(255), val TEXT);"
+	this.sd.init( dbName, "initTagdaTable" );
+  }
  }//inner cls
- this.start= function(){new this.CalcApp("Math.tan(Math.PI*x/180)").start()}
+ this.start= function(){new this.CalcApp('caz').start()}
 }
