@@ -1,4 +1,4 @@
-//as found in 2101
+//as found in 2102
 //11-9-14 JChoy test stub
 //11-11-14 JChoy regexp replace; muxUrl
 //11-15-14 JChoy JGetDemo4 2070
@@ -26,13 +26,15 @@ function QuikMob(){
 		this.jGetter.jGet( this.slotNum, new OOCallback(this,meth).fcn );
 	}
 	this.saveMyData= function(){
+		if (typeof(this.myIndex)==='undefined') return this.refresh("saveData");
 		var old= this.jsonObj.list[this.myIndex];
 		if (old.name+old.val==this.myVals.name+this.myVals.val) return;
 		this.refresh( "saveData" );
 	}
 	this.saveData= function(s){
 		this.jsonObj = JSON.parse(s);
-		this.jsonObj.list[this.myIndex]=this.myVals;
+		if (typeof(this.myIndex)==='undefined') this.jsonObj.list.push(this.myVals)
+		else this.jsonObj.list[this.myIndex]=this.myVals;
 		this.jGetter.jSave( JSON.stringify(this.jsonObj) );
 		this.startD( JSON.stringify(this.jsonObj) );
 	}
