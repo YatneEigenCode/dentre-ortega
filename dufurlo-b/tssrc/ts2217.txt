@@ -1,8 +1,9 @@
 DyredaApp= function(){
+  //TODO: use cached msg when offline
   new Ooze().bake(this);
   this.start= function(){
 	this.clsName= "DataCls";
-	this.url= "http://rip.okdaily.com/mad/textStore.php?f=text&i=2218";
+	this.url= "http://rip.okdaily.com/mad/textStore.php?f=text&i=2219";
 	this.subscribe();
 	this.div= this.write( "loading..." );
 	this.srcAndPing( this.clsName, this.url );
@@ -29,7 +30,7 @@ DyredaApp= function(){
 	this.acb= new Array();
 	this.subscribe= function(cb){this.acb.push(cb)}
 	this.ping= function(){
-		for (var i=0; this.acb.length; i++)
+		for (var i=0; i<this.acb.length; i++)
 			this.acb[i]();
 	}
   }//inner class
