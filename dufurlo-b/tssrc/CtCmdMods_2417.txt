@@ -70,3 +70,48 @@ CmdMod06= function(cap){
 }
 tmpfs.write("cmdmods.txt","CmdMod06");
 tmpfs.write("runonce.txt","tsjs 2423");
+
+////////// 2423
+function TmpFsExt(){
+  this.start= function(){
+    for (var m in this) tmpfs[m]= this[m];
+  }
+  this.del= function(fn){       delete(this.files[fn]); this.alertMod(fn); }
+  this.list= function( sep ){
+    var res=[];
+    for (var m in this.files) res.push(m);
+    return res.sort().join( sep );
+  }
+  this.trunc= function(fn, len){
+    if ((!this.exist(fn)) || (this.files[fn].length<len)) return;
+    this.files[fn]= this.files[fn].substr(this.files[fn].length-len);
+  }
+}
+new TmpFsExt().start();
+tmpfs.write("runonce.txt","tsjs 2424");
+
+////////// 2424
+CmdMod04= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "APPEND"){
+      var pm= (at[2]=="/c")? ["",3] : ["\n",2];
+      var res=  pm[0]+at.slice(pm[1],99).join(" ")
+      return [tmpfs.append(at[1], res), at[1]+" "+res.length][1];
+    }
+    if (at0 == "LS") return tmpfs.list(", "); 
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod04");
+tmpfs.write("runonce.txt","tsjs 2422");
+
+////////// 2422
+CmdMod22= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "LINK")
+      return cap.midcate(at[1],15).link(at[1]);
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod22");
+tmpfs.write("runonce.txt","tsjs 2425");
