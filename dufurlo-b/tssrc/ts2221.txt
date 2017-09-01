@@ -17,6 +17,10 @@ CustomizerApp= function(){
 		new PageOff().initAndSrc( "MakerApp", rip+"?f=text&i=2215" );
 	} else if (s=="720041") {
 		new PageOff().initAndSrc( "DyredaApp", rip+"?f=text&i=2220" );
+	} else if (s=="720061") {
+		new PageOff().initAndSrc( "TagdaZooApp", rip+"?f=text&i=2224" );
+	} else if (s=="720071") {
+		new PageOff().initAndSrc( "CalcZooApp", rip+"?f=text&i=2228" );
 	} else res= "Invalid code: "+s;
 	this.form.tx2.value = res;
  }
