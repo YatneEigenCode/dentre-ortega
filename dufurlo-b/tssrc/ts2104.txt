@@ -1,0 +1,50 @@
+//RoomQ
+//11-24-14 JChoy RoomQ 2104
+//11-25-14 JChoy isPrivate param for getNewTSName
+//12-01-14 JChoy recycleSlot, checkAvailableSpace
+//-----
+function RoomQ(num, notifyCB){
+	this.roomQNum = num || 2082;
+	this.notify= notifyCB;
+	this.jGetter= new JIOByNum();
+	this.jGetter.jGet( this.roomQNum, new OOCallback(this,"startD").fcn );
+
+	this.getTSNum= function(name){
+		return (this.jsonObj)? this.jsonObj.htNamed[name] : null;
+	}
+	this.getRecentList= function(){
+		return this.jsonObj.aRecent;
+	}
+	this.checkAvailableSpace= function(num){
+		return this.jsonObj.aUnnamed.length>=num;
+	}
+	this.recycleSlot= function(res){
+		var num;
+		if (res) this.jsonObj.aRecent.splice(this.jsonObj.aRecent.indexOf(res),1);
+		while (!res) res= this.jsonObj.aRecent.pop();
+		num = this.jsonObj.htNamed[res];
+		delete(this.jsonObj.htNamed[res]);
+		if (num) {
+			this.jsonObj.aUnnamed.push(num);
+			this.jGetter.jSave(JSON.stringify(this.jsonObj));
+		}
+		return num;
+	}
+	this.getNewTSName= function( isPrivate ){
+		var res = {num:this.jsonObj.aUnnamed.pop(),name:"No Space Available",err:-1};
+		if (!res.num) return res;
+		res.err= 0;
+		res.name= "k"+new RandomName().text;
+		this.jsonObj.htNamed[res.name]= res.num;
+		if (!isPrivate) {
+			this.jsonObj.aRecent.unshift(res.name);
+			this.jsonObj.aRecent.length=10;
+		}
+		this.jGetter.jSave(JSON.stringify(this.jsonObj));
+		return res;
+	}
+	this.startD= function(s){
+		this.jsonObj = JSON.parse(s);
+		this.notify(this);
+	}
+}

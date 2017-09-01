@@ -1,0 +1,92 @@
+//11-9-14 JChoy test stub
+//11-11-14 JChoy regexp replace; muxUrl
+//11-15-14 JChoy JGetDemo4 2070
+//11-19-14 JChoy RandomName()
+//11-20-14 JChoy JIOByNum, saveDataNicely
+//11-24-14 JChoy authoring 2106
+//11-25-14 JChoy fix Create-Public
+//TODO: 
+//-----
+function QuikMobMaker(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	if (Curly) Curly.inherit_js_class( "DomHelper",  this );
+	this.btnLabel = "GO";
+	this.aUtil = [];
+	this.roomQNum = 2082
+	this.helpMsg= "Limit 100 participants (20 for private). All questionnaires expire after 10 days of inactivity. Share the newly created link to invite participants.";
+	this.joObj = {q:"Question, e.g: Are u going to game?",
+		choices:["Yes","No","Maybe"], list:[], max:100}
+	this.start=function(){
+		if (!(new Darwin().isAcceptable()))
+			return this.write("Really? you call this a browser?");
+		this.div.innerHTML= "Loading...";
+		this.roomQ = new RoomQ(this.roomQNum, new OOCallback(this,"startD").fcn );
+		this.userid= new RandomName().getUserID();
+	}
+	this.create_d= function(roomQ){
+		var aSet= this.roomQ.getNewTSName(this.joObj.max<100);
+		if (aSet.err)
+			return this.div.appendChild(this.mkDiv(aSet.name));
+		var jGetter = new JIOByNum();
+		jGetter.dataSlot = aSet.num;
+		jGetter.jSave(JSON.stringify(this.joObj));	//save questionaire to new location
+
+		this.div.appendChild(this.mkDiv("<hr />"));
+		return this.div.appendChild(this.mkLinkMob(aSet.num,aSet.name));
+	}
+	this.startD= function(roomQ){
+		var fcn= new OOCallback(this, "handleBlur").fcn;
+
+		this.div.innerHTML= "Build your questionnaire using this form<br />";
+		this.div.appendChild(this.mkTxBx(30,this.joObj.q,"q")).onblur= fcn;
+		this.div.appendChild(this.mkDiv(""));
+		for (var div,i=0,at=this.joObj.choices; i<at.length; i++) {
+			div= this.div.appendChild(this.mkDiv(at[i]));
+			div.appendChild(this.mkButton("Del")).onclick=fcn;
+			div.lastChild.choice = at[i];
+		}
+		this.div.appendChild(this.mkTxBx(16,"Another choice","addChoice")).onblur= fcn;
+		this.div.appendChild(this.mkDiv("<hr />"));
+		this.div.appendChild(this.mkButton("Create")).onclick=fcn;
+		this.div.appendChild(this.mkButton("Create Privately")).onclick=fcn;
+		this.div.appendChild(this.mkButton("See Recently Created Questionnaires")).onclick=fcn;
+		this.div.appendChild(this.mkDiv(this.helpMsg));
+	}
+	this.delChoice= function(s){
+		var n = this.joObj.choices.indexOf(s);
+		if (n != -1) this.joObj.choices.splice(n,1);
+		this.startD();
+	}
+	this.addChoice= function(s){
+		if ((!s) || (s=="Another choice")) return;
+		this.joObj.choices.push(s); 
+		this.startD();
+	}
+	this.seeRecent= function(){
+		this.div.innerHTML= "Try this recently built questionnaire<br />";
+		for (var i=0,at=this.roomQ.getRecentList(); i<at.length; i++)
+		  if (at[i]) { 
+			this.div.appendChild(this.mkLinkMob(this.roomQ.getTSNum(at[i]),at[i]));
+			this.div.appendChild(this.mkDiv("<br />"));
+		  }
+		this.div.appendChild(this.mkButton("Return")).onclick= new OOCallback(this, "handleBlur").fcn;
+	}
+	this.mkLinkMob= function(num,name){
+		var url= "tsm.php?f=html&i=2046&nn=1789&cfg=QuikMob&di="+name;
+		return this.mkEl("a",{innerHTML:"Link to questionnaire "+name, href:url});
+	}
+	this.handleBlur= function(arg1){
+		var tg = arg1.target;
+		if (tg.value.indexOf("Create")==0) {
+			tg.disabled = true;
+			this.joObj.max= (tg.value=="Create")? 100:20;  //fix
+			return this.roomQ = new RoomQ(this.roomQNum, new OOCallback(this,"create_d").fcn );
+		}
+		if (tg.value=="Del") return this.delChoice( tg.choice );
+console.log("*"+tg.value);
+		if (tg.value=="Return")  this.startD();
+		if (tg.value=="See Recently Created Questionnaires") return this.seeRecent();
+		if (tg.name=="q") this.joObj.q= tg.value;
+		if (tg.name=="addChoice")  this.addChoice(tg.value);
+	}
+}
