@@ -115,3 +115,66 @@ CmdMod22= function(cap){
 }
 tmpfs.write("cmdmods.txt","CmdMod22");
 tmpfs.write("runonce.txt","tsjs 2425");
+
+////////// 2425
+CmdMod9= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "RM"){
+      return [(tmpfs.exist(at[1]))?"deleted":"not found",tmpfs.del(at[1])][0];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod9");
+tmpfs.write("runonce.txt","tsjs 2426");
+
+////////// 2426
+CmdMod19= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "HELP")
+      return "<pre>"+tmpfs.read("help.txt" )+"</pre>";
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod19");
+tmpfs.write( "help.txt","ver - app version"
+      +"\nlink [url] - create hyperlink"
+      +"\nloadjs [url] - src js file"
+      +"\nlocaljs, localtxt - file button to load file"
+      +"\ncat, write, append, rm, ls, eval - file operations" );
+tmpfs.write( "todo.txt","edit, clear, live, feed, serve. ls-col" );
+tmpfs.write("runonce.txt","tsjs 2427");
+
+////////// 2427
+CmdMod7= function(cap){
+  this.doCmd= function(at){
+    var at0= at[0].toUpperCase();
+    if (at0 == "LOCALJS") return "<div ignite=LocalJs />";
+  }
+}
+//===
+function LocalJs(){
+  new SnAppFdn().inherit( this, LocalTxt);
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ eval( evt.target.result ) }
+    fr.readAsText(files[0]);
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod7");
+tmpfs.write("runonce.txt","tsjs 2428");
+
+////////// 2428
+s="lslive$setcookie$CR$joinfiles";
+tmpfs.write("ideas.txt",s.split("$").join(unescape("%0A")));
+CmdMod08= function(cap){
+  this.doCmd= function(at){
+    if (at[0].toUpperCase()=="CLEAR") {
+      while (cap.rows.length>1) cap.deleteRow(1);
+      return "ok";
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod08");
+tmpfs.write("runonce.txt","clear$ver$localtxt".split("$").join(unescape("%0A")));
