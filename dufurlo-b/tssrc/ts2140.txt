@@ -1,7 +1,8 @@
-//bak
 //QuikVoteMaker and QuikMobMaker 2140
 //11-26-14 JChoy Quik_Maker
-//TODO: 
+//12-01-14 JChoy recycler (in addChoice); autoscroll
+//TODO: reclick, link, suspend
+
 //-----
 function JGetDemo4(){
 	if (Curly) Curly.inherit_js_class( "QuikVoteMaker",  this );
@@ -61,7 +62,8 @@ function Quik_Maker(){
 		jGetter.jSave(JSON.stringify(this.joObj));	//save questionaire to new location
 
 		this.div.appendChild(this.mkDiv("<hr />"));
-		return this.div.appendChild(this.mkLinkMob(aSet.num,aSet.name));
+		this.div.appendChild(this.mkLinkMob(aSet.num,aSet.name));
+		this.div.scrollTop= 999999;
 	}
 	this.startD= function(roomQ){
 		var fcn= new OOCallback(this, "handleBlur").fcn;
@@ -76,8 +78,12 @@ function Quik_Maker(){
 		}
 		this.div.appendChild(this.mkTxBx(16,"Another choice","addChoice")).onblur= fcn;
 		this.div.appendChild(this.mkDiv("<hr />"));
-		this.div.appendChild(this.mkButton("Create")).onclick=fcn;
-		this.div.appendChild(this.mkButton("Create Privately")).onclick=fcn;
+		if (!this.roomQ.checkAvailableSpace(1)){
+		  this.div.appendChild(this.mkDiv("No space available for new creations."));
+		} else {
+		  this.div.appendChild(this.mkButton("Create")).onclick=fcn;
+		  this.div.appendChild(this.mkButton("Create Privately")).onclick=fcn;
+		}
 		this.div.appendChild(this.mkButton("See Recently Created Ones")).onclick=fcn;
 		this.div.appendChild(this.mkDiv(this.msg.help));
 	}
@@ -88,6 +94,11 @@ function Quik_Maker(){
 		this.startD();
 	}
 	this.addChoice= function(s){
+		if (s.indexOf("recyclE::")==0){
+			var res = this.roomQ.recycleSlot(s.substr(9));
+			console.log("test number recycler "+s.substr(9)+" "+res);
+			return;
+		}
 		if ((!s) || (s=="Another choice")) return;
 		this.joObj.choices.push(s); 
 		this.startD();
@@ -113,7 +124,6 @@ function Quik_Maker(){
 			return this.roomQ = new RoomQ(this.roomQNum, new OOCallback(this,"create_d").fcn );
 		}
 		if (tg.value=="Del") return this.delChoice( tg.choice );
-console.log("*"+tg.value);
 		if (tg.value=="Return")  this.startD();
 		if (tg.value=="See Recently Created Ones") return this.seeRecent();
 		if (tg.name=="q") this.joObj.q= tg.value;
