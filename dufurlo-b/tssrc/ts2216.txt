@@ -1,6 +1,21 @@
 HtmlApp= function(){
  new Ooze().extend(this,PageOff_HtmlApp);
- this.text= "Welcome to Haqabob<br>"
- +"This web page is a web app providing the framework to load js applets."
- +" It has offline accessibility using html5 and the applets are stored locally using html5.";
+ var s= "TODO:";
+ s+="<br>- loop at end of More";
+ s+="<br>- convert CRLF";
+ s+="<br>- autosave buffer";
+ s+="<br>- autolink";
+ s+="<br>- favorite";
+ s+="<br>- More on refresh / reset button";
+ s+="<br>- identify min set";
+ s+="<br>- buttonify";
+ s+="<br>- linkmaker";
+ s+="<br>- initial load checker app";
+ s+="<br>- checker loads useful apps";
+ s+="<br>- avoid cgi double loads";
+ s+="<br>- remote app that subscribes to shared data";
+ s+="<br>- need a type of content-less app";
+ s+="<br>- More as a toggle";
+ s+="<br>- Maker takes command to load url";
+ this.text= s;
 }
