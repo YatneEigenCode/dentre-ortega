@@ -1,19 +1,15 @@
-//9-1-2017 jchoy v0.123 mkContent
+//9-1-2017 jchoy v0.124 tab cfg.csv
 //This can be used to run an externally stored CETB script
-//TODO: tab if file not exist
 
 CmdTugstart= function(){
   new AppTool().inherit( this, CmdAutostart );
   this.start= function(ce){
     this.cfg= {sl:new StoLog("tugstart.log"), nc:"none"};
-    var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
-    if (!st.isOk) return;
-    //if (pl= st.lo.getItem(nc)) 
     this.parse(ce, this.mkContent());
   }
   this.mkContent= function(){
-    var ct= "link . ";
-    return [ct+"tugstart r1003 $date"
+    var at, ct= "link . ", csv="QQtc_cfg.csv";
+    at= [ct+"tugstart r1003 $date"
       ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
       ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
       ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
@@ -21,8 +17,11 @@ CmdTugstart= function(){
       ,"hashcmd"
       ,"sleep 1"
       ,ct+"bitly=2418"
-      ].join(unescape("%0d%0a"));
+      ];
+    var st= this.cfg.sl.cfg.st;
+    if (st.isOk) 
+      if (!st.lo.getItem(csv)) at.push("tab "+csv);
+    return at.join(unescape("%0d%0a"));
   }
 }
 new CmdTugstart().start($ce); 
-
