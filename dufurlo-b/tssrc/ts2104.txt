@@ -1,7 +1,7 @@
-//bak
 //RoomQ
 //11-24-14 JChoy RoomQ 2104
 //11-25-14 JChoy isPrivate param for getNewTSName
+//12-01-14 JChoy recycleSlot, checkAvailableSpace
 //-----
 function RoomQ(num, notifyCB){
 	this.roomQNum = num || 2082;
@@ -14,6 +14,21 @@ function RoomQ(num, notifyCB){
 	}
 	this.getRecentList= function(){
 		return this.jsonObj.aRecent;
+	}
+	this.checkAvailableSpace= function(num){
+		return this.jsonObj.aUnnamed.length>=num;
+	}
+	this.recycleSlot= function(res){
+		var num;
+		if (res) this.jsonObj.aRecent.splice(this.jsonObj.aRecent.indexOf(res),1);
+		while (!res) res= this.jsonObj.aRecent.pop();
+		num = this.jsonObj.htNamed[res];
+		delete(this.jsonObj.htNamed[res]);
+		if (num) {
+			this.jsonObj.aUnnamed.push(num);
+			this.jGetter.jSave(JSON.stringify(this.jsonObj));
+		}
+		return num;
 	}
 	this.getNewTSName= function( isPrivate ){
 		var res = {num:this.jsonObj.aUnnamed.pop(),name:"No Space Available",err:-1};
