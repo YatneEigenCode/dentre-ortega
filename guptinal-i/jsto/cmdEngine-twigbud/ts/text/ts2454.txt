@@ -1,0 +1,24 @@
+//5-8-2017 jchoy 112
+MonoDrip= function(){
+ this.ut="http://{0}/mad/textStore.php?f=set&data=";
+ this.intervalMs=100;
+ this.data=[];
+ var $t=this;
+ this.isBusySince=new Date().valueOf();
+ this.add= function(jo,s){
+  if (s) this.url=this.ut.replace("{0}",s);
+  this.data.push(escape("pkg="+JSON.stringify(jo)));
+  this.sendOne();
+ }
+ this.sendOne=function(){
+  if ((this.isBusy()) || (this.data.length==0)) return;
+  var img= new Image();
+  img.src= this.url+this.data.shift();
+  setTimeout(function(){$t.sendOne()},this.intervalMs);
+ }
+ this.isBusy=function(){
+  var now=new Date().valueOf();
+  if (now-this.busySince<this.intervalMs) return true;
+  return [this.busySince=now,false][1];
+ }
+}
