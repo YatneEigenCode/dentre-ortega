@@ -1,0 +1,5 @@
+Bepagugu_ext = function() {
+  this.showScore= function(){
+    this.write( "The score is 0 - 0 for tomorrows game." );
+  }
+}

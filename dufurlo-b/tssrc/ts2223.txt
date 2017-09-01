@@ -1,0 +1,32 @@
+TagdaFooApp= function(){
+  new Ooze().bake(this);
+  this.tag= "foo";
+  this.start= function(){
+	this.initTagDb( "TagDa" );
+	this.div = this.write( "Private data:<br />");
+	this.form = this.div.appendChild( document.createElement("form") );
+	this.bake( this.form.appendChild( document.createElement("textarea") ), {name:"ta1"} );
+	this.bake( this.form.appendChild( document.createElement("input") ), {type:"button",name:"btn",value:"Save"} );
+	this.form.btn.onclick= this.createCBfunction("handleClick");
+	this.sd.getValByTagDb( [this.tag], this.createCBfunction("handleGetData") );
+  }
+  this.handleClick= function( el ){
+	this.sd.saveValByTagDb( [this.form.ta1.value,this.tag], function(){} );
+  }
+  this.handleGetData = function( ign0, ign1, txn, rs ){
+	if (rs.rows.length>0) return this.form.ta1.value= rs.rows.item(0).val;
+	else this.sd.addBlankValDb([this.tag], function(){} );
+  }
+  this.createCBfunction = function(meth,arg){
+	var $pthis = this;
+	return function(a,b,c,d){ $pthis[meth](this,arg,a,b,c,d) }
+  }
+  this.initTagDb = function(dbName){
+	this.sd = new DbApp();
+	this.sd.sql.getValByTag= "SELECT val FROM tagda WHERE tag=?;"
+	this.sd.sql.saveValByTag= "UPDATE tagda SET val=? WHERE tag=?;"
+	this.sd.sql.addBlankVal= "INSERT INTO tagda (tag,val) VALUES (?,'')"
+	this.sd.sql.initTagdaTable= "CREATE TABLE IF NOT EXISTS tagda (tag VARCHAR(255), val TEXT);"
+	this.sd.init( dbName, "initTagdaTable" );
+  }
+}

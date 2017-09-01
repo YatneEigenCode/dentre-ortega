@@ -1,0 +1,41 @@
+TagdaZooApp= function(){
+ this.TagdaApp= function(tag){
+  new Ooze().extend(this,PageOff_HtmlApp);
+  this.tag= tag;
+  this.start= function(){
+	this.initTagDb( "TagDa" );
+	this.div = this.write( "Priv instance data:<br />");
+	this.form = this.div.appendChild( document.createElement("form") );
+	this.bake( this.form.appendChild( document.createElement("textarea") ), {name:"ta1"} );
+	this.bake( this.form.appendChild( document.createElement("input") ), {type:"button",name:"btn",value:"Save"} );
+	this.form.btn.onclick= this.createCBfunction("handleClick");
+	this.sd.getValByTagDb( [this.tag], this.createCBfunction("handleGetData") );
+  }
+  this.handleClick= function( el ){
+	if (this.form.ta1.value=="!pragma cloneme"){
+		var s= "zoo"+new Date().valueOf();
+		s="this.start= function(){new this.TagdaApp('"+s+"').start();}"
+		TmpClonedCls= new Function(s+"\nthis.TagdaApp="+this.constructor.toString());
+		new PageOff().storeApp("TmpClonedCls");
+	}
+	this.sd.saveValByTagDb( [this.form.ta1.value,this.tag], function(){} );
+  }
+  this.handleGetData = function( ign0, ign1, txn, rs ){
+	if (rs.rows.length>0) return this.form.ta1.value= rs.rows.item(0).val;
+	else this.sd.addBlankValDb([this.tag], function(){} );
+  }
+  this.createCBfunction = function(meth,arg){
+	var $pthis = this;
+	return function(a,b,c,d){ $pthis[meth](this,arg,a,b,c,d) }
+  }
+  this.initTagDb = function(dbName){
+	this.sd = new DbApp();
+	this.sd.sql.getValByTag= "SELECT val FROM tagda WHERE tag=?;"
+	this.sd.sql.saveValByTag= "UPDATE tagda SET val=? WHERE tag=?;"
+	this.sd.sql.addBlankVal= "INSERT INTO tagda (tag,val) VALUES (?,'')"
+	this.sd.sql.initTagdaTable= "CREATE TABLE IF NOT EXISTS tagda (tag VARCHAR(255), val TEXT);"
+	this.sd.init( dbName, "initTagdaTable" );
+  }
+ }//inner cls
+ this.start= function(){new this.TagdaApp('zoo').start()}
+}

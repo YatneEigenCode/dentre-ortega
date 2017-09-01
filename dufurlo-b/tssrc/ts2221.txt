@@ -1,0 +1,29 @@
+CustomizerApp= function(){
+ new Ooze().extend(this,PageOff_HtmlApp);
+ this.start= function(){
+	this.div = this.write( "Coupon code: ");
+	var form = this.div.appendChild( document.createElement("form") );
+	this.bake( form.appendChild( document.createElement("input") ), {name:"tx1", value:"720030"} );
+	this.bake( form.appendChild( document.createElement("input") ), {type:"button",name:"btn",value:"Redeem"} );
+	form.btn.onclick= this.handleClick;
+	form.appendChild( document.createElement("br") );
+	this.bake( form.appendChild( document.createElement("input") ), 
+		{name:"tx2",disabled:true,size:60} ).style.border = "none";
+ }
+ this.handleClick= function(){
+	var res="", s= this.form.tx1.value.toUpperCase();
+	var rip= "http://rip.okdaily.com/mad/textStore.php";
+	if (s=="720031") {
+		new PageOff().initAndSrc( "MakerApp", rip+"?f=text&i=2215" );
+	} else if (s=="720030") {
+		new PageOff().initAndSrc( "HtmlApp", rip+"?f=text&i=2214" );
+	} else if (s=="720041") {
+		new PageOff().initAndSrc( "DyredaApp", rip+"?f=text&i=2220" );
+	} else if (s=="720061") {
+		new PageOff().initAndSrc( "TagdaZooApp", rip+"?f=text&i=2224" );
+	} else if (s=="720071") {
+		new PageOff().initAndSrc( "CalcZooApp", rip+"?f=text&i=2228" );
+	} else res= "Invalid code: "+s;
+	this.form.tx2.value = res;
+ }
+}
