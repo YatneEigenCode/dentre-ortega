@@ -1,4 +1,4 @@
-//9-1-2017 jchoy v0.118 add info about git repo
+//9-1-2017 jchoy v0.119 add ct shorthand
 //This can be used to run an externally stored CETB script
 //TODO: tab if file not exist
 
@@ -11,13 +11,15 @@ CmdTugstart= function(){
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
   }
 }
-var txt= ["link . tugstart $date"
-  ,"//module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
-  ,"//repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
+var ct= "link . ";
+var txt= [ct+"tugstart $date"
+  ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
+  ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
   ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
   ,"link #no-op"
   ,"hashcmd"
   ,"sleep 1"
+  ,ct+"bitly=2418"
   ].join(unescape("%0d%0a"));
 new Sto().lo.setItem("tugstart",txt)
 new CmdTugstart().start($ce); 
