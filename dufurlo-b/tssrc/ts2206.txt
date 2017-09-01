@@ -1,0 +1,76 @@
+/*
+@echo off
+echo %date% %time% ========== >> %~n0.txt
+rem md output
+rem 110x 111x 112x 113x 114x
+rem 115x 116x 117x 118x 119x
+
+for /F %%A in ('dir /b /o:n EIDs_with_Facet_Spend-*.csv') do (
+	echo Loading %%A >> %~n0.txt
+	cscript //Nologo //E:JScript %0 /FIND %%A 2>> %~n0.txt
+)
+for /F %%A in ('dir /b /o:n EIDs_with_Recent_Facet_Spend-*.csv') do (
+	echo Loading %%A >> %~n0.txt
+	cscript //Nologo //E:JScript %0 /FIND %%A 2>> %~n0.txt
+)
+cscript //Nologo //E:JScript %0 /FIND Profiles_To_Be_Deleted.csv "Initial List.txt" 2>> %~n0.txt
+:skip
+
+echo Finished %date% %time% ========== >> %~n0.txt
+pause
+
+goto end
+*/
+
+//----
+function JSLoader( folder ){
+	this.folder = folder || "js";
+	this.load = function( jsName ){
+		var fso=WScript.createObject("scripting.filesystemobject");
+		try {		var cls = eval(jsName);
+		} catch (e) {
+			WScript.Echo( "Loading "+ jsName);
+			for (var inFile= fso.openTextFile(this.folder+"\\"+jsName+".js"),jsCode=''; !inFile.atEndOfStream; )
+				jsCode += inFile.readLine() + "\n";				//must use Foo=function(){ syntax
+			eval( jsCode );
+		}
+		return this;
+	}
+}
+
+
+
+//-------------------
+BatApp102= function(){
+	this.doLine= function(at, nuVal, repCol, outFile){		//override this
+		var comp = [at[repCol],at[2],at[3],at[4],at[5],at[6]].join("|");
+		if (typeof(nuVal)=="string") {
+			outFile.writeLine( at[repCol]+"|dummy|"+comp );
+			return;
+		}
+		var nuValJoin = nuVal.join("|");
+		if (comp!=nuValJoin)
+			outFile.writeLine( at[repCol]+"|dummy|"+nuValJoin );
+	}
+}
+
+
+
+//-------------------
+//Compare addresses ID
+BatApp112= function(){
+	this.constructor= BatApp102;
+	this.constructor();
+}
+
+
+//--------------------------
+// main
+	//new JSLoader("js").load( "MSFeatures" ).load( "BatAppCommon" ).load( "HelperPrefAndSuf" ).load( "GroupWriter" );
+
+	var bu = new BatApp112();
+
+	bu.write( "Done at: " + new Date() + "\n-----" );
+
+// end main
+

@@ -1,0 +1,81 @@
+//8-20-12 JChoy TS1655 adapted to CSDS
+//8-21-12 JChoy subscription, addcmt, saveToSvr, title
+//8-23-12 JChoy ldd, runtsc-csds link in create
+//8-29-12 JChoy wtw
+//6-28-15 JChoy 2204 change style on admin div cfg=2203
+
+function PageApp(){
+  this.version= '0.22';
+  this.lddVersion= 'csds-114';
+  if (Curly) Curly.inherit_js_class( "Ajax",  this );
+  if (Curly) Curly.inherit_js_class( "CqTabDobPubSubCSDS",  this );
+  this.subscribers=[];
+  this.start = function(s){
+	this.titleDiv=document.body.appendChild(this.createEl('div',{align:'center'}));
+	var clientDiv=document.body.appendChild(this.createEl('div',{cfgn:'2203'}));
+	//prod=1647 dev=1730
+	(this.cct= new CqCfgTab().init(clientDiv)).start();
+	var clientDiv=document.body.appendChild(this.createEl('div',{cfgn:'1631'}));
+	//this.mold(clientDiv.style, {height:'180', overflow:'auto'});
+	this.mold(clientDiv.style, {height:'100'});
+	new CqCfgTab().init(clientDiv).start();
+
+	var nn=this.cgi('nn','1682',location);
+	this.startCqPubSub( this.tsNum=nn );
+  }
+  this.setTitle= function(at){
+	this.titleDiv.innerHTML= document.title= at[1];
+  }
+}
+//-----
+//Gets csds data from server and handles requests on that data including subscriptions.
+//Don't know why this doesn't work as a child object, only works as a superclass
+function CqTabDobPubSubCSDS(){
+	this.startCqPubSub=function(){
+		new CqTabDob().init(this.tsNum).getFromTS(this.tsNum,this);
+	}
+  this.notify= function(cqdob){
+	this.cqdob= cqdob;
+	new VRS().listen('csds',this);
+	if (this.setTitle) this.setTitle(this.cqdob.lookUp('title'));
+  }
+  this.request=function(reqObj){
+	var f= this.cgi('f','',reqObj.url);
+	if (this['request_'+f]) this['request_'+f](reqObj);
+	if ('body/cmt/key/wtw/'.match(f+'/'))
+	  this.subscribers[this.subscribers.length]=[f,reqObj];
+	this.publishToSubscribers();
+  }
+  this.publishToSubscribers=function(){
+	var res={cmt:[]}, ok=VRS.statusCode.OK;
+	res.body=this.cqdob.lookUp('body0')[1];
+	res.key=this.cqdob.lookUp('key')[1];
+	res.wtw=this.cqdob.lookUp('wtw')[1];
+	for (var i=0,at=this.cqdob.data; i<at.length; i++)
+		if (at[i][0]=='com') res.cmt[res.cmt.length]=at[i];
+
+	for (var i=0, at=this.subscribers; i<at.length; i++)
+	  if(res[at[i][0]])
+	    at[i][1].caller.vrsResponse(res[at[i][0]],at[i][1],ok);
+  }
+  this.request_setcmt=function(reqObj){
+	this.saveToSvr(this.cqdob.data[this.cqdob.data.length]=['com',''], reqObj);
+  }
+  this.request_refresh=function(reqObj){ this.startCqPubSub();  }
+  this.request_setbody=function(reqObj){
+	this.saveToSvr(this.cqdob.lookUp('body0'), reqObj);
+  }
+  this.saveToSvr=function(at, reqObj){
+	at[1]= unescape(this.cgi('data','',reqObj.url));
+	var _c=this.cqdob, eu= escape(this.cqdob.a2cq()+'&title=CSDS');
+	this.webPost(_c.tsUrl +'?f=set&i=' +_c.num +'&data=' +eu);
+  }
+  this.write=function(s){
+	new VRS().request('vrs://status/?saved');
+  }
+}
+//-----
+function CCTPayloadManager(){
+	if (Curly) Curly.inherit_js_class( "CCTPayloadManagerBase",  this );
+}
+
