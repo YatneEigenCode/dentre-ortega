@@ -1,0 +1,88 @@
+//QuikVote 2123
+//11-25-14 JChoy vote
+//11-26-14 JChoy niceCheckBox
+//11-27-14 JChoy niceTable
+//TODO: multi; change mind
+//-----
+function QuikVote(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	if (Curly) Curly.inherit_js_class( "DomHelper",  this );
+	this.btnLabel = "GO";
+	this.aUtil = [];
+	this.roomQNum = 2124;
+	this.helpMsg= "<hr />Simple vote/survey engine. Not secure, no privacy. Just easy. Click to build <a  href='http://rip.okdaily.com/mad/tsm.php?f=html&i=2046&nn=2122&cfg=QVM'>your own survey</a>";
+	this.msgInvalid= "That survey does not exist. ";
+	this.start=function(){
+		if (!(new Darwin().isAcceptable()))
+			return this.write("Really? you call this a browser?");
+		this.div.innerHTML= "Loading...";
+		this.userid= new RandomName().getUserID();
+		this.roomQ= new RoomQ(this.roomQNum, new OOCallback(this,"start_q").fcn );
+		setTimeout( new OOCallback(this,"invalidID").fcn, 5000 );
+	}
+	this.invalidID= function(){
+		if (!this.slotNum) this.div.innerHTML = this.msgInvalid+this.cgi("di","",location);
+	}
+	this.start_q= function(roomQ){
+		this.slotNum = roomQ.getTSNum( this.cgi("di","",location) );
+		this.jGetter= new JIOByNum();
+		this.refresh("startD");
+	}
+	this.refresh= function(meth){
+		this.jGetter.jGet( this.slotNum, new OOCallback(this,meth).fcn );
+	}
+
+	this.saveData= function(s){
+		this.jsonObj = JSON.parse(s);
+		if (isNaN(this.jsonObj.totals[this.selectedItem.name]++))
+			this.jsonObj.totals[this.selectedItem.name] = 1;
+		this.jsonObj.totals["_grand_"]++;
+		this.jsonObj.aRecent.unshift(this.userid);
+		this.jsonObj.aRecent.length= 10;
+		this.jsonObj.lastSaved= new Date().valueOf();
+		this.jGetter.jSave( JSON.stringify(this.jsonObj) );
+		this.startD();
+	}
+	this.startD= function(s){
+		var fcn= new OOCallback(this, "handleBlur").fcn;
+		if(s) this.jsonObj = JSON.parse(s);
+		this.div.innerHTML = "";
+		this.div.appendChild(this.mkDiv(this.jsonObj.q));
+
+		//if (this.isExpired())	return this.div.appendChild(this.mkDiv(this.msgExpire));
+		this.showChoices(fcn);
+		this.div.appendChild(this.mkDiv(this.helpMsg));
+	}
+	this.scaleCount= function(i,max){
+		var res = [this.jsonObj.totals["c"+i] || "", this.jsonObj.totals["_grand_"], max, ""];
+		if (this.jsonObj.aRecent.indexOf(this.userid)<0)	res[0] = "";
+		if (!isNaN(res[0])) res[2] = res[0]/res[1]*max;
+		if (!isNaN(res[0])) res[3] = this.mkSvgBar( res[2], 20, "blue" );
+		return res;
+	}
+	this.showChoices= function(fcn){
+		for (var sel=this.selectedItem,i=0,at=this.jsonObj.choices; i<at.length; i++){
+			var cSet = this.scaleCount( i, 300);
+			this.aUtil[i]= [this.mkCkBx(false,true,"c"+i), at[i], cSet[0], cSet[3]];
+			this.aUtil[i][0].onclick=fcn;
+			if ((sel) && (sel.name=="c"+i)) (this.selectedItem=this.aUtil[i][0]).checked=true;
+		}
+		this.niceTable( this.div.appendChild(this.mkTable(this.aUtil)) );
+		this.div.appendChild(this.mkButton("Vote")).onclick= fcn;
+		this.div.lastChild.disabled= (this.jsonObj.aRecent.indexOf(this.userid)>=0)
+	}
+	this.handleBlur= function(arg1){
+		var tg = arg1.target;
+		if (tg.value=="Vote")  {
+			this.refresh("saveData");
+			return;
+		}
+		if ((tg.type=="checkbox"))  {
+			if (this.selectedItem) this.selectedItem.checked = false;
+			if (this.selectedItem) this.niceCheckBox(this.selectedItem);
+			(this.selectedItem=tg).checked= true;
+			this.niceCheckBox(this.selectedItem);
+		}
+		return;
+	}
+}
