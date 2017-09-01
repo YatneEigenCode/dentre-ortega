@@ -1,11 +1,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
-<html manifest="http://demo-project-jcc9.c9.io/mbs?i=2&type=manifest">
+<html>
+<span>Click on image to edit</span>
 <form>
 <select style="display:none" name=sel1></select><select style="display:none" name=sel2></select>
 <input type=button value=Save name=save style="display:none;margin:2 5 2 5" onclick="this.form.helper.doButtonClick(this)">
-</form><a href="http://rip.okdaily.com/mad/tsm.php?f=html&i=2248"><img src="http://demo-project-jcc9.c9.io/mimebob?i=3" alt="gmail web: click to see image"></a>
-<img src="http://demo-project-jcc9.c9.io/mb64?i=9">
-
+</form>
+<a href="#"><img src="http://demo-project-jcc9.c9.io/mimebob?i=3" alt="gmail web: click to see image">/<img src="http://demo-project-jcc9.c9.io/mb64?i=9" 
+alt="This jpg version of the data may not be up to date because some browsers do not support jpg rendering."></a>
+<br />Note: This jpg version on the right may not be up to date because another user with an old browser (that does not support jpg rendering) may have performed edits. The jpg version is only for sending to gmail users because gmail's image
+caching engine does not expect svg images.
 
 <div style="display:none"><?xml version="1.0"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -19,7 +22,10 @@
 
 <script src="/mad/textStore.php?f=text&i=2243"></script>
 <script>
+//9-28-15 JChoy v1.115 ts2249 troubleshooting save-jpg in firefox
 //9-27-15 JChoy SvgEd ts2248 - no gradient, save jpg
+//TODO: atomic svg/jpg both or none
+//-----
 function SvgEd(){
   new Ooze().bake(this);
   this.mbsUrl= "http://demo-project-jcc9.c9.io/mbs?i=3";
@@ -34,14 +40,19 @@ function SvgEd(){
 	$d.images[0].helper = this;
 	$d.images[0].form= $d.forms[0];
 	this.dataDiv= $d.getElementsByTagName("div")[0];
+	this.hintSpan= $d.getElementsByTagName("span")[0];
+  }
+  this.randCgi= function(){
+ 	return "&r=" +Math.random();
   }
   this.imgClickFcn= function(){
- 	new SrcCls().start( "svgData", this.helper.datUrl, 
+ 	new SrcCls().start( "svgData", this.helper.datUrl+this.helper.randCgi(), 
 	   this.helper.createCBfunction("doUserInput",this) );
 	return false;
   }
   this.doUserInput= function(ob, img, data){
 	this.data= data;
+	this.hintSpan.style.display= "none";
 	return img.helper.showForm(img.form);
   }
   this.showForm= function(form){
@@ -59,26 +70,14 @@ function SvgEd(){
 	$f.sel2.style.display= $f.save.style.display= "block";
   }
   this.doButtonClick= function( el ){
-	var n= -1;
-	for (var i=0,at=this.data.items; i<at.length; i++)
-	  if (at[i]==this.getSelectedText(el.form.sel1)) n = i
+	var n=this.arrIndexOf( this.data.items, this.getSelectedText(el.form.sel1) );
 	this.data.responses[n]= this.getSelectedText(el.form.sel2);
-	this.saveData( this.data );
-  }
-  this.saveData= function( obj ){
-	var res= obj.name +"="+ JSON.stringify( obj );
+	var res= this.data.name +"="+ JSON.stringify(this.data);
 	var img= document.images[0];
 	img.onload= img.onerror= this.saveSvgFcn;
 	img.src= this.datUrl.replace("?f=text","?f=set")+"&data="+escape(res);
   }
-  this.saveSvgFcn= function(){ 
-	 var helper = this.helper;
-	 if (!helper.dataDiv) return;
-	 var res = helper.dataDiv.innerHTML.replace("__$CUSTOM_SVG$__", helper.buildCustomSvg() );
-	 this.onload= this.onerror= helper.imgLoadFcn;
-	 this.src= helper.mbsUrl+"&data="+escape(res);
-  }
-  this.buildCustomSvg= function(){
+  this.prepSvg= function(){ 
 	var res= this.customSvg.replace("__$Y$__",20)+ this.data.question +"</text>";
 	res = res.replace( "fill=\"yellow\"", "fill=\"orange\"" );
 	for (var i=0,f=45,at=this.data.items; i<at.length; i++)
@@ -86,34 +85,43 @@ function SvgEd(){
 	var respSvg = this.customSvg.replace( "x=\"30\"", "x=\"200\"" );
 	for (var i=0,f=45,at=this.data.responses; i<at.length; i++)
 	  res+= respSvg.replace("__$Y$__",f+i*20)+ at[i] +"</text>";
-	return res;
+	return this.dataDiv.innerHTML.replace("__$CUSTOM_SVG$__", res );
+  }
+  this.saveSvgFcn= function(){ 
+	 var helper = this.helper;
+	 if (!helper.dataDiv) return;
+	 this.onload= this.onerror= helper.imgLoadFcn;
+	 this.src= helper.mbsUrl+"&data="+escape(helper.prepSvg());
   }
   this.imgLoadFcn= function(){
-	var sjs= new SvgJpgSaver(this.helper.mbsUrl.replace("3","9").replace("/mbs","/mbs64"));
+	var url = this.helper.mbsUrl.replace("3","9").replace("/mbs","/mbs64");
 	this.onerror= null;
-	this.onload= sjs.createCBfunction( "save", this );
-	this.src= this.helper.mbsUrl.replace("/mbs?","/mimebob?")+"&r="+Math.random();
+	this.onload= new SvgJpgSaver(url).createCBfunction( "save", this );
+	this.src= this.helper.mbsUrl.replace("/mbs?","/mb?")+"&r="+Math.random();
   }
   this.extendClass( SelectUtil );
 }
 
 //-----
-function SvgJpgSaver(url){
+function SvgJpgSaver(mbsUrl){
   new Ooze().bake( this );
-  this.mbsUrl= url;
+  this.mbsUrl= mbsUrl;
+  this.proofImg = document.images[1];
+  this.dsvg= "data:image/svg+xml;base64,";
   this.save= function(img, va){
 	var cnv= document.createElement("canvas");
-	cnv.width = img.width;
-	cnv.height= img.height;
-	 var res = img.helper.dataDiv.innerHTML.replace("__$CUSTOM_SVG$__", img.helper.buildCustomSvg() );
-	var im= new Image();
-	im.src= "data:image/svg+xml;base64,"+btoa(res);
-	var ctx = cnv.getContext('2d');
-	ctx.drawImage( im, 0, 0 );
+	this.bake( cnv, {width:img.width, height:img.height} )
+	var im= this.monologue( this.dsvg + btoa(img.helper.prepSvg()) );
+	cnv.getContext('2d').drawImage( im, 0, 0 );
+
 	var s= cnv.toDataURL('image/jpeg', 0.1);
-alert(s.length);
-	var im= new Image();
-	im.src= this.mbsUrl + "&data="+escape(s.substr(23));
+	this.monologue( this.mbsUrl + "&data="+escape(s.substr(23)) );
+	this.proofImg.src= s;
+  }
+  this.monologue= function(url){
+	var img=new Image();
+	img.src= url;
+	return img;
   }
 }
 new SvgEd().start();
