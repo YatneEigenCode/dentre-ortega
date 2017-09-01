@@ -1,0 +1,71 @@
+//9-29-15 JChoy Ooze 2243 base class, SelectUtil.arrMap
+//-----
+function Ooze(){	//base class primal methods
+  this.bake= function( obj, oven ){
+	if (!oven) oven = this;
+	for (var m in oven) obj[m]=oven[m]; return obj;
+  }
+  this.extendClass = function( cls ){
+	this.extender=cls; this.extender();
+  }
+  this.extend = function( obj, cls ){
+	this.bake( obj ).extendClass( cls );
+  }
+  this.write= function(s){
+	var el =document.body.appendChild( document.createElement("div") );
+	return this.bake(el,{innerHTML:s});
+  }
+  this.toggle = function(mem){ return this[mem]= (this[mem])? false : true; }
+  this.createCBfunction = function(meth,arg){
+	var $pthis = this;
+	return function(a,b,c,d){ $pthis[meth](this,arg,a,b,c,d) }
+  }
+  this.buttonify= function(el){
+	el.style.backgroundColor= "lightgray";
+	el.style.margin= el.style.padding= "1 5 1 5";
+	el.onmouseover= function(){ this.style.fontWeight="bold" }
+	el.onmouseout= function(){ this.style.fontWeight="normal" }
+	return el;
+  }
+}
+
+//-----
+function SelectUtil(){
+  this.getSelectedText= function( sel ){
+	return sel.options[sel.selectedIndex].text;
+  }
+  this.setSelectedValue= function( sel, val ){
+	for (var i=0; i<sel.options.length; i++)
+	  if (sel.options[i].text==val) sel.options[i].selected=true;
+  }
+  this.fillSel= function( sel, at ){
+	for (var i=0; i<at.length; i++)
+		sel.options[i]= new Option(at[i],at[i]);
+	sel.selectedIndex= -1;
+  }
+  this.arrIndexOf= function( at, tx ){
+	var res = this.arrMap( at, function(ai){return (tx==ai)} );
+	return (res==null)? -1 : res;
+  }
+  this.arrMap= function( at, fcn ){
+	for (var i=0; i<at.length; i++)  if (fcn(at[i])) return i;
+  }
+}
+
+//-----
+SrcCls= function(){
+  new Ooze().bake(this);
+  this.start= function(name,url,cb){
+	 this.cb = cb;
+	 var $privThis= this;
+	 var el=document.createElement("script");
+	 document.body.appendChild( this.bake(el,{src:unescape(url)},window[name]= null) );
+	 var myIntv=setInterval( function(){if(window[name]) $privThis.deploy(name)}, 500 );
+	 setTimeout(function(){ clearInterval(myIntv)},9000);
+  }
+  this.deploy= function(name){
+	if (this.isDone) return; else this.isDone= true;
+	if (this.cb) return this.cb( window[name] );
+	new window[name]().start();
+  }
+}

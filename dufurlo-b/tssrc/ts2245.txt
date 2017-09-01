@@ -1,0 +1,157 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
+<html manifest="http://demo-project-jcc9.c9.io/mbs?i=2&type=manifest">
+*
+<script src="/mad/textStore.php?f=text&i=2243"></script>
+<script src="/mad/textStore.php?f=text&i=2244"></script>
+<script>
+//9-26-15 JChoy pageoff - shell in ts, no sqldb
+function PageOff(){
+  new Ooze().bake(this);
+  this.showId= -1;
+  this.start= function(){
+	this.initDb();
+	this.getSpawnAppFromDb();
+	this.showFooter();
+  }
+  this.initAndSrc= function( name, url ){
+	[this.initDb(), this.loadUrl = url, this.clsName = name];
+	this.srcAndSpawn();
+  }
+  this.showFooter= function(){
+	var div= this.bake( document.createElement("div"), {pageOffFooter:1} );
+	document.body.appendChild(div).style.padding= "8 0 0 0";
+	for (var i=0,at=["More","Favorites"],$th=this; i<at.length; i++){
+	  var el= this.bake( document.createElement("span"), {innerHTML:at[i]} );
+	  div.appendChild( this.buttonify(el) ).onclick= function(){$th.doFooterButton(this)}
+	  if (this["havLongPress"]) this.havLongPress( this.createCBfunction("handleLongPress") );
+	}
+  }
+  this.doFooterButton= function(el){
+	var s=el.innerHTML;
+	if (s=="More"){
+		this.write("<hr color='"+((this.toggle("hrColor"))?"orange":"green")+"'>");
+		this.getFromDb( this.showId-=1, this.spawnApp );
+	} else if (s=="Favorites"){
+		if (this["faveOne"]) this.showFavorites();
+	} else alert("Not available");
+  }
+  this.handleLongPress= function(){
+	if (!window["CustomizerApp"])
+	  new PageOff_srcCls().start("CustomizerApp",
+		"http://rip.okdaily.com/mad/textStore.php?f=text&i=2221");
+	var at=document.getElementsByTagName("hr");
+	if (!this["faveOne"]) return;
+	for (var j=this.showId,i=at.length-1; i>=0; i--,j++)
+	  if (at[i].isFavBtnAdded){
+	  } else if (at[i].getBoundingClientRect().top<0) {
+	  } else {
+		var el= this.bake( document.createElement("span"), {innerHTML:"Fav"} );
+		at[i].parentNode.appendChild(this.buttonify(el));
+		at[i].isFavBtnAdded = true;
+		el.onclick = this.createCBfunction("faveOne",j);
+	  }
+  }
+  this.getSpawnAppFromDb= function(){
+	var $privThis = this;
+	this.getMaxNum( function(n){		//run latest app
+		if (n) return $privThis.getFromDb( $privThis.showId=n, $privThis.spawnApp );
+		WelcomeApp = new $privThis.HtmlAppFactory( "Welcome to PageOff" ).nuClass;
+		$privThis.storeApp( "WelcomeApp" );
+	} );
+  }
+  this.spawnApp= function(s){
+	new AppWrapper().deserialize( s ).spawnApp();
+	for (var i=0,at= document.getElementsByTagName("div"); i<at.length; i++)
+		if (at[i].pageOffFooter) document.body.appendChild(at[i]);
+	window.scrollBy(0,999);
+  }
+  this.srcAndSpawn= function(){
+	var el=document.createElement("script");
+	document.body.appendChild( this.bake(el,{src:unescape(this.loadUrl)}) );
+	this.watchForClass( this, 50, window[this.clsName]= null );
+  }
+  this.watchForClass = function( obj, n ){
+	if (n<0) return alert(this.clsName +" not found");
+	if (window[this.clsName])
+		return this.storeApp(this.clsName);
+	var tmr=setTimeout( this.createCBfunction("watchForClass",n-1), 100 );
+  }
+  this.HtmlAppFactory = function(s){
+	var code= "new Ooze().extend(this,PageOff_HtmlApp);\n";
+	this.nuClass = new Function( code + "this.text=" +JSON.stringify(s) );
+  } //inner class
+  this.extendClass( PageOff_ext_sqldb );
+  this.extendClass( PageOff_ext_longpress );
+  this.extendClass( PageOff_ext_favebob );
+}
+//-----
+PageOff_ext_sqldb= function(){
+  this.initDb = function(){
+	this.sd = new DbApp();
+	this.sd.sql.getPupById= "SELECT name FROM pups WHERE id=?;"
+	this.sd.sql.getMaxId= "SELECT max(id) id FROM pups;"
+	this.sd.init( "PageOff" );
+  }
+  this.getFromDb= function(i, cb){
+	this.sd.getPupByIdDb( [i], function(txn, rs){
+		if (rs.rows.length>0) cb( rs.rows.item(0)["name"] );
+	} );
+  }
+  this.storeApp= function(name){
+	if (!this.sd) this.initDb();
+	var s = new AppWrapper(name).serialize();
+	this.sd.savePupDb( [s], this.resStoreApp );
+  }
+  this.resStoreApp= function(){
+	var s="Item successfully saved to database - click to refresh";
+	new PageOff_HtmlApp().write(s).onclick= function(){location.reload()};
+  }
+  this.getMaxNum= function( cb ){
+	this.sd.getMaxIdDb( [], function(txn, rs){
+		cb( (rs.rows.length>0) ? rs.rows.item(0)['id'] : null );
+	});
+  }
+}
+//-----
+PageOff_srcCls= function(){
+  new Ooze().bake(this);
+  this.start= function(name,url){
+	var $privThis= this;
+	var el=document.createElement("script");
+	document.body.appendChild( this.bake(el,{src:unescape(url)},window[name]= null) );
+	var myIntv=setInterval( function(){if(window[name]) $privThis.deploy(name)}, 500 );
+ 	setTimeout(function(){ clearInterval(myIntv)},9000);
+  }
+  this.deploy= function(name){
+	if (this.isDone) return; else this.isDone= true;
+	new window[name]().start();
+  }
+}
+
+//-----
+PageOff_HtmlApp= function(){
+	this.text= "This will be displayed.";
+	this.start= function(){ this.write(this.text); }
+	new Ooze().bake(this);
+}
+//-----
+AppWrapper= function(name){
+  this.name= name;
+  this.serialize= function(){
+	var obj = {name:this.name};
+	obj.code= window[this.name].toString();
+	return JSON.stringify(obj);
+  }
+  this.deserialize= function(s){
+	eval( "obj="+ s );
+	[this.name= obj.name, this.code= obj.code];
+	return this;
+  }
+  this.spawnApp= function(){
+	eval( "this.ClsTmp="+ this.code );
+	new this.ClsTmp().start();
+  }
+}
+new PageOff().start();
+</script>
+<html>

@@ -1,0 +1,56 @@
+//-----
+PageOff_ext_favebob= function(){
+  this.faveOne= function( src, arg, a, b, c, d ){
+	src.style.display = "none";
+	this.initFavDb();
+	this.sdf.addFavDb( ["F"+arg] );
+	this.sdf.deDupDb( ["F"+arg] );
+  }
+  this.unFaveOne= function( src, arg, a, b, c, d ){
+	src.style.display = "none";
+	this.sdf.delFavDb( ["F"+arg] );
+  }
+  this.initFavDb = function(){
+	if (this.sdf) return;
+	this.sdf = new DbApp();
+	this.sdf.sql.addFav= "INSERT INTO pups (name) VALUES (?)"
+	this.sdf.sql.deDup= "DELETE FROM pups WHERE name=? AND id NOT IN (SELECT max(id) FROM pups);"
+	this.sdf.sql.delFav= "DELETE FROM pups WHERE name=?;"
+	this.sdf.init( "PageOff_Fav" );
+  }
+  this.showFavorites= function(){
+	this.initFavDb();
+	document.body.innerHTML= document.title+"<div><hr></div>";
+	this.sdf.getPupsDb([], this.createCBfunction("showFavList") );
+  }
+  this.showFavList= function( src, arg, txn, rs ){	
+	for (var i=0; i<rs.rows.length; i++)
+		setTimeout( this.createCBfunction("showOneFav",
+			rs.rows.item(i).name.substr(1)), 300*i );
+  }
+  this.showOneFav= function( src, num ){
+	var el= this.bake( document.createElement("span"), {innerHTML:"Fav"} );
+	document.body.appendChild(this.buttonify(el));
+	el.onclick = this.createCBfunction("unFaveOne",num);
+	this.getFromDb( num, this.spawnApp );
+  }
+}
+//-----
+PageOff_ext_longpress= function(){
+  this.havLongPress= function( cb ){
+  	new this.LongPressBob( document.body ).start( cb );
+  }
+  this.LongPressBob= function(el){
+  	this.el = el;
+    new Ooze().bake(this);
+  	this.start= function( cb ){
+  		this.cb = cb;
+  		this.el.onmousedown =this.createCBfunction( "mark", true );
+  		this.el.onmouseup  = this.createCBfunction( "mark", false );
+  	}
+  	this.mark = function( src, isDn ) {
+  		if (isDn) this.to = setTimeout( this.cb, 2000 );
+  		else if (this.to) clearTimeout( this.to );
+  	}
+  }//inner class
+}
