@@ -1,0 +1,15 @@
+pkg=pkg2451={ver:"0.116-20170508"};
+pkg.TabReserve=function (){
+ this.start=function(ap){
+  var n=parseInt(ap[1]);
+  if (isNaN(n)) return "invalid: "+ap[0];
+  var ar=[["name","desc:44","link:TabTmpl/R1C1"],["","?://&js=619&tts={v}",""]];
+  for (var i=n+1; i<n+11; i++) ar.push(["x","",""+i]);
+  var md=new MonoDrip();
+  md.add({asset:ar},ap[2]);
+  for (var i=n+1; i<n+11; i++) 
+    md.add({asset:[["a","b"],["1","x"+i]]})
+  return "OK";
+ }
+}
+new PkgWiz("2451","defcmd tabreserve TabReserve");

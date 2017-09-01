@@ -1,0 +1,26 @@
+pkg=pkg2505={ver:"0.126-20170515"};
+pkg.TsReserve=function (){
+ new AppTool().inherit( this, StoTab );
+ var $t= this;
+ this.md=new MonoDrip();
+ this.fn="tsreserve.csv";
+ this.start=function(ap){
+  var n=parseInt(ap[1]);
+  if (isNaN(n)) return "invalid: "+ap[1];
+  this.md.url=this.md.ut.replace("{0}",ap[2]);
+  var url=this.md.url.split("?")[0]+"?f=text&i=2460";
+  window.pkg=null;
+  this.prepSn().start( url+"&r"+Math.random(), "pkg",
+    function(){$t.asset= window.pkg.asset; $t.reserve(n)} );
+  return "ok";
+ }
+ this.reserve= function(n){
+  for (var i=n; i<n+5; i++){
+    this.assetVal(1,1,this.assetVal(1,1)+","+i);
+    this.md.add({asset:[[""+i,"reserved"]]})
+  }
+  var url=this.md.url.split("?")[0]+"?f=set&i=2460&data="
+  new Image().src= url+escape("pkg="+JSON.stringify({asset:$t.asset}));
+ }
+}
+new PkgWiz("2505","defcmd tsreserve TsReserve");
