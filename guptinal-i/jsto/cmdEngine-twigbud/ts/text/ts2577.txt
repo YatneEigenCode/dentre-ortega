@@ -1,4 +1,4 @@
-//8-31-2017 jchoy v0.117 change to Tug
+//9-1-2017 jchoy v0.118 add info about git repo
 //This can be used to run an externally stored CETB script
 //TODO: tab if file not exist
 
@@ -11,6 +11,14 @@ CmdTugstart= function(){
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
   }
 }
-new Sto().lo.setItem("tugstart","link . Tugstart $date")
+var txt= ["link . tugstart $date"
+  ,"//module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
+  ,"//repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
+  ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
+  ,"link #no-op"
+  ,"hashcmd"
+  ,"sleep 1"
+  ].join(unescape("%0d%0a"));
+new Sto().lo.setItem("tugstart",txt)
 new CmdTugstart().start($ce); 
 
