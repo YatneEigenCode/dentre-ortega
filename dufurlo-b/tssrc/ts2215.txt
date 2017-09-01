@@ -1,0 +1,16 @@
+MakerApp= function(){
+ new Ooze().extend(this,PageOff_HtmlApp);
+ this.text= "Meet your maker.";
+ this.start= function(){
+	this.div = this.write( "Make new entry:<br />");
+	var form = this.div.appendChild( document.createElement("form") );
+	this.bake( form.appendChild( document.createElement("textArea") ), {name:"ta1"} );
+	this.bake( form.appendChild( document.createElement("input") ), {type:"button",name:"btn",value:"Make"} );
+	form.btn.onclick= this.handleClick;
+ }
+ this.handleClick= function(){
+	var po = new PageOff();
+	MadeByMaker = new po.HtmlAppFactory(this.form.ta1.value).nuClass;
+	po.storeApp( "MadeByMaker" );
+ }
+}

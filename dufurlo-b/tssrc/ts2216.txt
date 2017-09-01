@@ -1,0 +1,4 @@
+HtmlApp= function(){
+ new Ooze().extend(this,PageOff_HtmlApp);
+ this.text= "Let's ooze tonight!";
+}

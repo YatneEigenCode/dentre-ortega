@@ -1,0 +1,3 @@
+DataCls= function(){
+ this.text="The transformative magical dyreda message is deceptively plain.";
+}

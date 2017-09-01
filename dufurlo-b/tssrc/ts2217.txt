@@ -1,0 +1,36 @@
+DyredaApp= function(){
+  new Ooze().bake(this);
+  this.start= function(){
+	this.clsName= "DataCls";
+	this.url= "http://rip.okdaily.com/mad/textStore.php?f=text&i=2218";
+	this.subscribe();
+	this.div= this.write( "loading..." );
+	this.srcAndPing( this.clsName, this.url );
+  }
+  this.subscribe= function(){
+	var $privThis= this;
+	if (!window["pingerForPageOff"]) pingerForPageOff=new this.Pinger();
+	pingerForPageOff.subscribe( function(){$privThis.refresh()} );
+  }
+  this.refresh= function(){
+	if (!this.isDone) this.div.innerHTML = new window[this.clsName]().text;
+	this.isDone = true;
+  }
+  this.srcAndPing= function(name,url){
+	var el=document.createElement("script");
+	document.body.appendChild( this.bake(el,{src:unescape(url)}) );
+	window[name]= null;
+	var myIntv=setInterval( function(){
+		if(window[name]) pingerForPageOff.ping();
+	  }, 200 );
+ 	setTimeout(function(){ clearInterval(myIntv)},9000);
+  }
+  this.Pinger= function(){
+	this.acb= new Array();
+	this.subscribe= function(cb){this.acb.push(cb)}
+	this.ping= function(){
+		for (var i=0; this.acb.length; i++)
+			this.acb[i]();
+	}
+  }//inner class
+}
