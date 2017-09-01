@@ -1,14 +1,16 @@
-//8-31-2017 jchoy v0.115 fix inherit call
+//8-31-2017 jchoy v0.117 change to Tug
 //This can be used to run an externally stored CETB script
-CmdGitstart= function(){
+//TODO: tab if file not exist
+
+CmdTugstart= function(){
   new AppTool().inherit( this, CmdAutostart );
   this.start= function(ce){
-    console.log( "CmdGitstart starting" );
-    this.cfg= {sl:new StoLog("gitstart.log"), nc:"gitstart"};
+    this.cfg= {sl:new StoLog("tugstart.log"), nc:"tugstart"};
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
     if (!st.isOk) return;
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
   }
 }
-new Sto().lo.setItem("gitstart","link . gitstart $date")
-new CmdGitstart().start($ce); 
+new Sto().lo.setItem("tugstart","link . Tugstart $date")
+new CmdTugstart().start($ce); 
+
