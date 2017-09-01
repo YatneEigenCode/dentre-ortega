@@ -1,26 +1,28 @@
-//9-1-2017 jchoy v0.119 add ct shorthand
+//9-1-2017 jchoy v0.123 mkContent
 //This can be used to run an externally stored CETB script
 //TODO: tab if file not exist
 
 CmdTugstart= function(){
   new AppTool().inherit( this, CmdAutostart );
   this.start= function(ce){
-    this.cfg= {sl:new StoLog("tugstart.log"), nc:"tugstart"};
+    this.cfg= {sl:new StoLog("tugstart.log"), nc:"none"};
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
     if (!st.isOk) return;
-    if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
+    //if (pl= st.lo.getItem(nc)) 
+    this.parse(ce, this.mkContent());
+  }
+  this.mkContent= function(){
+    var ct= "link . ";
+    return [ct+"tugstart r1003 $date"
+      ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
+      ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
+      ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
+      ,"link #no-op"
+      ,"hashcmd"
+      ,"sleep 1"
+      ,ct+"bitly=2418"
+      ].join(unescape("%0d%0a"));
   }
 }
-var ct= "link . ";
-var txt= [ct+"tugstart $date"
-  ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
-  ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
-  ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
-  ,"link #no-op"
-  ,"hashcmd"
-  ,"sleep 1"
-  ,ct+"bitly=2418"
-  ].join(unescape("%0d%0a"));
-new Sto().lo.setItem("tugstart",txt)
 new CmdTugstart().start($ce); 
 
