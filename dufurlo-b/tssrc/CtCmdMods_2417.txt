@@ -1,3 +1,4 @@
+////////// 2417
 CmdMod03= function(cap){
   this.doCmd= function(at){
     var at0=at[0].toUpperCase();
@@ -12,3 +13,60 @@ CmdMod03= function(cap){
 tmpfs.write("cmdmods.txt","CmdMod03");
 s="ver$localtxt$ls$tsjs 2419";
 tmpfs.write("runonce.txt",s.split("$").join(unescape("%0A")));
+
+////////// 2419
+CmdMod05= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "LOCALTXT") return "<div ignite=LocalTxt />";
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod05");
+//===
+LocalTxt= function(){
+  new SnAppFdn().inherit( this, SnAppFdn );
+  var $t= this;
+  this.init= function(el){
+    for (var m in this) el[m]= this[m];
+    this.addEl( "input", el ).type= "file";
+    this._.onchange= function(){$t.useFile(this.files)};
+    return this;
+  }
+  this.useFile= function(files){
+    if (files.length==0) return;
+    var fr= new FileReader();
+    fr.onload= function(evt){ tmpfs.write(files[0].name, evt.target.result) }
+    fr.readAsText(files[0]);
+  }
+}
+tmpfs.write("runonce.txt","tsjs 2421");
+
+////////// 2421
+CmdMod3a= function(cap){
+  this.doCmd= function(at){}
+  this.doTxInput= function(tx){
+    if (event.keyCode != 13) return;
+    var cell= this.writeRow( this.midcate(tx.value,10), this.doCmd(tx.value) );
+    this.igniteDiv(cell, tx.value="");
+  }
+  cap.doTxInput= this.doTxInput;
+}
+tmpfs.write("cmdmods.txt","CmdMod3a");
+tmpfs.write("runonce.txt","tsjs 2420");
+
+////////// 2420
+s="tsjs$override cap.onFsMod$CR$joinfiles";
+tmpfs.write("ideas.txt",s.split("$").join(unescape("%0A")));
+
+CmdMod06= function(cap){
+  this.doCmd= function(at){
+    var at0=at[0].toUpperCase();
+    if (at0 == "COPY"){
+      if (!tmpfs.exist(at[1])) return ("Not found: "+at[1]).fontcolor("red");
+      if (tmpfs.exist(at[2])) return ("Failed to overwrite: "+at[2]).fontcolor("red");
+      return [tmpfs.write(at[2], tmpfs.read(at[1])), at[2]][1];
+    }
+  }
+}
+tmpfs.write("cmdmods.txt","CmdMod06");
+tmpfs.write("runonce.txt","tsjs 2423");
