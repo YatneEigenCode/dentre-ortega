@@ -1,0 +1,128 @@
+<meta name=viewport content="width=device-width, initial-scale=1.5, maximum-scale=4.0, minimum-scale=0.7" />
+<!DOCTYPE html>
+<title>autolink</title>
+<html>
+<body>
+<img id="foo98" src="" />
+
+<img src="https://dl.dropboxusercontent.com/u/28448395/jsondata/svg-playground2.svg">
+
+<img xsrc="https://dl.dropboxusercontent.com/u/28448395/jsondata/hbd-JAH.svg">
+
+
+<!-- ********************************************** -->
+
+
+<br />
+<a href="http://1.bp.blogspot.com/-m2c2VPbsHEk/UlzWg7PTlLI/AAAAAAAACIY/vGkVMQjmYMg/s1600/captain_america_by_contreras19-d64iqjo.png">Click here to preload costume image if needed</a>
+<br />
+<div jsMorph="Peekboo">
+  <form>
+    <textarea name=ta1 rows=10 cols=40></textarea>
+    <input type=button onclick="this.form.doSave()" value="Save">
+    <input type=hidden name="jsMorph_ToyoForm">
+    <input type=hidden name="tsNum" value="2036">
+  </form>
+</div>
+
+<script>
+//6-13-14 JChoy animation; use svg art
+//6-16-14 JChoy unescape-cgi; replaceImg(); change clippath
+//6-25-14 JChoy flip horizontal
+//7-24-14 JChoy ToyoForm
+//11-2-14 JChoy working as 2037 reading 2036
+//---------------------
+function ToyoForm(){
+	this.tsUrl= "http://rip.okdaily.com/mad/textStore.php";
+	this.morph= function(fm){
+		for (var m in this) fm[m]= this[m];
+	}
+	this.doSave= function(){
+		var pl = btoa(this.ta1.value);
+		pl = "data_ts_"+this.tsNum.value+"=" + JSON.stringify( {text64:pl} );
+		url= "?f=set&i="+this.tsNum.value+"&data="+ escape(pl);
+		var img= new Image();
+		img.src= this.tsUrl + url;
+		alert( "Saved ");
+	}
+}
+//---------------------
+function PageApp(){
+	var _d= document;
+	this.elids= ["tx0","tx1","foo98"];
+	this.num= 1858;
+	this.ripurl = "http://rip.okdaily.com/mad/textStore.php?f=text&i=";
+	this.relurl = "svg_data.txt?";
+	this.cgi= function(k,def,qy){var at=(qy+"").split(new RegExp("[\&\?]"+k+"=")); return (at.length==1)?def:at[1].split("&")[0]; }
+
+	this.start= function(){
+		var tx = unescape(this.cgi("t","Bob",location));
+		this.activeEls = this.morphEls();
+		this.jsonRead();
+	}
+
+	this.morphEls= function(){
+		var res = new Array()
+		for (var i=0, toyo = new ToyoForm(); i<_d.forms.length; i++) {
+			if (_d.forms[i].jsMorph_ToyoForm)
+			  toyo.morph(_d.forms[i]);
+			if (_d.forms[i].jsMorph_ToyoForm)
+			  res.push(_d.forms[i]);
+		}
+		return res;
+	}
+
+	this.jsonRead= function(){
+		var jg = new JsonGet("data_ts_2036", this, "jGot", 5);
+		jg.srcScript( this.ripurl+"2036" );
+		jg.start();
+	}
+	this.jGot= function(resJson, jg){
+		var disx = "data:image/svg+xml;charset=utf-8;base64,";
+		if (resJson) {
+			var fix64= resJson.text64.replace(/ /g, '+');
+			var uu= this.cgi("url","http://www.youtube.com/watch?v=",location);
+			var at=atob(fix64).split(' ');
+			for (var i=0; i<at.length; i++){
+			  var link= _d.createElement('a');
+			  link.href= uu+at[i];
+			  link.innerHTML= ' ***'+i;
+			  _d.body.appendChild(link);
+			}
+			if (this.activeEls.length>0)
+				this.activeEls[0].ta1.value= atob(fix64);
+		}
+	}
+}
+//----------
+JsonGet= function(key, client, meth, limit){
+	this.key= key;
+	this.client= client;
+	this.meth= meth;
+	this.expiry= new Date().valueOf() + limit*1000;
+	this.start= function(){
+		window[this.key]= null;
+		var _pt= this;
+		this.cbFcn = function(){_pt.tup()};
+		setTimeout( this.cbFcn, 300 );
+	}
+	this.srcScript= function(url){
+		var el = document.createElement("scr"+"ipt");
+		el.setAttribute("src", url+"&rand"+Math.random() );
+        	document.body.appendChild(el);
+	}
+	this.tup= function(){
+		if (window[this.key])
+			this.client[meth](window[this.key])
+		else if (new Date().valueOf() > this.expiry)
+			this.client[meth](null,this)
+		else
+			setTimeout( this.cbFcn, 300 );
+	}
+}
+new PageApp().start();
+</script>
+<script xsrc="http://rip.okdaily.com/mad/scrape2json.php?feed=textStore.php%3Fi"></script>
+
+</body>
+</html>
