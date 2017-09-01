@@ -1,0 +1,15 @@
+//8-31-2017 jchoy ts2578 v0.914
+Favicon=function(){  
+ this.start=function(at){return [this.setFavicon(at[1]),"missing url argument","ok"][at.slice(0,1).length];}
+ this.setFavicon= function(src){
+ (function(g,p,t){(function(o,t){for(var m in t)o[m]=t[m]})(p.appendChild(document.createElement(g)),t)})(
+  "link",document.head, {id:"dynamic-favicon", rel:"icon", href:src} );
+ }
+ var T=this;
+ T.mkSetFn=function(nm,v){ return function(o){if(o)o[nm]=v;} }
+ T.elApply=function(qy,fn){ fn( document.querySelector(qy) ) }
+ T.chgFavicon=function(src) {
+  ["shortcut icon","icon"].map( function(m){
+   T.elApply("link[rel=""+m+""]",T.mkSetFn("href",src))} );
+ }
+} 
