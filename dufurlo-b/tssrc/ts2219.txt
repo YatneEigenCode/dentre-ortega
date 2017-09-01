@@ -1,3 +1,22 @@
 DataCls= function(){
- this.text="The transformative magical dyreda message is deceptively plain.";
+ var s= "Welcome to Haqabob";
+ s+="<br>This web page is a web app providing the framework to load js applets.";
+ s+=" It has offline accessibility using html5 and the applets are stored locally using html5.";
+ s+="<br><br>TODO: ";
+ s+="<br>- loop at end of More";
+ s+="<br>- convert CRLF";
+ s+="<br>- autosave buffer";
+ s+="<br>- autolink";
+ s+="<br>v- favorite";
+ s+="<br>- More on refresh / reset button";
+ s+="<br>- linkmaker";
+// s+="<br>x- initial load checker app";
+// s+="<br>x- checker loads useful apps";
+// s+="<br>v- remote app that subscribes to shared data";
+// s+="<br>v- need a type of content-less app/DataCls";
+// s+="<br>v- DyredaApp to cache in separate db";
+ s+="<br>- More as a toggle";
+ s+="<br>- Maker takes command to load url";
+// s+="<br>v- hosted coupon code interpreter";
+ this.text= s;
 }
