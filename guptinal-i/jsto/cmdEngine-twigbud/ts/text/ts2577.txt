@@ -1,15 +1,16 @@
-//9-1-2017 jchoy v0.124 tab cfg.csv
+//9-1-2017 jchoy v0.128 buildCsv
 //This can be used to run an externally stored CETB script
 
 CmdTugstart= function(){
   new AppTool().inherit( this, CmdAutostart );
+  this.cr= unescape("%0d%0a");
   this.start= function(ce){
     this.cfg= {sl:new StoLog("tugstart.log"), nc:"none"};
     this.parse(ce, this.mkContent());
   }
   this.mkContent= function(){
-    var at, ct= "link . ", csv="QQtc_cfg.csv";
-    at= [ct+"tugstart r1003 $date"
+    var at, ct= "link . ", csv="tc_cfg.csv";
+    at= [ct+"tugstart r1006 $date"
       ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
       ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
       ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
@@ -20,8 +21,15 @@ CmdTugstart= function(){
       ];
     var st= this.cfg.sl.cfg.st;
     if (st.isOk) 
-      if (!st.lo.getItem(csv)) at.push("tab "+csv);
-    return at.join(unescape("%0d%0a"));
+      if (this.buildCsv(csv, st))
+        at.push("tab "+csv);
+    return at.join(this.cr);
+  }
+  this.buildCsv= function(csv, st){
+    if (st.lo.getItem(csv)) return false;  //did nothing
+    var at="K,V$dm,http://tserv.it/$pa,/bay/ws/{v}".split("$");
+    st.lo.setItem(csv, at.join(this.cr) );
+    return true;
   }
 }
 new CmdTugstart().start($ce); 
