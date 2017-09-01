@@ -1,5 +1,6 @@
-//8-31-2017 jchoy ts2578 v0.914
-Favicon=function(){  
+pkg=pkg2578={ver:"0.915-20170901"}
+Favicon=function(){
+ new AppTool().inherit( this, StoTab );
  this.start=function(at){return [this.setFavicon(at[1]),"missing url argument","ok"][at.slice(0,1).length];}
  this.setFavicon= function(src){
  (function(g,p,t){(function(o,t){for(var m in t)o[m]=t[m]})(p.appendChild(document.createElement(g)),t)})(
@@ -12,4 +13,5 @@ Favicon=function(){
   ["shortcut icon","icon"].map( function(m){
    T.elApply("link[rel=""+m+""]",T.mkSetFn("href",src))} );
  }
-} 
+}
+new PkgWiz("2578","defcmd favicon Favicon");
