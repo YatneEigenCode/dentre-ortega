@@ -1,3 +1,4 @@
+//as found in 2101
 //11-9-14 JChoy test stub
 //11-11-14 JChoy regexp replace; muxUrl
 //11-15-14 JChoy JGetDemo4 2070
@@ -11,23 +12,13 @@ function QuikMob(){
 	if (Curly) Curly.inherit_js_class( "DomHelper",  this );
 	this.btnLabel = "GO";
 	this.aUtil = [];
-	this.msgFull= "Maximum capacity - no new participants allowed.";
-	this.msgExpire= "This questionnaire has expired due to inactivity.";
-	this.msgInvalid= "That questionnaire does not exist. ";
 	this.start=function(){
 		if (!(new Darwin().isAcceptable()))
 			return this.write("Really? you call this a browser?");
 		this.div.innerHTML= "Loading...";
 		this.userid= new RandomName().getUserID();
 		this.myVals= {id:this.userid, val:"", name:"My Name"}
-		this.roomQ= new RoomQ(0, new OOCallback(this,"start_q").fcn );
-		setTimeout( new OOCallback(this,"invalidID").fcn, 5000 );
-	}
-	this.invalidID= function(){
-		if (!this.slotNum) this.div.innerHTML = this.msgInvalid+this.cgi("di","",location);
-	}
-	this.start_q= function(roomQ){
-		this.slotNum = roomQ.getTSNum( this.cgi("di","",location) );
+		this.slotNum = this.cgi("dn","2078",location);
 		this.jGetter= new JIOByNum();
 		this.refresh("startD");
 	}
@@ -35,51 +26,38 @@ function QuikMob(){
 		this.jGetter.jGet( this.slotNum, new OOCallback(this,meth).fcn );
 	}
 	this.saveMyData= function(){
-		if (!this.myIndex1) return this.refresh("saveData");
-		var old= this.jsonObj.list[this.myIndex1-1];
+		var old= this.jsonObj.list[this.myIndex];
 		if (old.name+old.val==this.myVals.name+this.myVals.val) return;
 		this.refresh( "saveData" );
 	}
 	this.saveData= function(s){
 		this.jsonObj = JSON.parse(s);
-		if (!this.myIndex1) this.jsonObj.list.push(this.myVals)
-		else this.jsonObj.list[this.myIndex1-1]=this.myVals;
-		this.jsonObj.lastSaved= new Date().valueOf();
+		this.jsonObj.list[this.myIndex]=this.myVals;
 		this.jGetter.jSave( JSON.stringify(this.jsonObj) );
 		this.startD( JSON.stringify(this.jsonObj) );
 	}
 	this.setMyVals= function(ar,i){
-		if (ar.id!=this.userid) return "";
 		this.myVals.name=ar.name;
 		this.myVals.val=ar.val;
-		this.myIndex1= i+1;
-		return " <b>(me)</b>";
+		this.myIndex= i;
+		return "*";
 	}
 	this.startD= function(s){
 		this.jsonObj = JSON.parse(s);
 		this.div.innerHTML = "";
 		for (var i=0,aUtil=[],at=this.jsonObj.list; i<at.length; i++)
-			aUtil.push( [at[i].name+this.setMyVals(at[i],i),at[i].val] );
+			aUtil.push( [at[i].name,at[i].val,(at[i].id==this.userid)?this.setMyVals(at[i],i):""] );
 		this.div.appendChild(this.mkDiv(this.jsonObj.q));
-		if (!aUtil.length) aUtil.push(["No participants have responded yet"]);
 		this.div.appendChild(this.mkTable(aUtil,{border:"1",cellSpacing:0}));
 		var fcn = new OOCallback(this,"handleBlur").fcn;
-
-		if (this.isExpired())	return this.div.appendChild(this.mkDiv(this.msgExpire));
-		if ((!this.myIndex1) && (this.jsonObj.list.length>=this.jsonObj.max)) //full cap
-			return this.div.appendChild(this.mkDiv(this.msgFull));
 		this.div.appendChild(this.mkTxBx(20,this.myVals.name,"tx1")).onblur= fcn;
 		this.showChoices(fcn);
-	}
-	this.isExpired= function(){
-		if (!this.jsonObj.lastSaved) return false;
-		var exp = new Date(this.jsonObj.lastSaved);
-		return (exp.setDate(exp.getDate()+10) < new Date());
 	}
 	this.showChoices= function(fcn){
 		var div = this.div.appendChild(this.mkDiv(""));
 		for (var i=0,at=this.jsonObj.choices; i<at.length; i++){
 			div.appendChild(this.mkButton(at[i])).onclick= fcn;
+			div.lastChild.style.margin= 4;
 			div.lastChild.purpose="choice";
 		}
 		this.div.appendChild(this.mkButton("Refresh")).onclick= fcn;
