@@ -1,0 +1,16 @@
+pkg=pkg2525={ver:"0.114-20170513"};
+pkg.TempleCurly=function(){
+ this.cb=new StoTabEnv();
+ this.start=function(ap){
+  this.cb.fileName=ap[0]+"_cfg.csv";
+  if (ap.length<4) return "eg: tsc {ul}{0} 2447,2505 pkg2505";
+  var res=this.cb.exp(ap[1]);
+  this.prepSn(res).start( ap[2], ap[3], function(){} );
+  return "ok-"+res;
+ }
+ this.prepSn= function(temple){
+    var sn= new SnCurly(); 
+    return [sn, sn.textPkgUrl=temple, sn.cfgJsLoader=function(){}][0];
+ }
+}
+new PkgWiz("2525","defcmd tsc TempleCurly");

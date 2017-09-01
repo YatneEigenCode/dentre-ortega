@@ -1,0 +1,21 @@
+pkg=pkg2524={ver:"0.115-20170513"};
+pkg.TmplCmd=function(){
+ this.cb=new StoTabEnv();
+ this.start=function(ap){
+  this.cb.fileName=ap[0]+"_cfg.csv";
+  var res=this.cb.exp(ap.slice(1).join(" "));
+  return ["Ok: "+res,$ce.parse(res)][0];
+ }
+}
+PkgWiz= function(n,cmd){
+ this.start=function(n,cmd){
+  var $p= window["pkg"+n];
+  $p.contents=[
+   { name:"pkg.startup",text:cmd}
+  ,{ name:"pkg"+n+"notes",text:"v"+$p.ver}
+  ]
+  new PkgTool().start($p, $p.contents);
+ }
+ this.start(n,cmd);
+}
+new PkgWiz("2524","defcmd tc TmplCmd");
