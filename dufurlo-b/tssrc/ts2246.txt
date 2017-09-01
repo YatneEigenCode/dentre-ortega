@@ -3,42 +3,37 @@
 <form>
 <select style="display:none" name=sel1></select><select style="display:none" name=sel2></select>
 <input type=button value=Save name=save style="display:none;margin:2 5 2 5" onclick="this.form.helper.doButtonClick(this)">
-</form><a href="http://rip.okdaily.com/mad/tsm.php?f=html&i=2246"><img src="http://demo-project-jcc9.c9.io/mimebob?i=3" alt="gmail web: click to see image"></a>
+</form><a href="http://rip.okdaily.com/mad/tsm.php?f=html&i=2248"><img src="http://demo-project-jcc9.c9.io/mimebob?i=3" alt="gmail web: click to see image"></a>
+<img src="http://demo-project-jcc9.c9.io/mb64?i=9">
 
 
 <div style="display:none"><?xml version="1.0"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg id="deadgear" width="380" height="220" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#88AACC;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#005577;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect x="0" y="0" height="220" width="380" style="fill: #DCDCBC"/>
-  <rect x="5" y="5" height="210" width="370" style="fill:url(#grad1);clip-path:url(#clipPath3);"/>
+<svg id="deadgear" width="300" height="220" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect x="0" y="0" height="220" width="300" style="fill: #DCDCBC"/>
+  <rect x="5" y="5" height="210" width="290" style="fill: #005577"/>
   __$CUSTOM_SVG$__
 </svg>
 </div>
 
 <script src="/mad/textStore.php?f=text&i=2243"></script>
 <script>
-//9-27-15 JChoy SvgEd ts2246 - update data in ts, update svg in mbs
+//9-27-15 JChoy SvgEd ts2248 - no gradient, save jpg
 function SvgEd(){
   new Ooze().bake(this);
   this.mbsUrl= "http://demo-project-jcc9.c9.io/mbs?i=3";
   this.datUrl= "http://rip.okdaily.com/mad/textStore.php?f=text&i=2247";
   this.customSvg= '<text id="tx0" fill="yellow" font-size="18" font-family="Arial" x="30" y="__$Y$__">';
   this.start= function(){
-	 this.initDom();
+	this.initDom(document);
   }
-  this.initDom= function( ){
-	if (document.images.length==0) return;
-	document.images[0].onclick= this.imgClickFcn;
-	document.images[0].helper = this;
-	document.images[0].form= document.forms[0];
-	this.dataDiv= document.getElementsByTagName("div")[0];
+  this.initDom= function( $d ){
+	if ($d.images.length==0) return;
+	$d.images[0].onclick= this.imgClickFcn;
+	$d.images[0].helper = this;
+	$d.images[0].form= $d.forms[0];
+	this.dataDiv= $d.getElementsByTagName("div")[0];
   }
   this.imgClickFcn= function(){
  	new SrcCls().start( "svgData", this.helper.datUrl, 
@@ -52,38 +47,28 @@ function SvgEd(){
   this.showForm= function(form){
 	form.helper= this;
 	form.sel1.options.length=0;
-	for (var i=0,at=this.data.items; i<at.length; i++)
-		form.sel1.options[i]= new Option(at[i],at[i]);
-	form.sel1.selectedIndex= -1;
+	this.fillSel( form.sel1, this.data.items );
 	form.sel1.onchange= this.showSel2Fcn;
 	form.sel1.style.display= "block";
   }
   this.showSel2Fcn= function(){
-	var data= this.form.helper.data;
-	if (this.form.sel2.options.length==0)
-	  for (var i=0,at=data.responseChoices; i<at.length; i++)
-		this.form.sel2.options[i]= new Option(at[i],at[i]);
-	this.form.helper.setSelectedValue( this.form.sel2, data.responses[this.selectedIndex] );
-	this.form.sel2.style.display= "block";
-	this.form.save.style.display= "block";
+	var $f= this.form;
+	var data= $f.helper.data;
+	if ($f.sel2.options.length==0) $f.helper.fillSel( $f.sel2, data.responseChoices );
+	$f.helper.setSelectedValue( $f.sel2, data.responses[this.selectedIndex] );
+	$f.sel2.style.display= $f.save.style.display= "block";
   }
   this.doButtonClick= function( el ){
 	var n= -1;
 	for (var i=0,at=this.data.items; i<at.length; i++)
 	  if (at[i]==this.getSelectedText(el.form.sel1)) n = i
 	this.data.responses[n]= this.getSelectedText(el.form.sel2);
-	this.saveData( document.images[0], this.data );
+	this.saveData( this.data );
   }
-  this.getSelectedText= function( sel ){
-	return sel.options[sel.selectedIndex].text;
-  }
-  this.setSelectedValue= function( sel, val ){
-	for (var i=0; i<sel.options.length; i++)
-	  if (sel.options[i].text==val) sel.options[i].selected=true;
-  }
-  this.saveData= function( img, obj ){
+  this.saveData= function( obj ){
 	var res= obj.name +"="+ JSON.stringify( obj );
-	 img.onload= img.onerror= this.saveSvgFcn;
+	var img= document.images[0];
+	img.onload= img.onerror= this.saveSvgFcn;
 	img.src= this.datUrl.replace("?f=text","?f=set")+"&data="+escape(res);
   }
   this.saveSvgFcn= function(){ 
@@ -104,28 +89,33 @@ function SvgEd(){
 	return res;
   }
   this.imgLoadFcn= function(){
-	  this.onload= this.onerror= null;
-	  this.src= this.helper.mbsUrl.replace("/mbs?","/mimebob?")+"&r="+Math.random();
+	var sjs= new SvgJpgSaver(this.helper.mbsUrl.replace("3","9").replace("/mbs","/mbs64"));
+	this.onerror= null;
+	this.onload= sjs.createCBfunction( "save", this );
+	this.src= this.helper.mbsUrl.replace("/mbs?","/mimebob?")+"&r="+Math.random();
   }
-}
-//-----
-SrcCls= function(){
-  new Ooze().bake(this);
-  this.start= function(name,url,cb){
-	 this.cb = cb;
-	 var $privThis= this;
-	 var el=document.createElement("script");
-	 document.body.appendChild( this.bake(el,{src:unescape(url)},window[name]= null) );
-	 var myIntv=setInterval( function(){if(window[name]) $privThis.deploy(name)}, 500 );
-	 setTimeout(function(){ clearInterval(myIntv)},9000);
-  }
-  this.deploy= function(name){
-	if (this.isDone) return; else this.isDone= true;
-	if (this.cb) return this.cb( window[name] );
-	new window[name]().start();
-  }
+  this.extendClass( SelectUtil );
 }
 
+//-----
+function SvgJpgSaver(url){
+  new Ooze().bake( this );
+  this.mbsUrl= url;
+  this.save= function(img, va){
+	var cnv= document.createElement("canvas");
+	cnv.width = img.width;
+	cnv.height= img.height;
+	 var res = img.helper.dataDiv.innerHTML.replace("__$CUSTOM_SVG$__", img.helper.buildCustomSvg() );
+	var im= new Image();
+	im.src= "data:image/svg+xml;base64,"+btoa(res);
+	var ctx = cnv.getContext('2d');
+	ctx.drawImage( im, 0, 0 );
+	var s= cnv.toDataURL('image/jpeg', 0.1);
+alert(s.length);
+	var im= new Image();
+	im.src= this.mbsUrl + "&data="+escape(s.substr(23));
+  }
+}
 new SvgEd().start();
 </script>
 <html>
