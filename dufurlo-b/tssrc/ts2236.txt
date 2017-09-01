@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg id="headgear2" width="580" height="220" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#88AACC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005577;stop-opacity:1" />
+    </linearGradient>
+    <path id="path_t" d="M200,140 L200,100 C200,0 400,0 400,100" />
+    <path id="path_t2" d="M185,60 L185,100 C185,220 410,220 410,100" />
+    <path id="path1"  d="M200,150 L400,70" />
+  </defs>
+  <rect x="0" y="0" height="200" width="510" style="fill: #DCDCBC"/>
+  <rect x="5" y="5" height="190" width="500" style="fill:url(#grad1);clip-path:url(#clipPath3);"/>
+  <text id="tx0" fill="yellow" font-size="18" font-family="Verdana"
+    x="48" y="72"><textPath xlink:href="#path_t">JKC, top notch expert (yatne)</textPath></text>
+  <text id="tx0" fill="orange" font-size="33" font-family="Arial"
+    x="48" y="72"><textPath xlink:href="#path1">&#27225;&#33394;&#21313;&#26376;</textPath></text>
+  <text id="tx0" fill="#44AA00" font-size="23" font-family="Arial"
+    x="48" y="72"><textPath xlink:href="#path_t2">Keep calm &amp; send in MadBum</textPath></text>
+</svg>
