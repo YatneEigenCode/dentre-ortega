@@ -1,4 +1,6 @@
 HtmlApp= function(){
  new Ooze().extend(this,PageOff_HtmlApp);
- this.text= "Let's ooze tonight!";
+ this.text= "Welcome to Haqabob<br>"
+ +"This web page is a web app providing the framework to load js applets."
+ +" It has offline accessibility using html5 and the applets are stored locally using html5.";
 }
