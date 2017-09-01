@@ -1,0 +1,80 @@
+//bak
+//11-10-14 JChoy MyCfg 2054
+//11-11-14 JChoy MyCfgExt
+//11-12-14 JChoy pClass, addJS
+//-----
+function MyCfg(){
+  if (Curly) Curly.inherit_js_class( "Ajax",  this );
+  this.mainPanelCfgNum= "2075";  //"2053";
+  this.auxPanelCfgNum= "1631";
+  this.defaultNn= "1789";
+  this.pClass= "JGetDemo3";
+  this.addJS= "TS2050";
+
+  var cfgName = this.cgi('cfg','',location);
+  if (cfgName) new MyCfgExt(this,cfgName);
+}
+//usage: new MyCfg().mainPanelCfgNum;
+//-----
+
+function MyCfgExt(obj,cfgName){
+  if (cfgName=="waffle"){
+	obj.muxUrl= "http://rip.okdaily.com/svc/amdisk/cq/tabulofl.htm?waffle,";
+  }
+  if (cfgName=="text"){
+	obj.muxUrl= "/mad/textStore.php?f=text&i=";
+  }
+  if (cfgName=="csds"){
+	obj.muxUrl= "/mad/tsm.php?f=html&i=2063&nn=";
+  }
+  if (cfgName=="list"){
+	obj.muxUrl= "/mad/tsm.php?f=html&i=2063&nn=1789&dn=";
+  }
+  if (cfgName=="amzaannnn"){
+	obj.muxUrl= "http://www.amazon.com/gp/product/{0}/ref=as_li_tf_tl?ie=UTF8&tag=aannnn-20&linkCode=as2&camp=217145&creative=399373&creativeASIN={0}";
+  }
+  if (cfgName=="tsm"){
+	obj.muxUrl= "/mad/tsm.php?f=html&i=";
+  }
+  if (cfgName=="stable_20141111"){
+	obj.mainPanelCfgNum= "2064";
+	obj.muxUrl= "http://rip.okdaily.com/mad/tsm.php?f=html&i=2046&nn=1789&dn=";
+  }
+  if (cfgName=="test"){
+	obj.muxUrl= "http://rip.okdaily.com/mad/tsm.php?f=html&i=2046&nn=1789&dn=";
+	obj.pClass= "JGetDemo3";
+	obj.addJS= "TS2050";
+  }
+  if ((cfgName=="testQuikMob") || (cfgName=="QuikMob")){
+	obj.pClass= "QuikMob";
+	obj.addJS= "TS2084";
+  }
+  if (cfgName=="QuikVote"){
+	obj.pClass= "QuikVote";
+	obj.addJS= "TS2123";
+  }
+  if (cfgName=="QMM"){
+	obj.pClass= "QuikMobMaker";
+	obj.addJS= "TS2140";
+  }
+  if (cfgName=="QVM"){
+	obj.pClass= "QuikVoteMaker";
+	obj.addJS= "TS2140";
+  }
+  if (cfgName=="JReader"){
+	obj.pClass= "JReader";
+	obj.addJS= "TS2147";
+  }
+  if (cfgName=="test2077"){
+	obj.pClass= "DemoBT14";
+	obj.addJS= "TS2077";
+  }
+  if (cfgName=="testQMM"){
+	obj.pClass= "QuikMobMaker";
+	obj.addJS= "TS2106";
+  }
+  if (cfgName=="test2070"){
+	obj.pClass= "JGetDemo4";
+	obj.addJS= "TS2070";
+  }
+}

@@ -1,0 +1,25 @@
+//12-01-14 JChoy JReader 2147
+//TODO: 
+//-----
+function JGetDemo4(){
+	if (Curly) Curly.inherit_js_class( "JReader",  this );
+	//if (Curly) Curly.inherit_js_class( "QuikVoteMaker",  this );
+	//if (Curly) Curly.inherit_js_class( "QuikMobMaker",  this );
+}
+//-----
+function JReader(){
+	if (Curly) Curly.inherit_js_class( "ViewRO",  this );
+	if (Curly) Curly.inherit_js_class( "DomHelper",  this );
+	this.start=function(){
+		if (!(new Darwin().isAcceptable()))
+			return this.write("Really? you call this a browser?");
+		this.div.innerHTML= "Loading...";
+		this.slotNum = this.cgi("dn","",location);
+		this.jGetter= new JIOByNum();
+		this.jGetter.jGet( this.slotNum, new OOCallback(this,"startD").fcn );
+	}
+	this.startD= function(s){
+		this.div.innerHTML= "Data for "+this.slotNum;
+		this.div.appendChild(this.mkDiv(s));
+	}
+}

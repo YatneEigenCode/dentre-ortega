@@ -1,0 +1,46 @@
+//11-24-14 JChoy DomHelper 2090
+//11-25-14 JChoy default margin for buttons;
+//11-27-14 JChoy niceCheckBox, niceTable, mkSvgBar;
+
+function DomHelper(){
+	this.dhDefaults= {buttonMargin:3}
+	this.niceTable= function(tbl,colors){
+		var clr= colors || ["#F4EEEE",null];
+		for (var i=0; i<tbl.rows.length; i++)
+			tbl.rows[i].style.backgroundColor= clr[i % clr.length];
+	}
+	this.niceCheckBox= function(cb){
+		cb.parentNode.style.backgroundColor = (cb.checked)? "gray":null;
+		cb.parentNode.style.border = (cb.checked)? "1 solid black":"none";
+	}
+	this.mkSvgBar= function(w,h,color){
+		return '<svg height="'+h+'" width="'+w+'"><line x1="0" y1="'+h/2+'" x2="'+
+			w+'" y2="'+h/2+'" style="stroke:'+color+';stroke-width:'+h+'" /></svg>';
+	}
+	this.mkCkBx= function(isChecked,isEnabled,name){
+		return this.mkEl("input", {type:'checkbox',checked:isChecked, disabled:!isEnabled, name:name} );
+	}
+	this.mkTxBx= function(size,val,name){
+		return this.mkEl("input", {size:size, value:val, name:name} );
+	}
+	this.mkTable= function(aData,attribs){
+		var res= this.mkEl("table",attribs);
+		for (var i=0; i<aData.length; i++)
+		  for (var row=res.insertRow(i),j=0; j<aData[i].length; j++)
+			if (aData[i][j].tagName) { row.insertCell(j).appendChild( aData[i][j] );
+			} else { row.insertCell(j).innerHTML= aData[i][j] }
+		return res;
+	}
+	this.mkButton= function(s){
+		var res= this.mkEl("input", {value:s,type:"button"} );
+		return [res.style.margin=this.dhDefaults.buttonMargin, res][1];
+	}
+	this.mkDiv= function(s){
+		return this.mkEl("div", {innerHTML:s} );
+	}
+	this.mkEl= function(tag, attribs){
+		var res= document.createElement(tag);
+		if (attribs) for (var m in attribs) res[m]=attribs[m];
+		return res;
+	}
+}
