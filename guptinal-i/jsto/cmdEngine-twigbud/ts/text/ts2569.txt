@@ -5,7 +5,7 @@ TestCmd=function(){
   if (ap.length>3) {
    return [tmpfs.write(ap[1], ap.join(" ")),"saved to "+ap[1]][1];
   } else if (ap.length>2) {//req
-   return [this.setCookie("req",ap[1]+"/"+ap[2]),"ok"][1];
+   return this.cookieReq(ap[1],ap[2]);
   } else if (ap.length>1) {
    this.setCookie("listen","Y");
    return [$t.handle(),"..."][1];
@@ -13,13 +13,27 @@ TestCmd=function(){
    return [this.delCookie("listen"),"stop"][1];
   }
  }
+ this.cookieReq=function(nm,id){
+  this.setCookie("req",nm+"/"+id);
+  var lm= new LinkMaker();
+  var res= lm.start("x . loading...".split(" "));
+  var $sn= lm._.parentNode.lastChild;
+  var $rFn=function(){
+   if ($t.readCookie(id+"status")=="") return;
+   console.log(unescape($t.readCookie(id+"data")));
+   $sn.innerHTML=unescape($t.readCookie(id+"data"));
+   $sn.isX=true;
+  }
+  new RTI().retryTimedIf( 500, function(){ return $sn.isX;}, $rFn );
+  return res;
+ }
  this.handle=function(){
   var ap=this.readCookie("req").split("/");
   this.delCookie("req");
   console.log(ap.join("-"));
   if (ap.length>1) this.respond(ap[0],ap[1]);
   if (this.readCookie("listen")!="Y")
-   return [this.clr(),console.log("stop")];
+   return [this.clrPrev(),console.log("stop")];
   setTimeout( function(){$t.handle()}, 500 );
  }
  this.respond= function(name,tag){
