@@ -1,16 +1,12 @@
-//9-2-2017 jchoy TugText v0.136 slice.call(arguments)
+//9-2-2017 jchoy TugText v0.139 set location hash
 
 TugText= function(){
   new AppTool().inherit( this, CmdAutostart );
-  this.cr= unescape("%0d%0a");
   this.start= function(ce){
-    this.cfg= {sl:new StoLog("tugtext.log"), fn:"tugtext", pl:[].slice.call(arguments,1).join(this.cr)};
-    this.parse(ce, "link #://cmd/edit%20"+this.writePayload(this.cfg.fn));
-  }
-  this.writePayload= function(fn){
-    var st= this.cfg.sl.cfg.st;
-    if (st.isOk) st.lo.setItem( fn, this.cfg.pl );
-    return fn;
+    var cfg, st=new Sto(), cr= unescape("%0d%0a");
+    cfg= {fn:"tugtext", pl:[].slice.call(arguments,1).join(cr)};
+    if (st.isOk) st.lo.setItem( cfg.fn, cfg.pl );
+    location.hash= "#://cmd/edit%20"+cfg.fn;
   }
 }
 new TugText().start($ce,
@@ -21,5 +17,4 @@ new TugText().start($ce,
   ,""
   ,"TODO: a publisher class"
   ,"  list published files like bbs"
-  ,"  make this class more data friendly"
   ,""); 
