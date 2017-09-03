@@ -1,16 +1,11 @@
-//9-2-2017 jchoy TugText v0.139 set location hash
+//9-2-2017 jchoy TugText v0.141 filename in param
 
-TugText= function(){
-  new AppTool().inherit( this, CmdAutostart );
-  this.start= function(ce){
-    var cfg, st=new Sto(), cr= unescape("%0d%0a");
-    cfg= {fn:"tugtext", pl:[].slice.call(arguments,1).join(cr)};
-    if (st.isOk) st.lo.setItem( cfg.fn, cfg.pl );
-    location.hash= "#://cmd/edit%20"+cfg.fn;
-  }
-}
-new TugText().start($ce,
-  "welcome to TugText"
+TugText= function(fn){ this.start= function(){
+    var st=new Sto(), cr= unescape("%0d%0a");
+    if (st.isOk) st.lo.setItem( fn, [].slice.call(arguments,0).join(cr) );
+    location.hash= "#://cmd/edit%20"+fn;
+  }}
+new TugText("tugtext").start("Welcome to TugText"
   ,"This can be used to publish info"
   ,"Info is packaged into a javascript class"
   ,"Subscribers use loadjs [url]"
