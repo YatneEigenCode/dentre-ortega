@@ -1,0 +1,13 @@
+pkg=pkg2568={ver:"0.114-20170518"};
+pkg.FrameRig=function (){
+ var $t= this;
+ this.start=function(ap){
+  var s="<frames cols=\"50%,*\">";
+  for (var i=0; i<2; i++)
+   s+="<frame src=\""+document.location+"\"></frame>";
+  s+="</frames>";
+  top.document.body.innerHTML=s;
+  return "ok";
+ }
+}
+new PkgWiz("2568","defcmd fr FrameRig");
