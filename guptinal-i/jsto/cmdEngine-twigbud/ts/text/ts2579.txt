@@ -1,0 +1,26 @@
+//9-2-2017 jchoy v0.134 TugText mainly write text file
+
+TugText= function(){
+  new AppTool().inherit( this, CmdAutostart );
+  this.cr= unescape("%0d%0a");
+  this.start= function(ce){
+    this.cfg= {sl:new StoLog("tugtext.log"), fn:"tugtext", pl:""};
+    this.parse(ce, "link #://cmd/edit%20"+this.writePayload(this.cfg.fn));
+  }
+  this.line= function(s){ this.cfg.pl+=s+this.cr; }
+  this.writePayload= function(fn){
+    var T=this, res= "welcome";
+    T.line("welcome to TugText");
+    T.line("This can be used to publish info.");
+    T.line("Info is packaged into a javascript class.");
+    T.line("Subscribers use tc loadjs {url}");
+    T.line("");
+    T.line("TODO: a publisher class");
+    T.line("  list published files like bbs");
+    T.line("  make this class more data friendly");
+    var st= this.cfg.sl.cfg.st;
+    if (st.isOk) st.lo.setItem( fn, this.cfg.pl );
+    return fn;
+  }
+}
+new TugText().start($ce); 
