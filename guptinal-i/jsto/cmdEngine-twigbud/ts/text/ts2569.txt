@@ -1,0 +1,61 @@
+TestCmd=function(){
+ new AppTool().inherit(this,CookieJar);
+ var $t=this;
+ this.start=function(ap){
+  if (ap.length>3) {
+   return [tmpfs.write(ap[1], ap.join(" ")),"saved to "+ap[1]][1];
+  } else if (ap.length>2) {//req
+   return [this.setCookie("req",ap[1]+"/"+ap[2]),"ok"][1];
+  } else if (ap.length>1) {
+   this.setCookie("listen","Y");
+   return [$t.handle(),"..."][1];
+  } else {
+   return [this.delCookie("listen"),"stop"][1];
+  }
+ }
+ this.handle=function(){
+  var ap=this.readCookie("req").split("/");
+  this.delCookie("req");
+  console.log(ap.join("-"));
+  if (ap.length>1) this.respond(ap[0],ap[1]);
+  if (this.readCookie("listen")!="Y")
+   return [this.clr(),console.log("stop")];
+  setTimeout( function(){$t.handle()}, 500 );
+ }
+ this.respond= function(name,tag){
+  this.clrPrev();
+  if (tmpfs.exist(name)) {
+   var res=tmpfs.read(name);
+   this.setCookie( (this.prev=tag)+"status","200");
+   this.setCookie( tag+"size",res.length);
+   this.setCookie( tag+"data",escape(res));
+  } else {
+   this.setCookie( (this.prev=tag)+"status","404");
+  }
+ }
+ this.clrPrev=function(){
+  for (var i=0,at="status,size,data".split(","); i<at.length; i++)
+    this.delCookie(this.prev+at[i]);
+ }
+}
+function TmpFs(){
+  this.files= {};
+  this.exist= function(fn){ return (this.files[fn])? true:false; }
+  this.read= function(fn){ return this.files[fn]; }
+  this.write= function(fn, val){ this.files[fn]= val; }
+}
+CookieJar=function(){
+ this.exp70="Thu, 01 Jan 1970 00:00:01 GMT;";
+ var $d=document;
+ this.setCookie=function(nm,v){
+  $d.cookie=nm+"="+v;
+ }
+ this.readCookie=function(nm){
+  var at= ("; "+$d.cookie).split("; "+nm+"=");
+  return (at.length==1)? "" : (at[1].split(";")[0]);
+ }
+ this.delCookie=function(nm){
+  $d.cookie=nm+"=; expires="+this.exp70;
+ }
+}
+if (!window.tmpfs) tmpfs=new TmpFs()
