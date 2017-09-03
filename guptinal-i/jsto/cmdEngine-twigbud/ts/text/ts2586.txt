@@ -1,0 +1,21 @@
+pkg=pkg2586={ver:"0.125-20170903"};
+pkg.TugPublish=function(){
+ this.cb=new StoTabEnv();
+ this.start=function(ap){
+  if (ap.length<2) return "missing parameter #2";
+  //this.cb.fileName=ap[0]+"_cfg.csv";
+  var img=new Image()
+  this.cb.fileName="tc_cfg.csv";
+  //need to wrap in TugText class
+  img.src=this.cb.exp( "{dm}{wv}"+ap[1].split("_").pop() )+this.prepData(ap[1]);
+  return "Ok: ";
+ }
+ this.prepData= function(fn){
+  var q=unescape("%22"), cr=unescape("%0a")
+  var res= "new TugText("+q+fn+q+").start(" +q 
+    +this.cb.getSto().lo.getItem(fn).split(cr).join(q+","+q) +q+");";
+  return "&data="+encodeURIComponent(res);
+ }
+}
+//usage: #://cmd/tugpub%20tugtext_2581
+new PkgWiz("2586","defcmd tugpub TugPublish");
