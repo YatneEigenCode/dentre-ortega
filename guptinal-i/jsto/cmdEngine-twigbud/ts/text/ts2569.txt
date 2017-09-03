@@ -73,3 +73,9 @@ CookieJar=function(){
  }
 }
 if (!window.tmpfs) tmpfs=new TmpFs()
+EchoCookie=function(){
+ this.start=function(){
+  return document.cookie;
+ }
+}
+//evaljs
