@@ -1,15 +1,22 @@
-//9-2-2017 jchoy TugText v0.141 filename in param
+//9-3-2017 jchoy TugText v0.162 TugTab
 
-TugText= function(fn){ this.start= function(){
+TugTabText= function(fn,cmd){ this.start= function(){
     var st=new Sto(), cr= unescape("%0d%0a");
     if (st.isOk) st.lo.setItem( fn, [].slice.call(arguments,0).join(cr) );
-    location.hash= "#://cmd/edit%20"+fn;
+    if (cmd) location.hash= "#://cmd/"+cmd+"%20"+fn;
   }}
-new TugText("tugtext").start("Welcome to TugText"
+TugText= function(fn){ new AppTool().inherit( this, TugTabText, fn, "edit" ); }
+TugTab= function(fn){ new AppTool().inherit( this, TugTabText, fn, "tab" ); }
+
+new TugTabText("tugtext").start("Welcome to TugText"
   ,"This can be used to publish info"
   ,"Info is packaged into a javascript class"
   ,"Subscribers use loadjs [url]"
+  ,"Use tab tugtab to see list"
   ,""
   ,"TODO: a publisher class"
   ,"  list published files like bbs"
   ,""); 
+new TugTab("tugtab.csv").start( "K,V"
+  ,"Welcome Mesage,#://cmd/edit%20tugtext"
+  ,"this list,#://cmd/tab%20tugtab")
