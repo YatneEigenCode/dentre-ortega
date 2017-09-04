@@ -1,4 +1,4 @@
-pkg=pkg2578={ver:"0.915-20170901"}
+pkg=pkg2578={ver:"0.918-20170903"}
 Favicon=function(){
  new AppTool().inherit( this, StoTab );
  this.start=function(at){return [this.setFavicon(at[1]),"missing url argument","ok"][at.slice(0,1).length];}
@@ -9,9 +9,10 @@ Favicon=function(){
  var T=this;
  T.mkSetFn=function(nm,v){ return function(o){if(o)o[nm]=v;} }
  T.elApply=function(qy,fn){ fn( document.querySelector(qy) ) }
+ T.q=function(s){ var q=unescape("%22"); return q+s+q; }
  T.chgFavicon=function(src) {
   ["shortcut icon","icon"].map( function(m){
-   T.elApply("link[rel=""+m+""]",T.mkSetFn("href",src))} );
+   T.elApply("link[rel="+T.q(m)+"]",T.mkSetFn("href",src))} );
  }
 }
 new PkgWiz("2578","defcmd favicon Favicon");
