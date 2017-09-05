@@ -1,4 +1,4 @@
-//9-1-2017 jchoy v0.128 buildCsv
+//9-4-2017 jchoy v0.134 suggest tugpub list
 //This can be used to run an externally stored CETB script
 
 CmdTugstart= function(){
@@ -10,12 +10,14 @@ CmdTugstart= function(){
   }
   this.mkContent= function(){
     var at, ct= "link . ", csv="tc_cfg.csv";
-    at= [ct+"tugstart r1006 $date"
+    at= [ct+"tugstart r1008 $date"
       ,ct+"module repository: https://github.com/YatneEigenCode/dentre-ortega.git"
       ,ct+"repo path: /guptinal-i/jsto/cmdEngine-twigbud/ts/text"
       ,"link ct.htm?run=loadjs%20http://bit.ly/2jtJIxe"
       ,"link #no-op"
       ,"hashcmd"
+      ,ct+"2579 for list, 2586 for tugpub"
+      ,ct+"2586 needs mv entry in tc_cfg"
       ,"sleep 1"
       ,ct+"bitly=2418"
       ];
