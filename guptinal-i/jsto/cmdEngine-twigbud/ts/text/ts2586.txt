@@ -1,11 +1,12 @@
-pkg=pkg2586={ver:"0.128-20170903"};
+pkg=pkg2586={ver:"0.129-20170905"};
 pkg.TugPublish=function(){
  this.cb=new StoTabEnv();
  this.start=function(ap){
   if (ap.length<2) return "missing parameter #2";
-  var img=new Image()
-  this.cb.fileName="tc_cfg.csv";
-  img.src=this.cb.exp( "{dm}{wv}"+ap[1].split("_").pop() )+this.prepData(ap[1]);
+  var img=new Image(), fn=this.cb.fileName="tc_cfg.csv";
+  var src=this.cb.exp( "{dm}{wv}"+ap[1].split("_").pop() )+this.prepData(ap[1]);
+  console.log("tugpublish start "+src);
+  img.src= src;
   return "Ok: ";
  }
  this.prepData= function(fn){
