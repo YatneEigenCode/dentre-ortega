@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r0.123 9/7/2017 -->
+<!-- r0.124 9/8/2017 -->
 <body>
 <div>Use this page to demo embeds and live links from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
@@ -14,7 +14,7 @@
 <script src="http://localhost:3000/tbc_sdk.js"></script>
 <script>
   function write(d,s){ d.body.appendChild( d.createElement("div") ).innerHTML=s }
-  TBC.crunch("tbc_2_-2", ({ value }) => {write(document,value)});
+  TBC.crunch("tbc_2_-2", function(o){ write(document,o.value); });
   function reloadPage(){ location="?"+Math.random() }
 </script>
 <script>
