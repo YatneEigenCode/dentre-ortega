@@ -1,9 +1,12 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r0.215 9/7/2017 -->
+<!-- r0.315 9/7/2017 -->
 <body>
 <div>Use this page to demo embeds and live links from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
 <div>From tbc, we know<span id=tbc_insert>...</span></div>
+<form>
+<input name=spaceid><input type=button value=Subscribe onclick="this.form.doClick(this)">  
+</form>
 <div>
 <textarea></textarea>
 </div>
@@ -17,6 +20,14 @@
   function write(d,s){ d.body.appendChild( d.createElement("div") ).innerHTML=s }
   TBC.crunch("tbc_-4_-23", ({ value }) => {write(document,value)});
   function reloadPage(){ location="?"+Math.random() }
+  
+  (function(fm){
+    function addTbcCrunch(spaceid){
+      TBC.crunch(spaceid,  ({ value }) => {write(document,value)});
+    }
+    fm.doClick=function(button){ if (button.value=="Subscribe") this.crunch() }
+    fm.crunch=function(){ addTbcCrunch(this.elements["spaceid"].value) }
+  })( document.forms[0] )
 </script>
 <script>
 //6-1-2016 twigbud.htm config
