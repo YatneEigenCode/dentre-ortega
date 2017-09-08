@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r0.119 9/7/2017 -->
+<!-- r0.121 9/7/2017 -->
 <body>
 <div>Use this page to demo embeds and live links from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
@@ -7,7 +7,7 @@
 <div>
 <textarea></textarea>
 </div>
-<div onclick="reloadPage()">Reload</div>
+<div onclick="reloadPage()">[Reload]</div>
 </body>
 <script src="guptinal-i/jsto/cmdEngine-twigbud/js/ts604.js"></script>
 <script src="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
@@ -15,7 +15,7 @@
 <script xsrc="http://ec2-54-66-169-110.ap-southeast-2.compute.amazonaws.com:3000/tbc_sdk.js"></script>
 <script>
   function write(d,s){ d.body.appendChild( d.createElement("div") ).innerHTML=s }
-  TBC.crunch("tbc_-4_-23", ({ value }) => {write(document,value)});
+  TBC.crunch("tbc_2_-2", ({ value }) => {write(document,value)});
   function reloadPage(){ location="?"+Math.random() }
 </script>
 <script>
