@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r0.316 9/7/2017 -->
+<!-- r0.317 9/8/2017 -->
 <body>
 <div>Use this page to demo embeds and live links from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
@@ -17,8 +17,8 @@
 <script src="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
 <script src="http://ec2-54-66-169-110.ap-southeast-2.compute.amazonaws.com:3000/tbc_sdk.js"></script>
 <script>
-  function write(d,s){ var el=d.body.appendChild( d.createElement("div") ); el.innerHTML=s; return el }
-  TBC.crunch("tbc_-4_-23", ({ value }) => {write(document,value)});
+  function write(d,s){ var el=d.body.appendChild( d.createElement("div") ); el.innerHTML=s; return el };
+  TBC.crunch("tbc_-4_-23", ({ value }) => {write(document,value);});
   function reloadPage(){ location="?"+Math.random() }
   
   (function(fm){
