@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r1.332 9/8/2017 -->
+<!-- r1.334 9/8/2017 -->
 <body>
 <div>Use this page to demo embeds and live feeds from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
@@ -23,7 +23,7 @@
       if (button.value=="Try code") this.runCode()
     }
     fm.runCode=function(){
-      var res="<frameset rows-"50%,*"><frame src='"+location+"></frame><frame></frame></frameset>";
+      var res="<frameset rows-"50%,*"><frame src='"+location+"'></frame><frame></frame></frameset>";
       window.top.document.innerHTML= res;
     }
     fm.crunch=function(spaceid){
