@@ -1,12 +1,12 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r1.334 9/8/2017 -->
+<!-- r1.336 9/8/2017 -->
 <body>
 <div>Use this page to demo embeds and live feeds from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
 <div>Space ID<span id=tbc_insert></span></div>
 <form>
 <input name=spaceid><input type=button value=Subscribe onclick="this.form.doClick(this)">  
-<textarea></textarea><input type=button value="Try code" onclick="this.form.doClick(this)">  
+<textarea></textarea>
 </form>
 <div onclick="reloadPage()">[Reload]</div>
 </body>
@@ -20,11 +20,7 @@
   (function(fm){
     fm.doClick=function(button){
       if (button.value=="Subscribe") this.crunch()
-      if (button.value=="Try code") this.runCode()
-    }
-    fm.runCode=function(){
-      var res="<frameset rows-"50%,*"><frame src='"+location+"'></frame><frame></frame></frameset>";
-      window.top.document.innerHTML= res;
+      //if (button.value=="Try code") this.runCode()
     }
     fm.crunch=function(spaceid){
       var el= write(document,"..."), spaceid |= this.elements["spaceid"].value;
