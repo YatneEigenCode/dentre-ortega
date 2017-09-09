@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r0.324a 9/8/2017 -->
+<!-- r0.325 9/8/2017 -->
 <body>
-<div>Use this page to demo embeds and live links from other sites.</div>
+<div>Use this page to demo embeds and live feeds from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
 <div>Space ID<span id=tbc_insert></span></div>
 <form>
@@ -25,7 +25,7 @@
     fm.doClick=function(button){ if (button.value=="Subscribe") this.crunch() }
     fm.crunch=function(){
       var el= write(document,"..."), spaceid= this.elements["spaceid"].value;
-      TBC.crunch(spaceid, function(o){el.innerHTML=o.value} )
+      TBC.crunch(spaceid, function(o){el.innerHTML=[spaceid, o.value].join(" ")} )
     }
   })( document.forms[0] )
 </script>
