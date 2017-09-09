@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<!-- r1.327 9/8/2017 -->
+<!-- r1.328 9/8/2017 -->
 <body>
 <div>Use this page to demo embeds and live feeds from other sites.</div>
 <div id=app_client_div>&nbsp;</div>
@@ -8,12 +8,7 @@
 <input name=spaceid><input type=button value=Subscribe onclick="this.form.doClick(this)">  
 </form>
 <div>
-<textarea>Sample IDs
-tbc_-288_-14
-tbc_0_-2
-tbc_-8_12
-tbc_5_1
-tbc_5_3</textarea>
+<textarea></textarea>
 </div>
 <div onclick="reloadPage()">[Reload]</div>
 </body>
@@ -27,12 +22,13 @@ tbc_5_3</textarea>
   
   (function(fm){
     fm.doClick=function(button){ if (button.value=="Subscribe") this.crunch() }
-    fm.crunch=function(){
+    fm.crunch=function(spaceid){
       var el= write(document,"..."), spaceid= this.elements["spaceid"].value;
       TBC.crunch(spaceid, function(o){el.innerHTML=[spaceid, o.value].join(" >>--> ")} )
     }
   })( document.forms[0] )
   //TODO: show recent history
+  ["tbc_5_1","tbc_5_3","tbc_0_-2","tbc_-8_12","tbc_-288_-14"].map( function(id){document.forms[0].crunch(id)} );
 </script>
 <script>
 //6-1-2016 twigbud.htm config
