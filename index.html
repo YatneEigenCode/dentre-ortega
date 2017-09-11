@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 <body>
-<div>Use this page to demo embeds and live feeds from other sites. [r2.39]</div>
-                                      <!-- 9/10/2017 -->
+<div>Use this page to demo embeds and live feeds from other sites. [r2.41]</div>
+                                      <!-- 9/11/2017 -->
 <div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
 <form>
 <span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
@@ -26,7 +26,7 @@
       var svr= this.elements["server"].value;
       var scr= document.createElement("script");
       scr.src= svr+"/tbc_sdk.js";
-      document.body.append(scr);
+      document.body.appendChild(scr);
       this.hogTBC(1000,button);
     }
     fm.hogTBC= function(ms,btn){
