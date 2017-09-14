@@ -11,17 +11,21 @@ popTbl= function(tbl,old){
    tbl.onclick= function(){ this.parentNode.removeChild(this); }
    return tbl;
 }
-showHist=function(){
-   if (!this.txtrailHist) return alert("missing");
-   var tbl= popTbl(document.createElement("table"),this);
-   this.txtrailHist.forEach( function(s){tbl.insertRow(0).insertCell(0).innerHTML=s} );
-}
 txtrail=function(el,s){
-  var f1=function(amr, observer){ amr.forEach(function(){el.txtrailHist.push(el.innerHTML)}) }
-  el.txtrailHist=[];
-  el.onclick= showHist;
+  var f1=function(amr, observer){ amr.forEach( function(){ 
+    el.txtrailHist.unshift([new Date(),el.innerHTML]); el.txtrailHist.splice(10)} ) }
+  el.txtrailHist=[]; el.innerHTML=s;
+  el.onclick= function(){
+    if (!this.txtrailHist) return alert("missing");
+    var tbl= popTbl(document.createElement("table"),this);
+    this.txtrailHist.reverse().forEach( function(ap){ var r=tbl.insertRow(0);
+      r.insertCell(0).innerHTML=ap[0].toLocaleString(); r.insertCell(1).innerHTML=ap[1]; } );
+  }
   new MutationObserver(f1).observe( el, {characterData:true, subtree:true} );
   return el;
 }
+var el=txtrail(new AppTool().addEl("div"), "loading...");
+timeoutPop( funArray(function(){
+  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 4), 2000 );
 //var el=txtrail(new AppTool().addEl("div"), "ola ");
 //timeoutPop( funArray(function(){//  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 11), 2000 );
