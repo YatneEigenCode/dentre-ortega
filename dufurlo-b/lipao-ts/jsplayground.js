@@ -1,4 +1,4 @@
-//9-13-17 v0.231 showHist, insertAfter, popTbl;
+//9-13-17 v0.232 timestamp; capture first change;
 funArray= function(o,n){var r=[]; while(n-->0)r.push(o); return r}
 timeoutPop= function(a,ms,x){ if(x=a.pop())x();else return;
   setTimeout(function(){timeoutPop(a,ms)},ms);
@@ -24,8 +24,5 @@ txtrail=function(el,s){
   new MutationObserver(f1).observe( el, {characterData:true, subtree:true} );
   return el;
 }
-var el=txtrail(new AppTool().addEl("div"), "loading...");
-timeoutPop( funArray(function(){
-  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 4), 2000 );
-//var el=txtrail(new AppTool().addEl("div"), "ola ");
-//timeoutPop( funArray(function(){//  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 11), 2000 );
+//var el=txtrail(new AppTool().addEl("div"), "loading...");
+//timeoutPop( funArray(function(){  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 4), 2000 );
