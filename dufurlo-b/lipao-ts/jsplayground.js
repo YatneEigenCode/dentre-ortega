@@ -1,4 +1,5 @@
-//9-14-17 v0.245 insAft for try-catch
+//9-15-17 v0.254 exportNamespace
+
 funArray= function(o,n){var r=[]; while(n-->0)r.push(o); return r}
 timeoutPop= function(a,ms,x){ if(x=a.pop())x();else return;
   setTimeout(function(){timeoutPop(a,ms)},ms);
@@ -13,6 +14,7 @@ popTbl= function(tbl,old){
    return tbl;
 }
 txtrail=function(el,s){
+  if (el===undefined) return exportNamespace();
   var f1=function(amr, observer){ amr.forEach( function(){ 
     el.txtrailHist.unshift([new Date(),el.innerHTML]); el.txtrailHist.splice(10)} ) }
   el.txtrailHist=[]; el.innerHTML=s;
@@ -27,3 +29,10 @@ txtrail=function(el,s){
 }
 //var el=txtrail(new AppTool().addEl("div"), "loading...");
 //timeoutPop( funArray(function(){  el.innerHTML=" num ["+Math.random()+"] "+el.txtrailHist.length}, 4), 2000 );
+
+exportNs= function(o){ for (var m in o) o[m]= eval(m); return o; }
+exportNamespace= function(){ return exportNs(
+  {txtrail:0, insertAfter:0, funArray:0, timeoutPop:0} 
+) }
+//var nsTxtrail= txtrail();
+//var x= nsTxtrail.funArray({},9);
