@@ -1,10 +1,11 @@
-//9-13-17 v0.232 timestamp; capture first change;
+//9-14-17 v0.245 insAft for try-catch
 funArray= function(o,n){var r=[]; while(n-->0)r.push(o); return r}
 timeoutPop= function(a,ms,x){ if(x=a.pop())x();else return;
   setTimeout(function(){timeoutPop(a,ms)},ms);
 }
 
-insertAfter=function(nu,old){ var b=document.body; b.insertBefore(nu,old); b.insertBefore(old,nu); }
+insAft=function(nu,old,b){ b.insertBefore(nu,old); b.insertBefore(old,nu); }
+insertAfter=function(nu,old){ try{insAft(nu,old,document.body)}catch(E){}; insAft(nu,old,old.parentNode) }
 popTbl= function(tbl,old){
    tbl.style.border= "1 solid black";
    insertAfter( tbl, old );
