@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 <body>
-<div>Use this page to demo embeds and live feeds from other sites. [r2.45]</div>
-                                      <!-- 9/11/2017 -->
+<div>Use this page to demo embeds and live feeds from other sites. [r2.46]</div>
+                                      <!-- 9/14/2017 -->
 <div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
 <form>
 <span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
@@ -12,6 +12,7 @@
 </body>
 <script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts604.js"></script>
 <script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
+<script src="dufurlo-b/lipao-ts/txtrail.js?_cfg"></script>
 <script>
   function write(d,s){ var el=d.body.appendChild( d.createElement("div") ); el.innerHTML=s; return el };
   //TODO: show recent history, timeout
@@ -51,6 +52,7 @@
     }
     fm.crunch=function(spid){
       var el= this.appendChild(write(document,"…")), key=(spid)?spid:this.spaceid.value;
+      txtrail(el,"…");
       this.tbc.crunch(key, function(o){el.innerHTML=[key, o.value].join(" >>--> ")} )
     }
   })( document.forms[0] )
