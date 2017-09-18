@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 <body>
-<div>Use this page to demo embeds and live feeds from other sites. [r2.48]</div>
-                                      <!-- 9/14/2017 -->
+<div>Use this page to demo embeds and live feeds from other sites. [r2.49]</div>
+                                      <!-- 9/17/2017 -->
 <div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
 <form>
 <span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
@@ -25,8 +25,9 @@
     }
     fm.getTBC=function(button){
       button.disabled= true;
-      var scr= document.createElement("script");
-      scr.src= this.server.value + "/tbc_sdk.js";
+      var S, scr= document.createElement("script");
+      scr.src= (S=this.server).value + "/tbc_sdk.js";
+      S.onkeyup= function(){if (S.value=="reset")button.disabled=false}
       document.body.appendChild(scr);
       this.hogTBC(1000,button);
     }
