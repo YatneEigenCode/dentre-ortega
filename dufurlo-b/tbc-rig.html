@@ -1,0 +1,68 @@
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+<body>
+<div>Use this page to demo embeds and live feeds from other sites. [r2.49iv") ]</div>
+                                      <!-- 9/17/2017 -->
+<div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
+<form>
+<span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
+<xinput name=spaceid><input type=button value=Server onclick="this.form.doClick(this)">  
+<br />
+</form>
+<div onclick="reloadPage()">[Reload]</div>
+</body>
+<script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts604.js"></script>
+<script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
+<script src="dufurlo-b/lipao-ts/jsplayground.js"></script>
+<script>
+  function write(d,s){ var el=d.body.appendChild( d.createElement("d); el.innerHTML=s; return el };
+  //TODO: show recent history, timeout
+  //TBC.crunch("tbc_-4_-23", function(o){ write(document,o.value); });
+  
+  (function(fm){
+    fm.doClick=function(button){
+      if (button.value=="Server") this.getTBC(button)
+      //if (button.value=="Try code") this.runCode()
+    }
+    fm.getTBC=function(button){
+      button.disabled= true;
+      var S, scr= document.createElement("script");
+      scr.src= (S=this.server).value + "/tbc_sdk.js";
+      S.onkeyup= funct
+      ion(){if (S.value=="reset")button.disabled=false}
+      document.body.appendChild(scr);
+      this.hogTBC(1000,button);
+    }
+    fm.hogTBC= function(ms,btn){
+      if (window["TBC"]){
+        fm.mkSpaceForm(document,TBC);
+        TBC= null;
+        btn.disabled=false;
+      } else setTimeout( function(){fm.hogTBC(ms,btn)}, ms )
+    }
+    fm.mkSpaceForm= function(d,tbc){
+      var lb="Space ID ", fm=d.createElement("form");
+      fm.tbc= tbc;
+      d.body.appendChild(d.createElement("div")).innerHTML= this.server.value;
+      d.body.appendChild(fm).appendChild(d.createElement("span")).innerHTML=lb;
+      fm.appendChild(d.createElement("input")).name="spaceid";
+      fm.appendChild(d.createElement("input")).name="crunchBtn";
+      this.prepButton(fm.crunchBtn,"Crunch",function(){this.form.crunch()});
+      fm.crunch= this.crunch;
+    }
+    fm.prepButton=function(el,val,fn){
+      el.type="button"; el.value=val; el.onclick= fn;
+    }
+    fm.crunch=function(spid){
+      var el= this.appendChild(write(document,"…")), key=(spid)?spid:this.spaceid.value;
+      txtrail(el,"…");
+      this.tbc.crunch(key, function(o){el.innerHTML=[key, o.value].join(" >>--> ")} )
+    }
+  })( document.forms[0] )
+  function reloadPage(){ location="?"+Math.random() }
+</script>
+<script>
+//6-1-2016 twigbud.htm config
+//js604= pkg;
+//js604.appTool.exposeClassNames( js604 );
+//js604.starter.start(cfg);
+</script>
