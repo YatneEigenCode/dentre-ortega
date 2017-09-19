@@ -1,64 +1,29 @@
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+<!-- r0.341 9/19/2017 -->
 <body>
-<div>Use this page to demo embeds and live feeds from other sites. [r2.49]</div>
-                                      <!-- 9/17/2017 -->
-<div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
-<form>
-<span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
-<xinput name=spaceid><input type=button value=Server onclick="this.form.doClick(this)">  
-<br />
-</form>
-<div onclick="reloadPage()">[Reload]</div>
+<div>Welcome, here are the other pages</div>
+<div>
+<li><a href="dufurlo-b/tbc-rig.html">tbc rig</a>
+<li><a href="">cqtab</a>
+<li><a href="">CETB</a>
+<li><a href="">CT</a>
+<li><a href="">CurlyDat</a>
+<li><a href="">Haqabob</a>
+<li><a href="">Votey</a>
+<li><a href="">LocalImage</a>
+<li><a href="">KLM</a>
+<li><a href="">twigbud</a>
+<li><a href="http://rip.okdaily.com/f/toy/lipao-ce/twigbud.htm?js=619&tts=2361">tabweb</a>
+<li><a href="">Ape Cklist (dbx)</a>
+<li><a href="">Svg Plgd</a>
+<li><a href="./">index</a>
+</div>
+<div id=app_client_div>&nbsp;</div>
+<div><span id=app_insert></span></div>
+<form></form>
+<div></div>
 </body>
-<script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts604.js"></script>
-<script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
-<script src="dufurlo-b/lipao-ts/jsplayground.js"></script>
-<script>
-  function write(d,s){ var el=d.body.appendChild( d.createElement("div") ); el.innerHTML=s; return el };
-  //TODO: show recent history, timeout
-  //TBC.crunch("tbc_-4_-23", function(o){ write(document,o.value); });
-  
-  (function(fm){
-    fm.doClick=function(button){
-      if (button.value=="Server") this.getTBC(button)
-      //if (button.value=="Try code") this.runCode()
-    }
-    fm.getTBC=function(button){
-      button.disabled= true;
-      var S, scr= document.createElement("script");
-      scr.src= (S=this.server).value + "/tbc_sdk.js";
-      S.onkeyup= function(){if (S.value=="reset")button.disabled=false}
-      document.body.appendChild(scr);
-      this.hogTBC(1000,button);
-    }
-    fm.hogTBC= function(ms,btn){
-      if (window["TBC"]){
-        fm.mkSpaceForm(document,TBC);
-        TBC= null;
-        btn.disabled=false;
-      } else setTimeout( function(){fm.hogTBC(ms,btn)}, ms )
-    }
-    fm.mkSpaceForm= function(d,tbc){
-      var lb="Space ID ", fm=d.createElement("form");
-      fm.tbc= tbc;
-      d.body.appendChild(d.createElement("div")).innerHTML= this.server.value;
-      d.body.appendChild(fm).appendChild(d.createElement("span")).innerHTML=lb;
-      fm.appendChild(d.createElement("input")).name="spaceid";
-      fm.appendChild(d.createElement("input")).name="crunchBtn";
-      this.prepButton(fm.crunchBtn,"Crunch",function(){this.form.crunch()});
-      fm.crunch= this.crunch;
-    }
-    fm.prepButton=function(el,val,fn){
-      el.type="button"; el.value=val; el.onclick= fn;
-    }
-    fm.crunch=function(spid){
-      var el= this.appendChild(write(document,"…")), key=(spid)?spid:this.spaceid.value;
-      txtrail(el,"…");
-      this.tbc.crunch(key, function(o){el.innerHTML=[key, o.value].join(" >>--> ")} )
-    }
-  })( document.forms[0] )
-  function reloadPage(){ location="?"+Math.random() }
-</script>
+<script src="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
 <script>
 //6-1-2016 twigbud.htm config
 //js604= pkg;
