@@ -1,13 +1,15 @@
+
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-<body><div>Use this page to demo embeds and live feeds from other sites. [r2.52]</div updated="9/18/2017">
+<body><div>Use this page to demo embeds and live feeds from other sites. [r2.61]</div updated="9/19/2017">
   
 <div id=app_client_div>&nbsp;<span id=tbc_insert></span></div>
 <form>
-<span>Server </span><input name=server size=44 value="http://123456.big.io:8000">
+<span>Server </span><input name=server size=44 value="http://1234.nch.io">
 <input type=button value=Server onclick="this.form.doClick(this)">  
 <br />
 </form>
 <div onclick="reloadPage()">[Reload]</div>
+<div onclick="sim()">[Sim]</div>
 </body>
 <script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts604.js"></script>
 <script xsrc="guptinal-i/jsto/cmdEngine-twigbud/js/ts602.js?_cfg"></script>
@@ -57,4 +59,5 @@
     }
   })( document.forms[0] )
   function reloadPage(){ location="?"+Math.random() }
+  function sim(){ txtrailSim( Math.random() ) }
 </script>
