@@ -1,0 +1,42 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General  Public License  -->
+<TITLE>Re-usable output template CQ</TITLE>
+
+<BODY BACKGROUND=img/cyan_rule.jpg>
+<SCRIPT>
+function Cgi(s){
+	var aT=(s+"?").split("?");
+	this.locationBare= aT[0];
+	this.aCgi= aT[1].split("&");
+	this.value= function(s) {
+		for (var i=0; i<this.aCgi.length; i++){
+			var aKV= this.aCgi[i].split("=");
+			if (aKV[0]==s) return unescape(aKV[1]);
+		} return "";
+	}
+}
+var cgi=new Cgi(location);
+
+function dw(s){document.write(s)}
+//dw(location.search);
+function tabulate() {
+	var result= "<TABLE BORDER=1 ALIGN=CENTER CELLSPACING=0 BGCOLOR=FFFFEE>";
+	for (var i=0; i<cgi.aCgi.length; i++) {
+		var aTmp= cgi.aCgi[i].split("=");
+		if (aTmp.length>2) aTmp[1]=aTmp[1].link(aTmp[2]);
+		if (aTmp[0].toUpperCase()=="TIMER") {
+			setTimeout("goLink(0)", parseInt(aTmp[1])*1000);
+		} else {
+			result += "<TR><TD>"+aTmp[1]+"</TD></TR>"
+		}
+	}
+	return unescape(result).split("+").join(" ") +"</TABLE>"
+}
+function goLink(i){var dl=document.links;if (dl.length>0) location=dl[0].href;}
+dw(tabulate());
+</SCRIPT>
+<BR>
+
+<BR>Rev. 0.54 11/21/01
+</BODY>

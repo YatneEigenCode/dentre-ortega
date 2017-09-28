@@ -1,0 +1,83 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General Public License  -->
+<SCRIPT 
+//8-30-00  JChoy  v0.52 check domain
+//9-25-00  JChoy  v0.53 multiline
+//10-1-00  JChoy  v0.54 autoLink
+//10-3-00  JChoy  v0.56 reorder links
+//11-14-00 JChoy  v0.57 title
+//12-3-01  JChoy  v0.58 menu for cq ofline
+SRC=js/Cgi.js
+xSRC=http://www.okdaily.com/js/Cgi.js></SCRIPT>
+<SCRIPT>
+//----------
+function myReplace(old,nu) { 
+	var aT= this.split(old);
+	var sTemp= '';
+	for (var i=0;i<aT.length;i++) sTemp+= ((sTemp=='')? '':nu) +aT[i]
+	return sTemp;
+}
+String.prototype.myReplace= myReplace
+var title=cgi.value('Title').myReplace('+',' ')
+if (title=='') title= 'CQ News Summary'
+document.writeln('<TITLE>'+title+'</TITLE>')
+</SCRIPT>
+<SCRIPT 
+SRC=js/cqbm.js
+xSRC=http://www.okdaily.com/js/cqbm.js></SCRIPT>
+<SCRIPT>
+fieldControl.displayType='data'
+fieldControl.editText= '<FONT SIZE=-1>__________</FONT>'
+//----------
+function autoLink(key){
+	var sin= cgi.value(key)
+	sin.myReplace('<',' <')
+	sin=sin.myReplace('+',' ')
+	sin=sin.myReplace(unescape('%0D'),' ')
+	sin=sin.myReplace(unescape('%0A'),' ')
+	var aTmp= sin.split('http://')
+	var result= ''
+	for (var i=1; i<aTmp.length; i++) {
+	    var sUrl= aTmp[i].split(' ')[0]
+	    result+= '<LI><A HREF=http://' +sUrl +'>http://' +sUrl +'</A>'
+	}
+	return result
+}
+</SCRIPT>
+<!--link, data, or both-->
+
+<!----- YOUR LAYOUT BEGINS HERE ---->
+<style type="text/css" title="tuff-text">a:link {text-decoration: none; color: blue}a:visited {text-decoration: none; color: purple}a:active {text-decoration: none; color: blue}</style>
+<BODY BGCOLOR=DDEEFF>
+<CENTER>
+<H2>
+	<SCRIPT>field('Title')</SCRIPT>
+</H2>
+
+</CENTER>
+	<SCRIPT>field('Summary')</SCRIPT>
+	<P>
+	<SCRIPT>field('_Summary')</SCRIPT>
+
+
+<HR>
+<UL>
+Links to full story and other info:<BR>
+	<SCRIPT> dw( autoLink('_Summary') )</SCRIPT>
+	<SCRIPT>fieldControl.displayType='both'</SCRIPT>
+<LI>	<SCRIPT>field('Link1')</SCRIPT>
+<BR>
+<LI>	<SCRIPT>field('Link2')</SCRIPT>
+<BR>
+<LI>	<SCRIPT>field('Link3')</SCRIPT>
+</UL>
+
+<HR><SMALL>
+<SCRIPT SRC=js/menu.js></SCRIPT>
+<SCRIPT SRC=js/menu.js></SCRIPT>
+
+<BR><A HREF=http://www.okdaily.com>OK88</A>
+CQ Document - Rev. 10/3/00
+
+</BODY>

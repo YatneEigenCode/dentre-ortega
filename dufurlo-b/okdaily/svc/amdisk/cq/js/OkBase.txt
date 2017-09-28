@@ -1,0 +1,17 @@
+//8-3-04 JChoy v0.58 subclass 
+//11-7 " v0.59 cgi
+function OkBase(o){
+	this.version= "_ok v0.59 (c)2004 JChoy";
+	this.devUrl= "http://developer.ok88.com";
+	var at= document.getElementsByTagName('script'); 
+	this.tag= at[at.length-1];
+	this.dw= function(s){document.write(s)}
+	this.getAttr= function(o,tag,def){	var va= o.attributes[tag]; return (va)? va.value : def;}
+	this.callerAttr= function(nm){ return this.getAttr( this.tag, nm, '');}
+	this.map= function(d,a,f){ var r=new Array(d.length); for (var i=0; i<d.length; i++)r[i]=f(d[i],i,a); return r}
+	this.methLink= function(s,f,params){ return s.link("javascript:"+this.id+"."+f+"("+params+")") }
+	this.cgi= function(k){return (location.search+"&"+k+"=").split(k+"=")[1].split("&")[0];}
+	this.cgiRemove= function(k){var at=(location.search+"").split(k+"="); if (at.length==1) return at[0]; var k=at[1].indexOf("&"); return (k<0)? at[0] : (at[0]+at[1].substr(k));}
+	this.setId= function(id){ this.id=id+"_"+document.links.length; eval(this.id+"=this"); }
+	this.subClass= function(o){ for(m in this)o.prototype[m]=this[m] }
+} var okBase= new OkBase();

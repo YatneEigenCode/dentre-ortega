@@ -1,0 +1,111 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General  Public License  -->
+<TITLE>CQ Paste</TITLE>
+<SCRIPT>
+function Cgi(s){
+	var aT=(s+"?").split("?");
+	this.locationBare= aT[0];
+	this.aCgi= (aT[1]=="")? []:aT[1].split("&");
+	this.id= "cgi";
+	this.click= 0;
+	this.value= function(s) {
+		for (var i=0; i<this.aCgi.length; i++){
+			var aKV= this.aCgi[i].split("=");
+			if (aKV[0]==s) return unescape(aKV[1]);
+		} return "";
+	}
+	this.dw= function(s){document.write(s)}
+}
+var cgi=new Cgi(location);
+
+function about10(msg){
+	var w=window;
+	var lsW= [w.screenX,w.screenY,w.outerWidth,w.outerHeight];
+	var lsP= [lsW[0]+lsW[2]/4,lsW[1]+lsW[3]/4,lsW[2]/2,lsW[3]/2];
+	var ac= "&timer=10&=Close="+escape("javascript:window.close()");
+	var fe= "scrollbars=1,width="+lsP[2]+",height="+lsP[3]+",screenX="+lsP[0]+",screenY="+lsP[1];
+	w.open("cqoutofl.htm?="+escape(msg)+ac,"About",fe);
+}
+function HotCookie(){
+	this.aCookie= document.cookie.split(';');
+	this.expiry= ";path=/;expires=" +(new Date((new Date()).valueOf()+31*86400000)).toGMTString();
+	this.getCookie= function(key){
+		for (var i=0; i<this.aCookie.length; i++){
+			aTmp= this.aCookie[i].split('=');
+			if ((aTmp[0]==key) || (aTmp[0]==' '+key)) return aTmp[1];
+		} return '';
+	}
+	this.setCookie= function(key,value){ document.cookie= key+"="+value+this.expiry; }
+}
+var hc=new HotCookie;
+HotCookie.prototype.shiftCookie= function(title,value){ 
+	if (this.aC.length>8) this.aC.length=8;
+	var aT=[];
+	document.cookie= this.key+"="+escape(title)+"&"+escape(value)+"&"+this.aC.join("&")+this.expiry;
+	about10("Done");
+	setTimeout("location.reload(true)",1000);
+}
+HotCookie.prototype.clearList= function(){ 
+	this.expiry= ";path=/;expires="+(new Date()).toGMTString();
+	this.shiftCookie("","");
+}
+HotCookie.prototype.reOrder= function(k) {
+	var myV= [0,new Array(),"",""];
+	for (var i=0; i<10; i=i+2) {
+		if (k==myV[0]++) {
+			myV[2]= this.aC[i];
+			myV[3]= this.aC[i+1];
+		} else {
+			myV[1][myV[1].length]=this.aC[i];
+			myV[1][myV[1].length]=this.aC[i+1];
+		}
+	}
+	myV[1][myV[1].length]=myV[2];
+	myV[1][myV[1].length]=myV[3];
+	document.cookie= this.key+"="+myV[1].join("&")+this.expiry;
+	location.reload();
+}
+HotCookie.prototype.showList= function() {
+	var rs="";
+	var j=0;
+	for (var i=0; i<10; i=i+2) {
+		rs+= showLink( this.aC[i], this.aC[i+1] );
+		rs+=" "+"[move]".link("javascript:hc.reOrder("+(j++)+")")+"<BR>";
+	} return rs;
+}
+function cqPaste(tmpl){location= tmpl+location.search;}
+function showLink(desc,url){return "CQ template: "+unescape(desc).link("javascript:cqPaste('"+unescape(url)+"')"); }
+
+
+hc.aC= [];
+hc.key="pa0";
+hc.aC= (hc.getCookie(hc.key)+"&&&&&&&&&&").split("&");
+cgi.dw("Apply the following cgi parameters to one of the following templates:<BR>");
+cgi.dw("<FONT COLOR=purple>"+location.search +"</FONT><BR>")
+
+var aF= [["Text","txt_ofl.htm"],
+	["Receipt","rcpt_ofl.htm"],
+	["Cover Letter","http://pws.okdaily.com/cqsoho/coverletter.htm"],
+	["Online cq Paste","http://pws.okdaily.com/cqsoho/amdisk/cq/cqpaste.htm"],
+	["Tabulate","tabulofl.htm"],
+	["Note","note_ofl.htm"]];
+for (var i=0; i<aF.length; i++) {
+	cgi.dw( showLink(aF[i][0],aF[i][1])+"<BR>" );
+}
+cgi.dw(hc.showList());
+</SCRIPT>
+
+
+<TABLE BGCOLOR=DDDDDD><TR><TD>
+<FORM NAME=tempsave>
+If yout don't see the template you want, enter the url of new template here:<BR>
+Title <INPUT NAME=title VALUE="new"> Url <INPUT NAME=url SIZE=35>
+<BR>Rotate CQ template into existing list:
+<INPUT TYPE=button VALUE=Yes ONCLICK=hc.shiftCookie(this.form.title.value,this.form.url.value)>
+<INPUT TYPE=button VALUE=Cancel ONCLICK=history.back()>
+<INPUT TYPE=button VALUE="Clear List" ONCLICK=hc.clearList()>
+</FORM>
+</TD></TR></TABLE>
+
+<HR>Rev. 0.61 3/19/02

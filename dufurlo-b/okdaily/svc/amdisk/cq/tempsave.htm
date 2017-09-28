@@ -1,0 +1,102 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General  Public License  -->
+<TITLE>Temp Save</TITLE>
+<SCRIPT>
+function Cgi(s){
+	var aT=(s+"?").split("?");
+	this.locationBare= aT[0];
+	this.aCgi= (aT[1]=="")? []:aT[1].split("&");
+	this.id= "cgi";
+	this.click= 0;
+	this.value= function(s) {
+		for (var i=0; i<this.aCgi.length; i++){
+			var aKV= this.aCgi[i].split("=");
+			if (aKV[0]==s) return unescape(aKV[1]);
+		} return "";
+	}
+	this.dw= function(s){document.write(s)}
+}
+var cgi=new Cgi(location);
+
+function about10(msg){
+	var w=window;
+	var lsW= [w.screenX,w.screenY,w.outerWidth,w.outerHeight];
+	var lsP= [lsW[0]+lsW[2]/4,lsW[1]+lsW[3]/4,lsW[2]/2,lsW[3]/2];
+	var ac= "&timer=10&=Close="+escape("javascript:window.close()");
+	var fe= "scrollbars=1,width="+lsP[2]+",height="+lsP[3]+",screenX="+lsP[0]+",screenY="+lsP[1];
+	w.open("cqoutofl.htm?="+escape(msg)+ac,"About",fe);
+}
+function HotCookie(){
+	this.aCookie= document.cookie.split(';');
+	this.expiry= ";path=/;expires=" +(new Date((new Date()).valueOf()+31*86400000)).toGMTString();
+	this.getCookie= function(key){
+		for (var i=0; i<this.aCookie.length; i++){
+			aTmp= this.aCookie[i].split('=');
+			if ((aTmp[0]==key) || (aTmp[0]==' '+key)) return aTmp[1];
+		} return '';
+	}
+	this.setCookie= function(key,value){ document.cookie= key+"="+value+this.expiry; }
+}
+var hc=new HotCookie;
+HotCookie.prototype.shiftCookie= function(title,value){ 
+	if (this.aC.length>8) this.aC.length=8;
+	var aT=[];
+	document.cookie= this.key+"="+escape(title)+"&"+escape(value)+"&"+this.aC.join("&")+this.expiry;
+	about10("Done");
+	setTimeout("history.back()",1000);
+}
+HotCookie.prototype.clearList= function(){ 
+	this.expiry= ";path=/;expires="+(new Date()).toGMTString();
+	this.shiftCookie("","");
+}
+HotCookie.prototype.reOrder= function(k) {
+	var myV= [0,new Array(),"",""];
+	for (var i=0; i<10; i=i+2) {
+		if (k==myV[0]++) {
+			myV[2]= this.aC[i];
+			myV[3]= this.aC[i+1];
+		} else {
+			myV[1][myV[1].length]=this.aC[i];
+			myV[1][myV[1].length]=this.aC[i+1];
+		}
+	}
+	myV[1][myV[1].length]=myV[2];
+	myV[1][myV[1].length]=myV[3];
+	document.cookie= this.key+"="+myV[1].join("&")+this.expiry;
+	location.reload();
+}
+HotCookie.prototype.showList= function() {
+	var rs="";
+	var j=0;
+	for (var i=0; i<10; i=i+2) {
+		rs+=("CQ doc: "+unescape(this.aC[i])).link(unescape(this.aC[i+1]));
+		rs+=" "+"[move]".link("javascript:hc.reOrder("+(j++)+")")+"<BR>";
+	} return rs;
+}
+HotCookie.prototype.witaffs= function(title,value) {
+	var wd=window.open().document;
+	wd.write("Use File/SaveAs menu to archive list to file.<BR>"+title.link(value)+"<BR>"+this.showList());
+	wd.close();
+}
+</SCRIPT>
+
+<FORM NAME=tempsave>
+Title <INPUT NAME=title><BR>Url <INPUT NAME=url SIZE=50>
+<BR>Rotate CQ document into existing list:
+<INPUT TYPE=button VALUE=Yes ONCLICK=hc.shiftCookie(this.form.title.value,this.form.url.value)>
+<INPUT TYPE=button VALUE=Cancel ONCLICK=history.back()>
+<INPUT TYPE=button VALUE="Clear List" ONCLICK=hc.clearList()>
+<BR>Write it to a file for saving: 
+<INPUT TYPE=button VALUE="WITAFFS" ONCLICK=hc.witaffs(this.form.title.value,this.form.url.value)>
+</FORM>
+<SCRIPT>
+hc.aC= [];
+hc.key="du0";
+hc.aC= (hc.getCookie(hc.key)+"&&&&&&&&&&").split("&");
+cgi.dw(hc.showList());
+var f1=document.tempsave;
+f1.url.value= cgi.value("url");
+f1.title.value= cgi.value("title");
+</SCRIPT>
+<HR>Rev. 0.56 12/4/01

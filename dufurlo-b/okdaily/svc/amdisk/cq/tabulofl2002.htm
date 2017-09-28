@@ -1,0 +1,336 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General Public License  -->
+<SCRIPT>
+//-----
+//11-12-00  JChoy  v0.52 debuging
+//11-14-00  JChoy  v0.53 escape in okSubmit, sendFormatted, title, fieldsize
+//12-2-00   JChoy  v0.54 ledger sheet, border blank cells, @hsum(n)
+//                 fld:8:align=right:sum, insert, deleteRow, alternate row color
+//12-4-00   JChoy  v0.56 var lc
+//12-5-00   JChoy  v0.57 fix missing & in okSubmit, fEscape
+//12-9-00   JChoy  v0.58 cgi inline
+//1-9-01    JChoy  v0.59 cleaned up aHdrTd[j]
+//12-7-01   JChoy  v0.63 autoLink
+//12-12-01  JChoy  v0.64 minimum 1 link for menu when editing
+//2002
+//3-6  JChoy  v0.65 cqpaste
+//4-16  " v0.67 nested sheets, flex cgi, startsWith,
+//4-17  " v0.68 send multi tables correctly
+//4-18  " v1.12 fixed bug in Cgi, startsWtithA, enable nesting with file protocol
+//future: graph, delete/insert multi row/column, 
+
+function dw(s){document.writeln(s)}
+function format(val, dec){return (Math.floor(val*Math.pow(10,dec)) /Math.pow(10,dec))}
+function brack(s,tag){ return('<'+tag+'>'+s+'</'+tag+'>') }
+String.prototype.myReplace= function (old,nu) { return this.split(old).join(nu); }
+String.prototype.startsWith= function(t) { return (t.length>this.length)? false: (this.substring(0,t.length).toLowerCase()==t.toLowerCase()); }
+String.prototype.startsWithA= function(aT) {
+ for (var i=0; i<aT.length;){if (this.startsWith(aT[i++])) return true} return false}
+function Cgi(sCgi) {
+	this.version = '0.53'	//cgi
+	var aCgi = sCgi.split('?')
+	this.locationBare = ''+aCgi[0]
+	this.locationCgi = (''+aCgi[1]).myReplace('+','%20')
+	this.arrayCgi = this.locationCgi.split('&')
+	this.value= function(key) {
+	  for (var i=0; i<this.arrayCgi.length; i++){
+	    if (this.arrayCgi[i].split('=')[0] == key) { 
+	      return unescape(this.arrayCgi[i].split('=')[1])
+	    }
+	  }
+	  return('')
+	}
+	this.key= function(i) {return unescape(this.arrayCgi[i].split('=')[0])}
+	this.length=function() {return this.arrayCgi.length}
+}
+cgi = new Cgi(''+location);
+//----------
+function myRotate( lastUse ) {
+	var aTmp= this.split(',')
+	for (var i=0;i<aTmp.length-1;i++) {
+		if (aTmp[i]==lastUse) return aTmp[i+1]
+	}
+	return aTmp[0]
+}
+String.prototype.myRotate=  myRotate
+function parseFloatZ(val){
+	if (val=='') {
+	} else if (isNaN(val)) { 
+	} else { return parseFloat(val) }
+	return 0
+}
+// when used locally, slashes need to be escaped
+function fescape( sin ) {
+	var result= escape(sin)
+	if ((''+document.location).substring(0,8)=='file:///') {
+		result= result.myReplace('/','%2F')
+	}
+	return result
+}
+//---------
+var title=cgi.value('title');
+if (title=='') title= 'CQ Tabulate'
+dw('<TITLE>'+title+'</TITLE>')
+</SCRIPT>
+<BODY BGCOLOR=FFFFEE>
+<SCRIPT>
+//----------
+function CqTable(instanceId) {
+	this.instanceId= (instanceId==null)? '':instanceId;
+	this.version= '1.12'
+	this.sep= '^^'
+	this.dataColors= 'EEFFFF,FFFFEE'
+	this.sumColor= 'yellow'
+	this.sendUrl= 'http://www.okdaily.com/svc/sendvote.htm'
+	this.defaultRow0= 'id' +this.sep +'value';
+	this.php= location.protocol+'//'+location.hostname+location.pathname;
+	this.php= this.php.myReplace('\\','/'); //MS quirk
+	this.loadCgi= function(sCgi) {
+	 this.cgi= new Cgi(sCgi);
+	 var curDat= this.cgi.value('row0')
+	 curDat= (curDat=='')? this.defaultRow0 :curDat.myReplace('+',' ')
+	 this.aRows= new Array();
+	 this.aRows[0]= curDat
+	 for (var i=1;curDat!='';i++) {
+		curDat= ''+this.cgi.value('row'+i)
+		if (curDat!='') this.aRows[i]= curDat.myReplace('+',' ')
+	 }//for
+	}//function
+	this.loadCgi(''+location)
+}
+CqTable.prototype.showTable =function(ctrl) {
+	//once thru processing
+	var result= ''
+	var lc=''
+	var aHdr= this.aRows[0].split(this.sep)
+	var aHdrTd= new Array()
+	var aSumVal= new Array()
+	for (var j=0;j<aHdr.length;j++) {aSumVal[j]=0}
+	var td= 'TH '	//cell formatting
+	for (var i=0;i<this.aRows.length;i++) {
+	    var resRow= ''
+	    var aSrc= this.aRows[i].split(this.sep)
+	    aSrc= this.calcAtFcn( aSrc )
+	    for (var j=0;j<aSrc.length;j++) {
+		var srcj= aSrc[j]
+		td= 'TD '+aHdrTd[j]
+		if (i==0) {	//header row
+			td= 'TH '
+			srcj=srcj.split(':')[0]
+			aHdrTd[j]= aHdr[j].myReplace(':',' ')
+			var firstColon= aHdr[j].indexOf(':')
+			aHdrTd[j]= (firstColon<0)? '': aHdrTd[j].substring(firstColon)
+		}
+		if (j==0) { srcj= this.makeEditLink(i,srcj,ctrl)}
+		if (aHdr[j].indexOf(':sum')>0) {
+			aSumVal[j]+= parseFloatZ(srcj)
+		}
+		srcj= this.autoLink(srcj);
+		resRow+= brack( srcj, td)
+	    }
+	    result+= brack( resRow,'TR bgcolor=' +(lc=this.dataColors.myRotate(lc)) )
+	}
+	//append row for sum
+	if (aHdr.toString().indexOf(':sum')>0) {
+	    var resRow= ''
+	    for (var j=0;j<aHdr.length;j++) {
+		var srcj= aHdr[j]
+		srcj= (srcj.indexOf(':sum')>0)? format(aSumVal[j],2):'&nbsp;'
+		resRow+= brack( srcj, 'TH ALIGN=right')
+	    }
+	    result+= brack( resRow,'TR bgcolor=' +this.sumColor)
+	}
+	
+	result= brack(result,'TABLE BORDER=0 CELLSPACING=1 CELLPADDING=1')
+	result= brack(result,'TD')
+	result= brack(result,'TR')
+	result= brack(result,'TABLE BORDER=0 CELLSPACING=0 CELLPADDING=1 BGCOLOR=gray')
+	var title= this.cgi.value('title');
+	if (title=='') title=document.title;
+	result= title.bold().fontsize(5) +result
+	result+= 'New sheet'.link(cgi.locationBare)
+	if (ctrl) {
+		result+= ' | ' +this.makeEditLink(this.aRows.length,'Add row',ctrl)
+		result+= ' | ' +this.makeEditLink(-1,'Add column',ctrl)
+		result+= ' | ' +'Send table'.link('javascript:'+this.instanceId+'.sendFormatted()')
+		result+= ' | ' +'Print'.link('javascript:self.print()')
+	}
+	while (aAllTables.length>0) {
+		attTable= new CqTable('attTable');
+		attTable.loadCgi(aAllTables[0]);
+		var aTmp= aAllTables.reverse();
+		aTmp.length= aTmp.length-1;
+		aAllTables= aTmp.reverse();
+		result+= '<HR>'+attTable.showTable(false);
+	}
+	return result
+}
+function CqTable_showForm(){
+	var sout= ''
+	sout+= '<FORM>'
+	sout+= 'Title: <INPUT NAME=title VALUE="'+document.title+'"><BR>'
+	row= parseInt(cgi.value('editRow'))
+	var aKey= this.aRows[0].split(this.sep)
+	if (row<0) aKey[aKey.length]= 'New'	//add column
+	if (row<0) row= 0
+	var aVal= new Array(aKey.length)
+	for (var j=0;j<aKey.length;j++) { aVal[j]='' }	//add row
+	if (row<this.aRows.length) { aVal= this.aRows[row].split(this.sep) }
+	for (var j=0;j<aKey.length;j++) {
+		sout+= aKey[j].split(':')[0]
+		sout+= ': <INPUT NAME=f_'+j
+		var fsize= (aKey[j]+':').split(':')[1]
+		if (parseFloatZ(fsize)!=0) { sout+= ' SIZE='+fsize }
+		if (j>=aVal.length) aVal[j]=''
+		sout+= ' VALUE="' +aVal[j] +'"><BR>'
+	}
+	sout+= '<INPUT TYPE=button VALUE=OK ONCLICK=cqTable.okSubmit(this.form,'
+	sout+= row+ ',' +aKey.length +')> '
+	sout+= '<INPUT TYPE=button VALUE=Cancel ONCLICK=history.back()> '
+	if (row>0) {
+		sout+= '<INPUT TYPE=button VALUE=Delete ONCLICK=cqTable.deleteRow(' +row+ ')> '
+		sout+= '<INPUT TYPE=button VALUE=Insert ONCLICK=cqTable.insertRow(' +row+ ')> '
+		sout+= '<INPUT TYPE=button VALUE="Paste Template" ONCLICK=cqTable.cqPaste(this.form)>'
+	}
+	sout+= '</FORM>'
+	onload= function(){document.forms[0].elements[1].focus()}
+	return sout
+}
+function CqTable_goEdit(row) {
+	var qamp= (location==cgi.locationBare)? "?":"&";
+	location+= qamp+'editRow=' +row
+}
+CqTable.prototype.cqPaste= function( frm ) {
+	var nuDat= '';
+	var aKey= this.aRows[0].split(this.sep)
+	for (var i=0;i<aKey.length;i++) {
+		nuDat+= aKey[i].split(':')[0]+"=";
+		nuDat+= escape(frm.elements[i+1].value)+ "&"
+	}
+	location= "cqpaste.htm?"+ nuDat;
+}
+function CqTable_okSubmit( frm,row,fields ) {
+	var nuDat= ''
+	for (var i=0;i<fields;i++) {
+		if (nuDat!='') nuDat+= this.sep
+		nuDat+= frm.elements[i+1].value
+	}
+	var result= cgi.locationBare +'?title=' +escape(frm.elements[0].value)
+	var totalRows= this.aRows.length
+	for (var i=0;i<totalRows;i++) {
+		result+= '&row' +i +'='
+		if (i==row) { result+= fescape(nuDat) }
+		if (i!=row) { result+= fescape(this.aRows[i]) }
+	}
+	if (row>=totalRows) result+= '&row' +totalRows +'=' +fescape(nuDat)
+	document.location= result
+}
+function CqTable_deleteRow( row ) {
+	var result= cgi.locationBare +'?title=' +escape(document.title)
+	for (var i=0,j=0;i<this.aRows.length;i++) {
+		if (i!=row) { result+= '&row' +(j++) +'=' +escape(this.aRows[i]) }
+	}
+	document.location= result
+}
+function CqTable_insertRow( row ) {
+	var result= cgi.locationBare +'?title=' +escape(document.title)
+	for (var i=0,j=0;i<this.aRows.length;i++) {
+		if (i==row) { result+= '&row' +(j++) +'=new' }
+		result+= '&row' +(j++) +'=' +escape(this.aRows[i])
+	}
+	document.location= result
+}
+function CqTable_makeEditLink(row,s,ctrl) {
+	if (!ctrl) return s;
+	var result= '<A HREF=javascript:' +this.instanceId
+	result+= '.goEdit(' +row +')>' +s +'</A>'
+	return result
+}
+function CqTable_sendFormatted() {
+	var sout= this.sendUrl +'?subject=' +escape(document.title) 
+	sout+= '&body=' +escape('<BR>'+this.showTable(false))
+	window.open( sout )
+}
+// spreadsheet type functions
+function CqTable_calcAtFcn( aSrc ) {
+	var aRes=new Array()
+	for (var j=0; j<aSrc.length; j++){
+	    if (aSrc[j].charAt(0)=='@') {
+		var atObj= new AtObj(aSrc,j)
+		var fcnName= aSrc[j].substring(1)
+		if (atObj.validMethod(fcnName)) { 
+			aRes[j]= eval('atObj.'+fcnName) // let eval invoke method
+			aSrc[j]= aRes[j]	// keep value, dump formula
+		} else {
+			aRes[j]= ''
+		}
+	    } else {
+		aRes[j]= aSrc[j]
+	    }
+	}
+	return aRes
+}
+CqTable.prototype.autoLink= function(src) {
+	if (src=='') return '&nbsp;';
+	if (!src.startsWithA(["http://","file://"])) return src;
+	var pos= src.indexOf(" ");
+	var aS=(pos<0)? [src,src]:[src.substring(pos),src.substring(0,pos)];
+	if (src.startsWith(this.php)) aAllTables[aAllTables.length]=aS[1];
+	if (aAllTables.length>10) aAllTables.length=10;
+	return (aS[0]).link(aS[1]);
+}
+cqTable= new CqTable( 'cqTable' )
+CqTable.prototype.showForm= CqTable_showForm
+CqTable.prototype.goEdit= CqTable_goEdit
+CqTable.prototype.okSubmit= CqTable_okSubmit
+CqTable.prototype.deleteRow= CqTable_deleteRow
+CqTable.prototype.insertRow= CqTable_insertRow
+CqTable.prototype.makeEditLink= CqTable_makeEditLink
+CqTable.prototype.sendFormatted= CqTable_sendFormatted
+CqTable.prototype.calcAtFcn= CqTable_calcAtFcn
+
+//----------
+// for handling @functions
+// just add or override methods at js object level and register name
+function AtObj( aSrc, curCol ) {
+	this.version= '0.51'
+	this.aSrc= aSrc
+	this.curCol= curCol
+	this.aValidFcn= new Array()
+	this.aValidFcn[this.aValidFcn.length]= 'hsum'
+}
+function AtObj_validMethod( fcnName ) {
+	var bareFcnName= fcnName.split('(')[0]
+	for (var i=0; i<this.aValidFcn.length; i++) {
+		if (this.aValidFcn[i]==bareFcnName) return true
+	}
+	return false
+}
+function AtObj_hsum( numCells ) {
+	var result= 0
+	for (var j=this.curCol-numCells; j<this.curCol; j++) {
+		var val= this.aSrc[j]
+		result+= parseFloatZ(val) 
+	}
+	return result
+}
+atObj= new AtObj( new Array(),0 )
+AtObj.prototype.validMethod= AtObj_validMethod
+AtObj.prototype.hsum= AtObj_hsum
+aAllTables= new Array;
+
+if (cgi.value('editRow')=='') {
+	dw( cqTable.showTable(true) );
+} else {
+	dw( cqTable.showForm() )
+}
+</SCRIPT>
+
+<P>
+
+<A HREF=javascript:></A>
+<HR>
+<SCRIPT>function about(){about10("Tabulate v"+cqTable.version)}</SCRIPT>
+<SCRIPT SRC=js/menu.js></SCRIPT>
+<SCRIPT SRC=js/menu.js></SCRIPT>

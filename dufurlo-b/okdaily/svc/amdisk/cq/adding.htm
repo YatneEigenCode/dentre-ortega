@@ -1,0 +1,90 @@
+<!-- Copyright 2000 Johnston Choy, OK88 LLC 
+http://www.ok88.com http://www.okdaily.com
+License Agreement: GNU General  Public License  -->
+<!--
+10/3/00  JChoy  added formatting, Clear All
+-->
+<TITLE>Adding Machine</TITLE>
+<SCRIPT>
+function Cgi(s){
+	var aT=(s+"?").split("?");
+	this.locationBare= aT[0];
+	this.aCgi= aT[1].split("&");
+	this.value= function(s) {
+		for (var i=0; i<this.aCgi.length; i++){
+			var aKV= this.aCgi[i].split("=");
+			if (aKV[0]==s) return unescape(aKV[1]);
+		} return "";
+	}
+}
+var cgi=new Cgi(location);
+</SCRIPT>
+
+<A HREF="javascript:changeDesc()">
+<SCRIPT>
+//uses CQ (Client Side Cgi Query Processing) technology
+function dw(s){document.writeln(s)}
+function myReplace(old,nu) { 
+	var aT= this.split(old);
+	var sTemp= '';
+	for (var i=0;i<aT.length;i++) sTemp+= ((sTemp=='')? '':nu) +aT[i]
+	return sTemp;
+}
+String.prototype.myReplace= myReplace
+
+var desc= cgi.value('desc').myReplace('+',' ')
+dw( (desc=='')? 'Desc:':desc )
+</SCRIPT>
+</A>
+
+
+<FORM NAME=adding>
+<SCRIPT>
+var total=0
+var numbers= cgi.value('numbers')
+var aNum = numbers.split('+')
+if (numbers!=''){
+    for (var i=0; i<aNum.length; i++){
+	dw( '<LI>'+aNum[i] )
+	total += parseFloat(aNum[i])
+    }
+}var newnumber= cgi.value('newnumber')
+if (newnumber!=''){
+	dw( '<LI>'+newnumber )
+	total += parseFloat(newnumber)
+	if (numbers=='') {numbers=newnumber} else {numbers+= '+' +newnumber}
+}
+function changeDesc(){
+	document.adding.desc.value= prompt( 'Description',cgi.value('desc').myReplace('+',' ') )
+	document.adding.submit()
+}
+function format(val, dec){
+	return (Math.floor(val*Math.pow(10,dec)) /Math.pow(10,dec))
+}
+
+</SCRIPT>
+
+<BR><INPUT NAME=newnumber SIZE=10>
+<INPUT TYPE=hidden NAME=desc VALUE="">
+
+<SCRIPT>
+dw( '<INPUT TYPE=hidden NAME=numbers VALUE="'+numbers+'">' )
+dw( '<BR>Total=' )
+dw( '<B>' +format(total,2) +'</B>' )
+</SCRIPT>
+<BR><INPUT TYPE=submit VALUE='Add Number'>
+<INPUT TYPE=button VALUE="Clear All" ONCLICK="document.location=cgi.locationBare">
+
+</FORM>
+
+<SCRIPT>
+document.adding.desc.value= cgi.value('desc').myReplace('+',' ')
+//----------
+
+document.forms[0].newnumber.focus();
+</SCRIPT>
+<SCRIPT>function about(){about10("Adding.htm Rev 0.53 11/20/01")};</SCRIPT>
+
+<HR>
+<SCRIPT SRC=js/menu.js></SCRIPT>
+<SCRIPT SRC=js/menu.js></SCRIPT>
