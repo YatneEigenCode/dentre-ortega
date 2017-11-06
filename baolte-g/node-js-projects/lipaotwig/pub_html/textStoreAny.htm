@@ -1,7 +1,7 @@
 
-<title>Text Store</title>
+<title>Text Store Any</title>
 <body>
-<h2>Text Store utility</h2>
+<h2>Text Store utility (Any ts)</h2>
 <form action=/ts/set/>
 	<input type=hidden name=f value=set>
 	<textarea name=data rows=9 cols=50></textarea>
@@ -11,11 +11,11 @@
 	<input type=button value=Clear onclick="this.form.data.value=''">
 	<input type=button value="GetText">
 </form>
-<div id="result"></div>
+<div id="result">[watch for results here]</div>
 </body>
 
 <script>
-//11-5-2017 jchoy v0.612 TsAny
+//11-5-2017 jchoy v0.613 loadUrlToIframe
 tsAny = function(fm, tsHelper){
 	function start(fm, tsHelper){
 			fm.doFormClick = doFormClick;
@@ -40,6 +40,7 @@ tsHelper = function(verb1, verb2, urlBase){
 		}
 		function get(i){
 			let url= buildUrl( verb1, [i] )
+			loadUrlToIframe( url );
 			console.log(i,' get ',url)
 		}
 		function buildUrl( verb, params ){
@@ -51,4 +52,10 @@ tsHelper = function(verb1, verb2, urlBase){
 		return {save:save, get:get};
 }
 tsAny( document.forms[0], tsHelper("/get/{0}","/save/{0}/{1}","/ts") )
+loadUrlToIframe= function(url){
+		let div= document.getElementById('result');
+		div.innerHTML= '';
+		let ifr= document.createElement('iframe');
+		div.appendChild( ifr ).src= url;
+}
 </script>
