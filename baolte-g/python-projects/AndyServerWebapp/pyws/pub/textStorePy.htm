@@ -1,0 +1,88 @@
+<title>Text Store</title>
+
+<body>
+
+<h2>Text Store utility</h2>
+
+<form action=/ts/set/>
+
+	<input type=hidden name=f value=set>
+
+	<textarea name=data rows=9 cols=50></textarea>
+
+	<br />
+
+	<input name=i size=5>
+
+	<input type=button name=saveBtn value=Save>
+
+	<input type=button value=Clear onclick="this.form.post();this.form.data.value=''">
+
+	<input type=button value=GetText onclick=this.form.getText(this)>
+
+</form>
+
+
+</body>
+
+
+<script src=ok88.element.base.js></script>
+
+<script src=RecentList.js></script>
+
+<script>
+
+//5-16-2016 jchoy v0.513 RecentList.js
+
+TaAjax = function( ta ){
+
+	this.taObj = ta;
+
+	ok88.element.base.mold( this, ok88.element.ajax );
+
+	this.write = function(s){ this.taObj.value = s }
+
+}
+
+document.forms[0].getText = function(el){
+
+	var taAjax = new TaAjax( this.data );
+
+	taAjax.webGet( "http://"+location.hostname+"/ts/text/?i="+ this.i.value );
+
+	if (!this.rcl) this.rcl= new RecentList();
+
+	var $tf= this;
+
+	this.rcl.addItem( this.i.value, function(s){$tf.i.value=s} )
+
+}
+
+document.forms[0].post = function(){
+
+	if (this.data.value!="utility") return;
+
+	this.method= "POST";
+
+	this.data.rows=30; this.data.cols=80;
+
+}
+
+document.forms[0]['saveBtn'].onclick= function(){
+    tspy.save();
+
+   return;
+
+	var taAjax = new TaAjax( this.form.data );
+
+	var url= "http://"+location.hostname+"/ts/set/?i="+ this.form.i.value;
+
+	url+= "&data=" +escape( this.form.data.value );
+
+	taAjax.webGet( url );
+
+}
+
+</script>
+
+

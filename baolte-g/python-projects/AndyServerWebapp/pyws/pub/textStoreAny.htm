@@ -1,0 +1,66 @@
+
+<title>Text Store</title>
+<h2>Text Store utility</h2>
+<form action=/ts/set/>
+	<input type=hidden name=f value=set>
+	<textarea name=data rows=9 cols=50></textarea>
+	<br />
+	<input name=i size=5>
+	<input type=button name=saveBtn value=Save>
+	<input type=button value=Clear onclick="this.form.data.value=''">
+	<input type=button value="GetText">
+</form>
+<div id="result"> </div>
+
+<script>
+//11-5-2017 jchoy v0.615 TsAny
+tsAny = function(fm, tsHelper){
+	 start=function(fm, tsHelper){
+			fm.doFormClick = doFormClick;
+			fm.tsHelper = tsHelper;
+			for (var i=0; i<fm.elements.length; i++)
+				fm.elements[i].onclick= function(){ this.form.doFormClick(this) }
+	}
+	 doFormClick= function(el){
+		console.log(el.value)
+			if (el.value=="Save") {
+					tsHelper.save( this.i.value, this.data.value )
+			} else if (el.value=="GetText") {
+					tsHelper.get( this.i.value )
+			}
+	}
+
+	start(fm, tsHelper);
+}
+tsHelper = function(verb1, verb2, urlBase){
+      save= function(i,data){
+				var im = new Image();
+				im.src= buildUrl( verb2, [i,data] )
+		}
+
+       function get(i){
+			var url= buildUrl( verb1, [i] );
+          loadUrlToIframe( url );
+			console.log(i,' get ',url)
+		}
+
+	   buildUrl= function( verb, params ){
+				var url= urlBase+verb;
+				for (var i=0; i<params.length; i++)
+						url = url.replace('{'+i+'}',params[i])
+				return url;
+		}
+
+		return {save:save, get:get};
+}
+
+tsAny( document.forms[0], tsHelper("/get/{0}","/save/{0}/{1}","/ts") )
+
+loadUrlToIframe = function(url){
+    var div= document.getElementById('result');
+    div.innerHTML= '';
+    var ifr= document.createElement('iframe');
+    div.appendChild(ifr). src= url;
+}
+
+</script>
