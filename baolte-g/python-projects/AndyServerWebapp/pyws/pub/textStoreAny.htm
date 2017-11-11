@@ -10,10 +10,11 @@
 	<input type=button value=Clear onclick="this.form.data.value=''">
 	<input type=button value="GetText">
 </form>
+<hr>
 <div id="result"> </div>
 
 <script>
-//11-5-2017 jchoy v0.615 TsAny
+//11-11-2017 jchoy v0.617 getRel; xhr
 tsAny = function(fm, tsHelper){
 	 start=function(fm, tsHelper){
 			fm.doFormClick = doFormClick;
@@ -29,10 +30,14 @@ tsAny = function(fm, tsHelper){
 					tsHelper.get( this.i.value )
 			}
 	}
+   if (!tsHelper.cb)
+      tsHelper.cb= function(s){
+         fm.data.value= s;
+      }
 
 	start(fm, tsHelper);
 }
-tsHelper = function(verb1, verb2, urlBase){
+tsHelper = function(verb1, verb2, urlBase, cb){
       save= function(i,data){
 				var im = new Image();
 				im.src= buildUrl( verb2, [i,data] )
@@ -40,9 +45,21 @@ tsHelper = function(verb1, verb2, urlBase){
 
        function get(i){
 			var url= buildUrl( verb1, [i] );
-          loadUrlToIframe( url );
+          if (url.indexOf('/') == 0)
+              getRel( url, this.cb )
+          else
+              loadUrlToIframe( url );
 			console.log(i,' get ',url)
 		}
+
+       getRel = function( url, fn ){  //xhr
+           var xhr= new XMLHttpRequest();
+           xhr.open( "GET", url, false );
+           xhr.onload= function(evt){
+               fn( xhr.responseText );
+           }
+           xhr.send(null);
+       }
 
 	   buildUrl= function( verb, params ){
 				var url= urlBase+verb;
@@ -51,10 +68,11 @@ tsHelper = function(verb1, verb2, urlBase){
 				return url;
 		}
 
-		return {save:save, get:get};
+		return {save:save, get:get, cb:cb};
 }
 
-tsAny( document.forms[0], tsHelper("/get/{0}","/save/{0}/{1}","/ts") )
+tsAny( document.forms[0], tsHelper("/get/{0}",
+    "/save/{0}/{1}", "/ts") )
 
 loadUrlToIframe = function(url){
     var div= document.getElementById('result');
@@ -62,5 +80,6 @@ loadUrlToIframe = function(url){
     var ifr= document.createElement('iframe');
     div.appendChild(ifr). src= url;
 }
+
 
 </script>
