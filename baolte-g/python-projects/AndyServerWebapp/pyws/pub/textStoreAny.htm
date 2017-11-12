@@ -14,13 +14,14 @@
 <div id="result"> </div>
 
 <script>
-//11-11-2017 jchoy v0.618 buildUrl2
+//11-11-2017 jchoy v0.619 fix clear button
 tsAny = function(fm, tsHelper){
 	 start=function(fm, tsHelper){
 			fm.doFormClick = doFormClick;
 			fm.tsHelper = tsHelper;
 			for (var i=0; i<fm.elements.length; i++)
-				fm.elements[i].onclick= function(){ this.form.doFormClick(this) }
+             if (!fm.elements[i].onclick)
+				  fm.elements[i].onclick= function(){ this.form.doFormClick(this) }
 	}
 	 doFormClick= function(el){
 		console.log(el.value)
