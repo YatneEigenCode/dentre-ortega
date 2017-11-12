@@ -7,14 +7,14 @@
 	<br />
 	<input name=i size=5>
 	<input type=button name=saveBtn value=Save>
-	<input type=button value=Clear onclick="this.form.data.value=''">
+	<input type=button value=Clear onclick="this.form.data.value='';">
 	<input type=button value="GetText">
 </form>
 <hr>
 <div id="result"> </div>
 
 <script>
-//11-11-2017 jchoy v0.617 getRel; xhr
+//11-11-2017 jchoy v0.618 buildUrl2
 tsAny = function(fm, tsHelper){
 	 start=function(fm, tsHelper){
 			fm.doFormClick = doFormClick;
@@ -40,11 +40,16 @@ tsAny = function(fm, tsHelper){
 tsHelper = function(verb1, verb2, urlBase, cb){
       save= function(i,data){
 				var im = new Image();
-				im.src= buildUrl( verb2, [i,data] )
+				im.src= buildUrl2( i, data );
 		}
 
+       buildUrl1= function(i){ return buildUrl(verb1, [i]) }
+       buildUrl2= function(i,d){
+           return buildUrl(verb2, [i,d])
+       }
+       
        function get(i){
-			var url= buildUrl( verb1, [i] );
+			var url= buildUrl1( i );
           if (url.indexOf('/') == 0)
               getRel( url, this.cb )
           else
@@ -68,7 +73,8 @@ tsHelper = function(verb1, verb2, urlBase, cb){
 				return url;
 		}
 
-		return {save:save, get:get, cb:cb};
+		return {save:save, get:get, cb:cb,
+           buildUrl1: buildUrl1, buildUrl2: buildUrl2 };
 }
 
 tsAny( document.forms[0], tsHelper("/get/{0}",
