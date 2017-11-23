@@ -1,3 +1,4 @@
+# 11/23/2017 jchoy v0.139 pyPath
 #-*-coding:utf8;-*-
 #qpy:3
 #qpy:webapp:Sample 
@@ -9,20 +10,23 @@ from bottle import run, route, template, static_file
 import shelve
 
 def dbname():
-    return 'runtime_data/pyandy';
+    return pyPath('so/dbPyandy');
+
+def pyPath(s):
+    return '/sdcard/andyServer/pyws/'+s;
     
 @route('/a')
 def about():
-    return "py Andy svr v0.137"
+    return "py Andy svr v0.139"
 
 @route('/t/<val:path>')
 def use_template(val):
     return template( 
-       	'/sdcard/andyServer/pyws/so/use.tpl',val=val)
+       	pyPath('so/use.tpl'),val=val)
     	  
 @route('/ws/<filepath:path>')
 def server_static(filepath):
-    return static_file(filepath, root='/sdcard/andyServer/pyws/pub')
+    return static_file(filepath, root=pyPath('pub'))
 
 @route('/ts/save/<key:path>/<val:path>')
 def textstore_set(key, val):
