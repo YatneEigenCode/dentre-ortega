@@ -1,12 +1,16 @@
-# 11/23/2017 jchoy textstore
+# 11/23/2017 jchoy soPath, setDbName
 import shelve
 from bottle import route
 
-def myPath(s):
-    return '/sdcard/andyServer/pyws/'+s;
+soPath = '/sdcard/andyServer/pyws/so/'
+dbName = 'dbNoname'
+
+def setDbName(s):
+    global dbName
+    dbName = s
 
 def dbname():
-    return myPath('so/dbPyandy');
+    return soPath+dbName
 
 @route('/ts/save/<key:path>/<val:path>')
 def textstore_set(key, val):

@@ -1,4 +1,4 @@
-# 11/23/2017 jchoy v0.141 textstore.py
+# 11/23/2017 jchoy v0.142 setDbName
 #-*-coding:utf8;-*-
 #qpy:3
 #qpy:webapp:AndyServerWebapp
@@ -14,7 +14,7 @@ def pyPath(s):
     
 @route('/a')
 def about():
-    return "py Andy svr v0.141"
+    return "py Andy svr v0.142"
 
 @route('/t/<val:path>')
 def use_template(val):
@@ -29,4 +29,5 @@ def server_static(filepath):
 def home_static():
     return static_file('rootindex.html', root='/sdcard/andyServer/pyws/pub')
 
+textstore.setDbName( 'dbPy' )
 run(host='localhost', port=8081)
