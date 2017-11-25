@@ -1,4 +1,4 @@
-# 11/23/2017 jchoy soPath, setDbName
+# 11/24/2017 jchoy soPath, setDbPath
 import shelve
 from bottle import route
 
@@ -8,6 +8,10 @@ dbName = 'dbNoname'
 def setDbName(s):
     global dbName
     dbName = s
+
+def setDbPath(s):
+    global soPath
+    soPath = s
 
 def dbname():
     return soPath+dbName

@@ -1,4 +1,4 @@
-# 11/23/2017 jchoy v0.142 setDbName
+# 11/24/2017 jchoy v0.145 cfg
 #-*-coding:utf8;-*-
 #qpy:3
 #qpy:webapp:AndyServerWebapp
@@ -9,12 +9,17 @@ qpython webapp with text store
 from bottle import run, route, template, static_file
 import textstore
 
+cfgData = {'port':8081, 'path':'/sdcard/devand/scriptOx/pyox1/'}
+
+def cfg(k):
+    return cfgData[k]
+
 def pyPath(s):
-    return '/sdcard/andyServer/pyws/'+s;
+    return cfg('path')+s
     
 @route('/a')
 def about():
-    return "py Andy svr v0.142"
+    return "py Andy svr v0.145e"
 
 @route('/t/<val:path>')
 def use_template(val):
@@ -27,7 +32,8 @@ def server_static(filepath):
 
 @route('/')
 def home_static():
-    return static_file('rootindex.html', root='/sdcard/andyServer/pyws/pub')
+    return static_file('rootindex.html', root=pyPath('pub'))
 
 textstore.setDbName( 'dbPy' )
-run(host='localhost', port=8081)
+textstore.setDbPath( pyPath('so/') )
+run(host='localhost', port=cfg('port'))
