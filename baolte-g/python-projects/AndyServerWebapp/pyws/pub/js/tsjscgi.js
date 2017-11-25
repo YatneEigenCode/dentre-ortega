@@ -1,4 +1,4 @@
-//11-24-2017 jchoy v0.113 tsjscgi.js fix tabs
+//11-24-2017 jchoy v0.114 fix typo instantiating TsJsCgi
 
 //-----
 function TsJsCgi(theTsHelper){
@@ -59,4 +59,4 @@ tsHelperBox= function(){
     return tsHelper( '/get/{0}', '' , '/ts' );
 }
 
-new TsJscgi( tsHelperBox() ).start();
+new TsJsCgi( tsHelperBox() ).start();
