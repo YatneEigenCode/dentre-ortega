@@ -1,5 +1,4 @@
-//11-24-2017 jchoy v0.114 fix typo instantiating TsJsCgi
-
+//11-24-2017 jchoy v0.115 call cgi with correct parameters
 //-----
 function TsJsCgi(theTsHelper){
     this.tsh= theTsHelper;
@@ -8,7 +7,7 @@ function TsJsCgi(theTsHelper){
         return (at.length==1)?def:at[1].split("&")[0];
     }
     this.start= function(){
-        const at = this.cgi('js').split(',');
+        const at = this.cgi('js','',location).split(',');
         at.map( scriptHelper(this.tsh).go );
     }
 }
