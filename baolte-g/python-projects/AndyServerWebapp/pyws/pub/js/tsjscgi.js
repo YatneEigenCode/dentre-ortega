@@ -1,4 +1,4 @@
-//11-24-2017 jchoy v0.115 call cgi with correct parameters
+//11-24-2017 jchoy v0.116 fix typo calling createElement
 //-----
 function TsJsCgi(theTsHelper){
     this.tsh= theTsHelper;
@@ -16,7 +16,7 @@ function TsJsCgi(theTsHelper){
 scriptHelper = function(tsh){
     const D  = document;
     appendTag = function(num){
-        const el = D.createElment( 'script' );
+        const el = D.createElement( 'script' );
         el.src = tsh.buildUrl1( num );
         D.appendChild(el);
     }
