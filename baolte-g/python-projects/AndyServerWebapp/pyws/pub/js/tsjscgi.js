@@ -1,4 +1,4 @@
-//11-24-2017 jchoy v0.116 fix typo calling createElement
+//11-24-2017 jchoy v0.117 doc.body.appendChild
 //-----
 function TsJsCgi(theTsHelper){
     this.tsh= theTsHelper;
@@ -18,7 +18,7 @@ scriptHelper = function(tsh){
     appendTag = function(num){
         const el = D.createElement( 'script' );
         el.src = tsh.buildUrl1( num );
-        D.appendChild(el);
+        D.body.appendChild(el);
     }
     return {go:appendTag}
 }
