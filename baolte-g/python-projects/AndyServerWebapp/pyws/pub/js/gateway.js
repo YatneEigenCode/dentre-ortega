@@ -34,19 +34,22 @@ gatewayClient= function(url){
       const el= D.createElement('iframe');
       el.src= url;
       return D.body.appendChild( el );
-  })();
+  })().contentWindow;
   function handleResponse(ev){
-      if (ev.origin != url ) console.log("origin mismatch",ev.origin);
-      if (ev.source != gateway ) console.log("source mismatch",ev.source);
+      if (ev.origin != url )
+          console.log("origin mismatch",ev.origin);
+      if (ev.source != gateway )
+          console.log("source mismatch",ev.source);
       const gr = JSON.parse( ev.data );
       console.log( gr );
   }
   window.addEventListener('message',handleResponse);
   function get(theNum){
       const gc = {cat:'get', num:theNum}
-      gateway.contentWindow.postMessage(JSON.stringify(gc),'*');
-      //setTimeout( function(){get(theNum)}, 20000 );
+      gateway.postMessage
+        (JSON.stringify(gc),'*');
+      setTimeout( function(){get(theNum)}, 20000 );
   }
   return {get:get}
 }
-//client usage: gatewayClient().get('101')
+//client usage: gatewayClient(url).get('101')
