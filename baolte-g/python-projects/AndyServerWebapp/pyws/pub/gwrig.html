@@ -1,5 +1,5 @@
 <body>
-<!-- 11/25/2017 jchoy v0.128 client; clientWindow -->
+<!-- 11/25/2017 jchoy v0.129 client; clientWindow -->
 
 <div id='gwrig'> test gateway 
   <a href=# onclick="runtest()">Run test</a>
@@ -25,7 +25,7 @@ gatewayClient= function(url){
     window.addEventListener('message',handleResponse);
     function get(num){
         const gc = {cat:'get', num:'A1001'}
-        gateway.contentWindow.postMessage(JSON.stringify(gc));
+        gateway.contentWindow.postMessage(JSON.stringify(gc),url);
     }
     return {get:get}
 }
