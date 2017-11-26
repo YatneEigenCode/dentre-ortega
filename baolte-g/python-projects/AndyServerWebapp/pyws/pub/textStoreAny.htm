@@ -13,8 +13,9 @@
 <hr>
 <div id="result"> </div>
 
+<script src="js/tshelper.js"></script>
 <script>
-//11-11-2017 jchoy v0.619 fix clear button
+//11-11-2017 jchoy v0.621 fix clear button
 tsAny = function(fm, tsHelper){
 	 start=function(fm, tsHelper){
 			fm.doFormClick = doFormClick;
@@ -38,55 +39,10 @@ tsAny = function(fm, tsHelper){
 
 	start(fm, tsHelper);
 }
-tsHelper = function(verb1, verb2, urlBase, cb){
-      save= function(i,data){
-				var im = new Image();
-				im.src= buildUrl2( i, data );
-		}
-
-       buildUrl1= function(i){ return buildUrl(verb1, [i]) }
-       buildUrl2= function(i,d){
-           return buildUrl(verb2, [i,d])
-       }
-       
-       function get(i){
-			var url= buildUrl1( i );
-          if (url.indexOf('/') == 0)
-              getRel( url, this.cb )
-          else
-              loadUrlToIframe( url );
-			console.log(i,' get ',url)
-		}
-
-       getRel = function( url, fn ){  //xhr
-           var xhr= new XMLHttpRequest();
-           xhr.open( "GET", url, false );
-           xhr.onload= function(evt){
-               fn( xhr.responseText );
-           }
-           xhr.send(null);
-       }
-
-	   buildUrl= function( verb, params ){
-				var url= urlBase+verb;
-				for (var i=0; i<params.length; i++)
-						url = url.replace('{'+i+'}',params[i])
-				return url;
-		}
-
-		return {save:save, get:get, cb:cb,
-           buildUrl1: buildUrl1, buildUrl2: buildUrl2 };
-}
 
 tsAny( document.forms[0], tsHelper("/get/{0}",
     "/save/{0}/{1}", "/ts") )
 
-loadUrlToIframe = function(url){
-    var div= document.getElementById('result');
-    div.innerHTML= '';
-    var ifr= document.createElement('iframe');
-    div.appendChild(ifr). src= url;
-}
 
 
 </script>
