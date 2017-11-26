@@ -1,5 +1,5 @@
 <body>
-<!-- 11/26/2017 jchoy  v0.148 gwClientUrl; runtest -->
+<!-- 11/26/2017 jchoy v0.151 gwClientUrl; setup -->
 
 <div id='gwrig'> test gateway - a -
   <a href=# onclick="runtest()">Run test</a>
@@ -12,25 +12,24 @@
 </body>
 <script src="js/gateway.js"></script>
 <script>
-gr= function(){
+setup= function(){
   const D= document;
   const gwe= D.getElementById('gw');
-  var isBusy= false;
   function handler(data){
       isBusy= false;
       D.body.appendChild
         (D.createElment('div')
         ).innerHTML= data;
   }
+  const gwc= gwClient(gwe.contentWindow, handler);
+  var isBusy= false;
   function runtest(){
-      if (isBusy) return;
+      if (!isBusy) gwc.get('A1001');
       isBusy= true;
-      gwClient(gwe.contentWindow).get
-        ('A1001', handler);
   }
   return {runtest:runtest}
 }
-const rig= gr();
+const rig= setup();
 function runtest(){
   rig.runtest();
 }
