@@ -1,4 +1,4 @@
-//11-26-2017 jchoy v0.146 gwUrl
+//11-26-2017 jchoy v0.147 gwClientUrl
 //Widget for cross domain data read 
 //using iframe and postMessage.
 //Requires tshelper
@@ -41,10 +41,12 @@ gatewayClient= function(url, fn){
 }
 //-----
 gwClient= function(gateway, fn){
-  const gwUrl= gateway.parentNode.src;
+  return gwClientUrl(gateway, '*', fn );
+}
+gwClientUrl= function(gateway, url, fn){
   function handleResponse(ev){
       try {
-        if ( gwUrl.indexOf(ev.origin) != 0 )
+        if ( url.indexOf(ev.origin) != 0 )
           console.log("origin mismatch",ev.origin);
       } catch (e) {}
       if (ev.source != gateway )
