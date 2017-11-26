@@ -1,6 +1,11 @@
-//11-25-2017 jchoy v0.141 gatewayClient
+//11-26-2017 jchoy v0.143 tshelper.cb; gwClient
+//Widget for cross domain data read 
+//using iframe and postMessage.
+//Requires tshelper
+
+//-----
 function gateway (tshelper){
-    respond=function (resTxt){
+    tshelper.cb= function (resTxt){
         const gr={
           cat:'response',
           data:resTxt
@@ -15,11 +20,8 @@ function gateway (tshelper){
               console.log('gw event');
               const gc= JSON.parse
                 (ev.data);
-              const url=
-               tshelper.buildUrl1(gc.num)
               if (gc.cat=='get')
-                  tshelper.getRel
-                    (url,respond);
+                  tshelper.get(gc.num);
           } 
         )
     }
@@ -28,27 +30,32 @@ function gateway (tshelper){
 //communicator usage: gateway().start()
 
 //-----
-gatewayClient= function(url){
+gatewayClient= function(url, fn){
   const D=document;
   const gateway= (function(){
       const el= D.createElement('iframe');
       el.src= url;
       return D.body.appendChild( el );
   })().contentWindow;
+  return gwClient(gateway, fn);
+}
+//-----
+gwClient= function(win, fn){
   function handleResponse(ev){
-      if (ev.origin != url )
+      if ( url.indexOf(ev.origin) != 0 )
           console.log("origin mismatch",ev.origin);
       if (ev.source != gateway )
-          console.log("source mismatch",ev.source);
+          console.log("source mismatch");
       const gr = JSON.parse( ev.data );
       console.log( gr );
+      if (fn) fn( gr.data );
   }
   window.addEventListener('message',handleResponse);
-  function get(theNum){
-      const gc = {cat:'get', num:theNum}
+  function get(nm){
+      const gc = {cat:'get', num:nm}
       gateway.postMessage
         (JSON.stringify(gc),'*');
-      setTimeout( function(){get(theNum)}, 20000 );
+      setTimeout( function(){get(nm)}, 20000 );
   }
   return {get:get}
 }
