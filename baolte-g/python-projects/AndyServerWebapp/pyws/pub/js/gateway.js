@@ -1,4 +1,4 @@
-//11-26-2017 jchoy v0.143 tshelper.cb; gwClient
+//11-26-2017 jchoy v0.145 gwClient fix
 //Widget for cross domain data read 
 //using iframe and postMessage.
 //Requires tshelper
@@ -40,7 +40,7 @@ gatewayClient= function(url, fn){
   return gwClient(gateway, fn);
 }
 //-----
-gwClient= function(win, fn){
+gwClient= function(gateway, fn){
   function handleResponse(ev){
       if ( url.indexOf(ev.origin) != 0 )
           console.log("origin mismatch",ev.origin);
