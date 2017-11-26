@@ -1,8 +1,8 @@
 <body>
-<!-- 11/26/2017 jchoy v0.143 tshelper.cb; gwClient -->
+<!-- 11/26/2017 jchoy  v0.148 gwClientUrl; runtest -->
 
 <div id='gwrig'> test gateway - a -
-  <a href=# onclick="gr().runtest()">Run test</a>
+  <a href=# onclick="runtest()">Run test</a>
 </div>
 <div style="display:block">
   <iframe src="http://192.168.1.25:8081/ws/gateway.html"
@@ -16,18 +16,22 @@ gr= function(){
   const D= document;
   const gwe= D.getElementById('gw');
   var isBusy= false;
-  function runtest(){
-      if (isBusy) return;
-      isBusy= true;
-      gwClient(gwe.contentWindow).get
-        ('A1001', handler);
-  }
   function handler(data){
       isBusy= false;
       D.body.appendChild
         (D.createElment('div')
         ).innerHTML= data;
   }
+  function runtest(){
+      if (isBusy) return;
+      isBusy= true;
+      gwClient(gwe.contentWindow).get
+        ('A1001', handler);
+  }
   return {runtest:runtest}
+}
+const rig= gr();
+function runtest(){
+  rig.runtest();
 }
 </script>
