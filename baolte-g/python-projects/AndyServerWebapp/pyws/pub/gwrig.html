@@ -1,5 +1,5 @@
 <body>
-<!-- 11/25/2017 jchoy v0.135 setTimeout -->
+<!-- 11/25/2017 jchoy v0.138 setTimeout -->
 
 <div id='gwrig'> test gateway - a -
   <a href=# onclick="runtest()">Run test</a>
@@ -15,8 +15,8 @@ gatewayClient= function(url){
         return D.body.appendChild( el );
     })();
     function handleResponse(ev){
-        if (ev.origin != url ) return console.log("origin mismatch");
-        if (ev.source != gateway ) return console.log("source mismatch");
+        if (ev.origin != url ) console.log("origin mismatch",ev.origin);
+        if (ev.source != gateway ) console.log("source mismatch",ev.source);
         const gr = JSON.parse( ev.data );
         console.log( gr );
     }
