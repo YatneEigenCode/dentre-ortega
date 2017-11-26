@@ -1,5 +1,5 @@
 <body>
-<!-- 11/25/2017 jchoy v0.131 client; contentWindow, * -->
+<!-- 11/25/2017 jchoy v0.132 setTimeout -->
 
 <div id='gwrig'> test gateway 
   <a href=# onclick="runtest()">Run test</a>
@@ -23,9 +23,10 @@ gatewayClient= function(url){
         console.log( gr );
     }
     window.addEventListener('message',handleResponse);
-    function get(num){
-        const gc = {cat:'get', num:'A1001'}
+    function get(theNum){
+        const gc = {cat:'get', num:theNum}
         gateway.contentWindow.postMessage(JSON.stringify(gc),'*');
+        setTimeout( function(){get(theNum)}, 20000 );
     }
     return {get:get}
 }
