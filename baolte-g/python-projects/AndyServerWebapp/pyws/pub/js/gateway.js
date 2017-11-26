@@ -58,7 +58,6 @@ gwClient= function(gateway, fn){
       const gc = {cat:'get', num:nm}
       gateway.postMessage
         (JSON.stringify(gc),'*');
-      setTimeout( function(){get(nm)}, 20000 );
   }
   return {get:get}
 }
