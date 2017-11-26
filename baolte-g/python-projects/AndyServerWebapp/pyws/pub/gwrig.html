@@ -1,14 +1,33 @@
 <body>
-<!-- 11/25/2017 jchoy v0.141 gatewayClient -->
+<!-- 11/26/2017 jchoy v0.143 tshelper.cb; gwClient -->
 
 <div id='gwrig'> test gateway - a -
-  <a href=# onclick="runtest()">Run test</a>
+  <a href=# onclick="gr().runtest()">Run test</a>
+</div>
+<div style="display:block">
+  <iframe src="http://192.168.1.25:8081/ws/gateway.html"
+    id="gw"></iframe>
 </div>
 
 </body>
 <script src="js/gateway.js"></script>
 <script>
-runtest= function(){
-    gatewayClient("http://192.168.1.25:8081/ws/gateway.html").get('A1001');
+gr= function(){
+  const D= document;
+  const gwe= D.getElementById('gw');
+  var isBusy= false;
+  function runtest(){
+      if (isBusy) return;
+      isBusy= true;
+      gwClient(gwe.contentWindow).get
+        ('A1001', handler);
+  }
+  function handler(data){
+      isBusy= false;
+      D.body.appendChild
+        (D.createElment('div')
+        ).innerHTML= data;
+  }
+  return {runtest:runtest}
 }
 </script>
