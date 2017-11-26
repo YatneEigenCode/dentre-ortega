@@ -1,5 +1,5 @@
 <body>
-<!-- 11/26/2017 jchoy v0.151 gwClientUrl; setup -->
+<!-- 11/26/2017 jchoy v0.152 fix typo -->
 
 <div id='gwrig'> test gateway - a -
   <a href=# onclick="runtest()">Run test</a>
@@ -18,7 +18,7 @@ setup= function(){
   function handler(data){
       isBusy= false;
       D.body.appendChild
-        (D.createElment('div')
+        (D.createElement('div')
         ).innerHTML= data;
   }
   const gwc= gwClient(gwe.contentWindow, handler);
