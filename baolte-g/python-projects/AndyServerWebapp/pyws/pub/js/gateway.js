@@ -1,4 +1,4 @@
-//11-25-2017 jchoy v0.125 gateway
+//11-25-2017 jchoy v0.137 buildUrl1
 function gateway (tshelper){
     respond=function (resTxt){
         const gr={
@@ -12,12 +12,14 @@ function gateway (tshelper){
         window.addEventListener(
           'message',
           function(ev){
+              console.log('gw event');
               const gc= JSON.parse
                 (ev.data);
+              const url=
+               tshelper.buildUrl1(gc.num)
               if (gc.cat=='get')
                   tshelper.getRel
-                    (gc.num,respond);
-
+                    (url,respond);
           } 
         )
     }

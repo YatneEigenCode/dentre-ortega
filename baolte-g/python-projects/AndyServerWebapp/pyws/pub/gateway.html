@@ -3,3 +3,10 @@ post messages to this iframe to read ts
 </div>
 <script src="js/tshelper.js"></script>
 <script src="js/gateway.js"></script>
+<script>
+
+tsHelperBox= function(){
+    return tsHelper( '/get/{0}', '' , '/ts' );
+}
+gateway(tsHelperBox()).start();
+</script>

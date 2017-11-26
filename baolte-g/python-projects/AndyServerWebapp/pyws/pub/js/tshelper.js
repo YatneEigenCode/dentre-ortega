@@ -1,4 +1,4 @@
-//11-24-2017 jchoy v0.117 tsHelper
+//11-25-2017 jchoy v0.136 getRel
 
 //-----
 tsHelper = function(verb1, verb2, urlBase, cb){
@@ -29,7 +29,9 @@ tsHelper = function(verb1, verb2, urlBase, cb){
           return url;
     }
     return {save:save, get:get, cb:cb,
-        buildUrl1: buildUrl1, buildUrl2: buildUrl2 };
+        getRel:getRel, 
+        buildUrl1: buildUrl1,
+        buildUrl2: buildUrl2 };
 }
 
 loadUrlToIframe = function(url){
