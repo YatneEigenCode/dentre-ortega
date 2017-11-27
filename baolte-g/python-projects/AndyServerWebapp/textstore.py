@@ -1,5 +1,6 @@
-# 11/24/2017 jchoy soPath, setDbPath
+# 11/26/2017 jchoy v0.634 cgi.fieldstorage
 import shelve
+import cgi
 from bottle import route
 
 soPath = '/sdcard/andyServer/pyws/so/'
@@ -16,8 +17,16 @@ def setDbPath(s):
 def dbname():
     return soPath+dbName
 
-@route('/ts/save/<key:path>/<val:path>')
-def textstore_set(key, val):
+@route('/ts/save/<key:path>')
+def textstore_set1(key):
+    fs= cgi.FieldStorage()
+    db= shelve.open(dbname())
+    db[key]= fs.getvalue('data')
+    db.close()
+    return 'ok'
+    
+@route('/ts/set/<key:path>/<val:path>')
+def textstore_set2(key,val):
     db= shelve.open(dbname())
     db[key]= val
     db.close()

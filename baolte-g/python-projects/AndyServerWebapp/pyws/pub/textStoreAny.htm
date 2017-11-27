@@ -15,7 +15,7 @@
 
 <script src="js/tshelper.js"></script>
 <script>
-//11-11-2017 jchoy v0.621 fix clear button
+//11-26-2017 jchoy v0.632 ?cgi
 tsAny = function(fm, tsHelper){
 	 start=function(fm, tsHelper){
 			fm.doFormClick = doFormClick;
@@ -41,8 +41,7 @@ tsAny = function(fm, tsHelper){
 }
 
 tsAny( document.forms[0], tsHelper("/get/{0}",
-    "/save/{0}/{1}", "/ts") )
-
+    "/save/{0}?data={1}", "/ts") )
 
 
 </script>
