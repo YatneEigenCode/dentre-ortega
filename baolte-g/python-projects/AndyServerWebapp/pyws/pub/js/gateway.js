@@ -1,4 +1,4 @@
-//11-26-2017 jchoy v0.261 count
+//11-26-2017 jchoy v0.263 continue on mismatch
 //Widget for cross domain data read 
 //using iframe and postMessage.
 //Requires tshelper
@@ -51,7 +51,7 @@ gwClientUrl= function(gateway, url, fn){
   function handleResponse(ev){
       count.messagesReceived++;
       if ( (""+url).indexOf(ev.origin) != 0 )
-          return count.originMismatches++;
+          count.originMismatches++;
       if (ev.source == gateway ){
         const gr = JSON.parse( ev.data );
         if (gr.cat == 'response'){
