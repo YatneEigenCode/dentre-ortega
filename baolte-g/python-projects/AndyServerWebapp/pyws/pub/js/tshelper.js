@@ -1,4 +1,4 @@
-//11-26-2017 jchoy v0.172 encodeURIComponent
+//11-26-2017 jchoy v0.174 encodeURIComponent
 
 //-----
 tsHelper = function(verb1, verb2, urlBase, cb){
@@ -23,11 +23,12 @@ tsHelper = function(verb1, verb2, urlBase, cb){
            xhr.send(null);
     }
     buildUrl= function( verb, params ){
-          var url= ""+verb;
+          var url= urlBase+verb;
           for (var i=0; i<params.length; i++)
-              url = url.replace('{'+i+'}',params[i])
-          console.log("bu",encodeURIComponent(url));
-          return urlBase + encodeURIComponent(url);
+              url = url.replace('{'+i+'}', 
+                encodeURIComponent(params[i]) );
+          console.log("bu", url);
+          return url;
     }
     return {save:save, get:get, cb:cb,
         buildUrl1: buildUrl1,
