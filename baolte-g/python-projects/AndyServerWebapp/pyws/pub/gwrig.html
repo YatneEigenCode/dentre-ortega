@@ -1,5 +1,5 @@
 <body>
-<!-- 11/26/2017 jchoy v0.152 fix typo -->
+<!-- 11/26/2017 jchoy v0.262 test count -->
 
 <div id='gwrig'> test gateway - a -
   <a href=# onclick="runtest()">Run test</a>
@@ -16,21 +16,21 @@ setup= function(){
   const D= document;
   const gwe= D.getElementById('gw');
   function handler(data){
-      isBusy= false;
       D.body.appendChild
         (D.createElement('div')
         ).innerHTML= data;
   }
   const gwc= gwClient(gwe.contentWindow, handler);
-  var isBusy= false;
   function runtest(){
-      if (!isBusy) gwc.get('A1001');
-      isBusy= true;
+      gwc.get('A1001');
   }
-  return {runtest:runtest}
+  return {runtest:runtest, gwc:gwc}
 }
 const rig= setup();
 function runtest(){
   rig.runtest();
+  setTimeout( function(){
+    console.log(rig.gwc.count.messagesReceived);
+  }, 9000);
 }
 </script>
