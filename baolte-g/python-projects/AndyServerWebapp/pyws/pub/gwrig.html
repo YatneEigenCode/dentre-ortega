@@ -1,10 +1,10 @@
 <body>
-<!-- 11/26/2017 jchoy v0.262 test count -->
+<!-- 11/26/2017 jchoy  v0.264 hide iframe -->
 
 <div id='gwrig'> test gateway - a -
-  <a href=# onclick="runtest()">Run test</a>
+  <a href=# onclick="rig.runtest('A1001')">Run test</a>
 </div>
-<div style="display:block">
+<div style="display:none">
   <iframe src="http://192.168.1.25:8081/ws/gateway.html"
     id="gw"></iframe>
 </div>
@@ -21,16 +21,10 @@ setup= function(){
         ).innerHTML= data;
   }
   const gwc= gwClient(gwe.contentWindow, handler);
-  function runtest(){
-      gwc.get('A1001');
+  function runtest(num){
+      gwc.get(num);
   }
   return {runtest:runtest, gwc:gwc}
 }
 const rig= setup();
-function runtest(){
-  rig.runtest();
-  setTimeout( function(){
-    console.log(rig.gwc.count.messagesReceived);
-  }, 9000);
-}
 </script>
