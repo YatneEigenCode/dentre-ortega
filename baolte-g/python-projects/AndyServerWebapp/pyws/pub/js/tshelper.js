@@ -1,4 +1,4 @@
-//11-25-2017 jchoy v0.171 encodeURIComponent
+//11-26-2017 jchoy v0.171 encodeURIComponent
 
 //-----
 tsHelper = function(verb1, verb2, urlBase, cb){
