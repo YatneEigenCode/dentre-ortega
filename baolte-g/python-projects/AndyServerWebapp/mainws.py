@@ -1,4 +1,4 @@
-# 11/25/2017 jchoy v0.161 get ip
+# 11/27/2017 jchoy v0.645 http://ip
 #-*-coding:utf8;-*-
 #qpy:3
 """
@@ -21,13 +21,17 @@ def getIp():
     s.connect(('google.com',0))
     return s.getsockname()[0]
 
+def bigFont(s,sz):
+    return "<font size=%d>%s</font>" % (sz,s)
+
 @route('/a')
 def about():
-    return "py Andy svr v0.161"+"<br><a href=/ip>show IP</a>"
+    return "py Andy svr v0.642"+"<br><a href=/ip>show IP</a>"
 
 @route('/ip')
 def aboutip():
-    return getIp()
+    rs= "http://%s:%s" % (getIp(),cfg('port'))
+    return bigFont(rs, 36)
 
 @route('/t/<val:path>')
 def use_template(val):
