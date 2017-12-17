@@ -11,7 +11,8 @@ TbcShare=function(){
     apt.wrapCloser(fr,true,ci);
   }
   this.updateCfg= function(at){
-    if (at.length>=4) this.updateConfig( at[2], at[3] );
+    if (at.length<4) return 'missing params';
+    return [this.updateConfig( at[2], at[3] ),'ok-config'][1]
   }
   this.updateConfig= function(k,v){ config_TbcShare[k]=v; }
 }
