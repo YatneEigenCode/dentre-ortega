@@ -1,4 +1,4 @@
-//12-18-2017 v0.113 successful test on windows
+//12-18-2017 v0.114 successful test on windows
 AniGifMaker=function(){
   this.start= function(){
     const ag = new Animated_GIF({repeat:null}), dim={w:320,h:240}
@@ -13,7 +13,7 @@ AniGifMaker=function(){
     ctx.fillStyle= 'yellow';
     for(var i = 0; i < 1501; i=i+10) {
       ctx.clearRect(0, 0, dim.w, dim.h);
-      ctx.fillText(i, i $ dim.w, i % dim.h);
+      ctx.fillText(i, i % dim.w, i % dim.h);
       const img= new Image();
       ian.src= img.src= cnv.toDataURL('image/jpeg');
       console.log( 'c', i, img.src.length );
