@@ -1,4 +1,4 @@
-//12-17-2017 CETB addon
+//12-18-2017 v0.121 older browsers error on let
 TbcShare=function(){
   this.start= function(at){
     if (at[1]=='/cfg') return this.updateCfg(at);
@@ -6,7 +6,7 @@ TbcShare=function(){
     return (at.length>1)?'ok':'missing param'
   }
   this.exec= function(ci){
-    let fr, apt= new LinkMaker();
+    var fr, apt= new LinkMaker();
     (fr=apt.addEl('iframe')).src= config_TbcShare['url']+ci;
     apt.wrapCloser(fr,true,ci);
   }
