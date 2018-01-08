@@ -1,5 +1,5 @@
-//8-29-2016 jchoy
-pkg= pkg9900= { ver:'1.227' }; //midcate, closeForm, onFormHide, toggleMark
+//1-8-2018 jchoy
+pkg= pkg9900= { ver:'1.231' }; //LinkMaker.initForRow
 
 //----
 pkg.CsvBud=function(){
@@ -117,6 +117,7 @@ pkg.StoTab=function(){
     var i1=this.asset=[['loading...']], ttl= url.split(/[\/\=]/).pop();
     if (!document.title) document.title= ttl;
     ($t.lm=new LinkMaker()).wrapCloser($tbl=this.addEl('table'),0,ttl);
+    $t.lm= $t.lm.initForRow();
     var i2=window.pkg=null, i3=this.fillTable($tbl);
     this.prepSn().start( url, 'pkg', function(){
       $t.asset= window.pkg.asset; $tbl.deleteRow(0); $t.fillTable($tbl); } );
@@ -135,6 +136,7 @@ pkg.StoTabLo=function(){
     if (at[1]=='/web') return ['ok',this.webGet( at[2] )][0];
     var tbl, x=this.getAsset( this.fn= at[1] );
     ($t.lm=new LinkMaker()).wrapCloser(tbl=this.addEl('table'),0,at[1]);
+    $t.lm= $t.lm.initForRow();
     return ['ok', this.fillTable(tbl)][0];
   }
   this.fillTable= function(tbl){
