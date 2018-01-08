@@ -1,6 +1,6 @@
-//9-13-2016 jchoy - LinkMkaer.bag, title, saved msg
+//1-8-2018 jchoy - v1.381 LinkMaker.closerIcon
 //7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.376'}
+pkg= pkg622={ver:'CETB 1.381'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -10,6 +10,12 @@ pkg.HashCmd=function (){
 }
 pkg.LinkMaker= function(){
   new AppTool().inherit( this, AppTool );
+  this.closerIcon= '[x] ';
+  this.init= function(closerIcon){
+    return [this,this.closerIcon= closerIcon][0];
+  }
+  this.initForRow= function(){ return this.init('[^] '; }
+  this.initForMin= function(){ return this.init('[.] '; }
   this.start= function(at){
     if (at[1] == '.') {
       this.addEl('span').innerHTML= at.slice(2,99).join(' ');
@@ -23,7 +29,7 @@ pkg.LinkMaker= function(){
     return ['ok',this._.innerHTML=rs,this.wrapCloser( this._ )][0];
   }
   this.wrapCloser= function(el, isBr, title){
-    this.addEl('span',this.addEl('div')).innerHTML='[x] '; //[.][o]
+    this.addEl('span',this.addEl('div')).innerHTML=this.closerIcon;
     this._.onclick= function(){ new DomAni().delEl(this.parentNode) }
     if (title) this.addEl('span',this._.parentNode).innerHTML= title;
     if (isBr) this.addEl('br',this._.parentNode);
