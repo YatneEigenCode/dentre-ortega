@@ -1,6 +1,5 @@
-//1-8-2018 jchoy - v1.381 LinkMaker.closerIcon
-//7-2-2016 jchoy TaApp, CurlyStarter
-pkg= pkg622={ver:'CETB 1.381'}
+//1-11-2018 jchoy - v1.382 fix missing paren in LinkMaker
+pkg= pkg622={ver:'CETB 1.382'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -14,8 +13,8 @@ pkg.LinkMaker= function(){
   this.init= function(closerIcon){
     return [this,this.closerIcon= closerIcon][0];
   }
-  this.initForRow= function(){ return this.init('[^] '; }
-  this.initForMin= function(){ return this.init('[.] '; }
+  this.initForRow= function(){ return this.init('[^] '); }
+  this.initForMin= function(){ return this.init('[.] '); }
   this.start= function(at){
     if (at[1] == '.') {
       this.addEl('span').innerHTML= at.slice(2,99).join(' ');
