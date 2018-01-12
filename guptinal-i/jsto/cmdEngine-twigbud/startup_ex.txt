@@ -1,13 +1,13 @@
-.link 1/13/2018 example for startup
+.link 1/12/2018 example for startup
 hashcmd
 sleep 1
 # Click this to add commands to startup
 link #://cmd/edit%20startup
 # See example of startup
-link startup_ex.txt#://
+link startup_ex.txt
 # Changes to startup will be saved to browser storage
 
 #loadjsc 9900 StoTab
 #loadjsc 9903 noop
 #tab launch.csv
-#link tab_howto.gif#://
+#link tab_howto.gif
