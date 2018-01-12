@@ -1,4 +1,4 @@
-.link 1/12/2018 example for startup
+.link 1/12/2018 c13 tab_howto.gif
 hashcmd
 sleep 1
 # Click this to add commands to startup
@@ -10,4 +10,5 @@ link startup_ex.txt
 #loadjsc 9900 StoTab
 #loadjsc 9903 noop
 #tab launch.csv
-#link tab_howto.gif
+link tab_howto.gif
+link /QuickWordGif/img/tab_howto.gif
