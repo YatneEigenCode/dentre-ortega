@@ -1,5 +1,5 @@
-//1-11-2018 jchoy - v1.382 fix missing paren in LinkMaker
-pkg= pkg622={ver:'CETB 1.382'}
+//1-14-2018 jchoy - v1.391 default startup
+pkg= pkg622={ver:'CETB 1.391'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -130,6 +130,8 @@ pkg.CmdAutostart= function(){
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
     if (!st.isOk) return;
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
+    else 
+        this.parse(ce, "See sample startup\nlink startup_ex.txt\ntype 'edit startup' to create startup");
   }
   this.parse= function(ce,sf){
     for (var i=0,at=sf.split('\n'); i<at.length; i++)
