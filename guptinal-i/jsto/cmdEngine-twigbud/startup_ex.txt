@@ -1,14 +1,17 @@
-.link 1/12/2018 c13 tab_howto.gif
+link . 1/14/2018 c14
 hashcmd
 sleep 1
-# Click this to add commands to startup
 link #://cmd/edit%20startup
-# See example of startup
 link startup_ex.txt
-# Changes to startup will be saved to browser storage
 
 #loadjsc 9900 StoTab
 #loadjsc 9903 noop
 #tab launch.csv
 link tab_howto.gif
 link /QuickWordGif/img/tab_howto.gif
+
+# Type 'edit startup' into CETB input area
+# Copy everything here into the startup textarea
+# Hit enter to add new line to startup textarea
+# Wait 10 seconds and reload page
+# Changes to startup will be saved to browser storage
