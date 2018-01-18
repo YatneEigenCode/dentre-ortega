@@ -1,5 +1,5 @@
-//9-13-2016 jchoy
-pkg=pkg9902= {ver:'v0.248'} //confirm, DomAni.aniScroll
+//1-17-2018 jchoy
+pkg=pkg9902= {ver:'v0.249'} //speed up DomAni
 
 pkg.OurStatus=function (){
   new AppTool().inherit( this, AppTool );
@@ -57,7 +57,7 @@ pkg.DomAni= function(){
   this.pinchDel= function( el ){
     var $ph= el.parentNode.insertBefore(document.createElement('div'),el);
     var dz, z=el.offsetHeight, es=$ph.style, x= $ph.style.overflow= 'hidden';
-    $ph.appendChild(el); dz= (z>20)?5:2; 
+    $ph.appendChild(el); dz= (z>20)?15:3; 
     (function fa(){ es.height=z-=dz; $raf((z>1)?fa:fz);})(el.position='relative')
     function fz(){ $ph.parentNode.removeChild($ph) }
   }
