@@ -1,0 +1,16 @@
+//1-17-2018 jchoy v0.112 DefCmdJsLine works
+DefCmdJsLine=function(){
+  const fn=new Function('at','return ["ok",eval(this.sc)][0]');
+  this.start=function(at){
+    const sc= at.slice(2).join(' ');
+    const cName= 'Anon_cetb'+new GCloak().theOne.i++;
+    eval('tmp=function(){this.sc=sc;this.start=fn}');
+    $ce.assets[at[1]]= new Function('at',
+      'return new '+cName+'().start(at)'  );
+    return ['ok',window[cName]= tmp][0];
+  }
+}
+const gCloak_theOne={i:0,at:[],ts:new Date(),ce:$ce};
+GCloak=function(){ this.theOne= gCloak_theOne}
+//dcjl (function(a,b,c,d){d.cfg=c;d.parse($ce,b.getItem(a))})(at[1],new Sto().lo,{sl:new StoLog('ca.log')},new CmdAutostart())")
+//evaljs-ok
