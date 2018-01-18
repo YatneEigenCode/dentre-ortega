@@ -1,4 +1,4 @@
-//1-17-2018 jchoy v0.113 addCmd
+//1-17-2018 jchoy v0.114 directly parse runner
 DefCmdJsLine=function(){
   const fn=new Function('at','return ["ok",eval(this.sc)][0]');
   this.start=function(at){
@@ -12,6 +12,9 @@ DefCmdJsLine=function(){
 }
 const gCloak_theOne={i:0,at:[],ts:new Date(),ce:$ce};
 GCloak=function(){ this.theOne= gCloak_theOne}
+
+//rm
 //dcjl foo12 (function(a,b){a.removeItem(b)})(new Sto().lo,at[1])
-//dcjl (function(a,b,c,d){d.cfg=c;d.parse($ce,b.getItem(a))})(at[1],new Sto().lo,{sl:new StoLog('ca.log')},new CmdAutostart())")
+
+new CmdAutostart().init('ca').parse( new CmdEngine().ce1.ce, new Sto().lo.getItem('runner'));
 //evaljs-ok
