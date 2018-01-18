@@ -1,10 +1,10 @@
-//1-17-2018 jchoy - v1.393 CmdAutostart.init
-pkg= pkg622={ver:'CETB 1.393'}
+//1-17-2018 jchoy - v1.394 CmdEngine_theOne
+pkg= pkg622={ver:'CETB 1.394'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
     return ['ok', window.onhashchange= function(){
-      $ce.parse(unescape(location.hash.replace('#://cmd/',''))); }][0]
+      new CmdEngine().ce1.ce.parse(unescape(location.hash.replace('#://cmd/',''))); }][0]
   }
 }
 pkg.LinkMaker= function(){
@@ -146,6 +146,7 @@ pkg.CmdAutostart= function(){
   }
 }
 //----
+const cmdEngine_theOne= {};
 pkg.CmdEngine= function(){
   var $t= $ce= this;
   this.assets= {};
@@ -156,6 +157,7 @@ pkg.CmdEngine= function(){
   this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
   this.addCmd( 'loadjs', function(at){ return new LoadJs().start(at); } );
   this.addCmd( 'hashcmd', function(at){return new HashCmd().start(at);});
+  this.ce1= cmdEngine_theOne;
   this.parse= function(taval){
     var args= taval.split('\n').pop().split(' '), res=this._='';
     var fn= (args[0].charAt(0)=='#')? function(){return 'ignored'} : this.assets[args[0]];
@@ -165,6 +167,7 @@ pkg.CmdEngine= function(){
   }
   this.crWrap= function(s){ return '\n'+s+'\n'; }
   this.init= function(){
+    if (               !this.ce1.ce) this.ce1.ce= this;
     this.assets['defcmd']= function(at){
       if (at.length < 3) return 'syntax: defcmd name class';
       var $cn= at[2];
@@ -205,16 +208,15 @@ pkg.LoadJs= function(){
 pkg.CurlyStarter= function(){
   new AppTool().inherit( this, AppTool );
   new AppTool().inherit( this, TaApp );
-  var $t= this;
+  const  $t= this;
   this.ver= pkg622.ver;
-  this.cmdEngine= new CmdEngine().init();
+  const $ce=this.cmdEngine= new CmdEngine().init();
   this.start= function(){
     this.sl= new StoLog('err.log');
     window.onerror= function(e,u,l){ $t.sl.log(e) }
-    document.title= 'CETB'
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
-    this.addEl('br');
+    document.title=['CETB', $t.addEl('br')][0]; 
     setTimeout( function(){ new CmdAutostart().start($ce) }, 400 );
   }
   this.enterFcn= function(ta){
