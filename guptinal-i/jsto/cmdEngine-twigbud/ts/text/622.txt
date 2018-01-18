@@ -1,5 +1,5 @@
-//1-17-2018 jchoy - v1.394 CmdEngine_theOne
-pkg= pkg622={ver:'CETB 1.394'}
+//1-18-2018 jchoy - v1.395 Fix PkgTool.ceParse
+pkg= pkg622={ver:'CETB 1.395'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -192,7 +192,7 @@ pkg.PkgTool=function(){
   }
   this.ceParse= function(ci){
     if (ci.name != 'pkg.startup') return;
-    new CmdAutostart().init('pt').parse(ci.text,$ce);
+    new CmdAutostart().init('pt').parse(new CmdEngine().ce1.ce, ci.text);
   }
 }
 pkg.LoadJsc=function(){
