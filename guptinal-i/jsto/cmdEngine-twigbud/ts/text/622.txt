@@ -1,5 +1,5 @@
-//1-18-2018 jchoy - v1.396 CurlyStarter user $ce instead of this.ce
-pkg= pkg622={ver:'CETB 1.396'}
+//1-19-2018 jchoy - v1.397 avoid using global $ce
+pkg= pkg622={ver:'CETB 1.397'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -129,6 +129,7 @@ pkg.CmdAutostart= function(){
   this.init( 'startup' );
   this.start= function(ce){
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
+    if (!ce) ce= new CmdEngine().ce1.ce;
     if (!st.isOk) return;
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
     else 
@@ -148,7 +149,7 @@ pkg.CmdAutostart= function(){
 //----
 const cmdEngine_theOne= {};
 pkg.CmdEngine= function(){
-  var $t= $ce= this;
+  var $t= this;
   this.assets= {};
   this.addCmd= function(s, fcn){ this.assets[s]=fcn };
   this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
@@ -171,11 +172,11 @@ pkg.CmdEngine= function(){
     this.assets['defcmd']= function(at){
       if (at.length < 3) return 'syntax: defcmd name class';
       var $cn= at[2];
-      $ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
+      $t.ce1.ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
       return 'ok';
     }
     this.addCmd( 'help', function(at){ 
-      var s=''; for (var m in $ce.assets) s+=' '+m;
+      var s=''; for (var m in $t.ce1.ce.assets) s+=' '+m;
       return 'available commands:'+s;
     } );
     return this;
@@ -210,19 +211,19 @@ pkg.CurlyStarter= function(){
   new AppTool().inherit( this, TaApp );
   const  $t= this;
   this.ver= pkg622.ver;
-  const $ce= new CmdEngine().init().ce1.ce;
   this.start= function(){
     this.sl= new StoLog('err.log');
     window.onerror= function(e,u,l){ $t.sl.log(e) }
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
     document.title=['CETB', $t.addEl('br')][0]; 
-    setTimeout( function(){ new CmdAutostart().start($ce) }, 400 );
+    setTimeout( function(){ new CmdAutostart().start() }, 400 );
   }
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
     if (s=='ver') return '\n'+this.ver+'\n';
-    if ($ce.parse(ta.value)) return $ce._;
+    const ce= new CmdEngine().init().ce1.ce;
+    if (ce.parse(ta.value)) return ce._;
     return '\nError - Valid Commands: ver, help \n';
   }
 }
