@@ -1,5 +1,5 @@
-//1-19-2018 jchoy - v1.398 first ce should be init'd
-pkg= pkg622={ver:'CETB 1.398'}
+//1-19-2018 jchoy - v1.411 EvalJsLine
+pkg= pkg622={ver:'CETB 1.411'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -63,6 +63,10 @@ pkg.EvalJs= function(){
     }, at[1]);
     return 'ok';
   }
+}
+//----
+pkg.EvalJsLine=function(){
+  this.start=function(at){ return ['ok',eval(at.slice(1).join(' '))][0]; }
 }
 //----
 pkg.TaApp= function(){
@@ -154,6 +158,7 @@ pkg.CmdEngine= function(){
   this.addCmd( 'link', function(at){ return new LinkMaker().start(at); } );
   this.addCmd( 'edit', function(at){ return new StoEdit().start(at); } );
   this.addCmd( 'evaljs', function(at){ return new EvalJs().start(at); } );
+  this.addCmd( 'jsline', function(at){ return new EvalJsLine().start(at); } );
   this.addCmd( 'loadjsc', function(at){ return new LoadJsc().start(at); } );
   this.addCmd( 'loadjs', function(at){ return new LoadJs().start(at); } );
   this.addCmd( 'hashcmd', function(at){return new HashCmd().start(at);});
