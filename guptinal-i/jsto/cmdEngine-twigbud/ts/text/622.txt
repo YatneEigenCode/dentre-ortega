@@ -1,5 +1,5 @@
-//1-18-2018 jchoy - v1.395 Fix PkgTool.ceParse
-pkg= pkg622={ver:'CETB 1.395'}
+//1-18-2018 jchoy - v1.396 CurlyStarter user $ce instead of this.ce
+pkg= pkg622={ver:'CETB 1.396'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -210,7 +210,7 @@ pkg.CurlyStarter= function(){
   new AppTool().inherit( this, TaApp );
   const  $t= this;
   this.ver= pkg622.ver;
-  const $ce=this.cmdEngine= new CmdEngine().init();
+  const $ce= new CmdEngine().init().ce1.ce;
   this.start= function(){
     this.sl= new StoLog('err.log');
     window.onerror= function(e,u,l){ $t.sl.log(e) }
@@ -222,7 +222,7 @@ pkg.CurlyStarter= function(){
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
     if (s=='ver') return '\n'+this.ver+'\n';
-    if (this.cmdEngine.parse(ta.value)) return this.cmdEngine._;
+    if ($ce.parse(ta.value)) return $ce._;
     return '\nError - Valid Commands: ver, help \n';
   }
 }
