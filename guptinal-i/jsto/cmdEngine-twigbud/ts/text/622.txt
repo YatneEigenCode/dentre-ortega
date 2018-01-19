@@ -1,5 +1,5 @@
-//1-19-2018 jchoy - v1.397 avoid using global $ce
-pkg= pkg622={ver:'CETB 1.397'}
+//1-19-2018 jchoy - v1.398 first ce should be init'd
+pkg= pkg622={ver:'CETB 1.398'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -129,7 +129,6 @@ pkg.CmdAutostart= function(){
   this.init( 'startup' );
   this.start= function(ce){
     var st= this.cfg.sl.cfg.st, nc=this.cfg.nc, pl;
-    if (!ce) ce= new CmdEngine().ce1.ce;
     if (!st.isOk) return;
     if (pl= st.lo.getItem(nc)) this.parse(ce, pl);
     else 
@@ -168,7 +167,7 @@ pkg.CmdEngine= function(){
   }
   this.crWrap= function(s){ return '\n'+s+'\n'; }
   this.init= function(){
-    if (               !this.ce1.ce) this.ce1.ce= this;
+    if (!this.ce1.ce) this.ce1.ce= this;
     this.assets['defcmd']= function(at){
       if (at.length < 3) return 'syntax: defcmd name class';
       var $cn= at[2];
@@ -193,7 +192,7 @@ pkg.PkgTool=function(){
   }
   this.ceParse= function(ci){
     if (ci.name != 'pkg.startup') return;
-    new CmdAutostart().init('pt').parse(new CmdEngine().ce1.ce, ci.text);
+    new CmdAutostart().init('pt').parse(new CmdEngine().init().ce1.ce, ci.text);
   }
 }
 pkg.LoadJsc=function(){
@@ -211,19 +210,19 @@ pkg.CurlyStarter= function(){
   new AppTool().inherit( this, TaApp );
   const  $t= this;
   this.ver= pkg622.ver;
+  $t.ce= new CmdEngine().init().ce1.ce;
   this.start= function(){
     this.sl= new StoLog('err.log');
     window.onerror= function(e,u,l){ $t.sl.log(e) }
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
     document.title=['CETB', $t.addEl('br')][0]; 
-    setTimeout( function(){ new CmdAutostart().start() }, 400 );
+    setTimeout( function(){ new CmdAutostart().start($t.ce) }, 400 );
   }
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
     if (s=='ver') return '\n'+this.ver+'\n';
-    const ce= new CmdEngine().init().ce1.ce;
-    if (ce.parse(ta.value)) return ce._;
+    if ($t.ce.parse(ta.value)) return $t.ce._;
     return '\nError - Valid Commands: ver, help \n';
   }
 }
