@@ -71,8 +71,8 @@ pkg.EvalJs= function(){
     //this.start=function(at){ 
     //  return this.eval(new Sto().lo.getItem($f),'')+this.eval(at.slice(1).join(' '),$m); }
     this.ejl1= $evaljsline_the_one;
-    this.eval=function(s,mOk){
-      try{ return [mOk,eval(s)][0]; } catch (e){return e.message+'\n'} }
+    //this.eval=function(s,mOk){
+    //  try{ return [mOk,eval(s)][0]; } catch (e){return e.message+'\n'} }
   }
   $evaljsline_the_one=new EvalJsLine();
 })()
