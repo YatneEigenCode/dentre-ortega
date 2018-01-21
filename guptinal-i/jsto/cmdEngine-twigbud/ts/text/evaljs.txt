@@ -1,16 +1,15 @@
-//1-20-2018 jchoy v0.115 mak()
+//1-20-2018 jchoy v0.116 DCJL to use ce1.i
 DefCmdJsLine=function(){
   const fn=new Function('at','return ["ok",eval(this.sc)][0]');
   this.start=function(at){
-    const sc= at.slice(2).join(' '), t1=new GCloak().theOne;
-    const cName= 'Anon_cetb'+ t1.i++;
-    eval('tmpce=function(){this.sc=sc;this.start=fn}');
-    t1.ce.addCmd( at[1], new Function('at',
-      'return new '+cName+'().start(at)')  );
-    return ['ok',window[cName]= tmpce][0];
+    if (at.length<3) return 'dcjl <name> <scode>\neg: dcjl a7 alert(7)';
+    const sc= at.slice(2).join(' '), ce1=new CmdEngine().ce1;
+    const cName= 'Anon_cetb'+ ce1.i++;
+    eval('window.'+cName+'=function(){this.sc=sc;this.start=fn}');
+    ce1.ce.addCmd( at[1], new Function('at', 'return new '+cName+'().start(at)')  );
+    return 'ok'
   }
 }
-//need to replace GCloak
 
 //rm
 //mak().lo.removeItem('foo')
