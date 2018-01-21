@@ -1,5 +1,5 @@
-//1-20-2018 jchoy - v1.413  troubleshooting EvalJsLine
-pkg= pkg622={ver:'CETB 1.413b'}
+//1-20-2018 jchoy - v1.414  anon fcn exec needs ;prefix
+pkg= pkg622={ver:'CETB 1.414'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -65,20 +65,18 @@ pkg.EvalJs= function(){
   }
 }
 //----
-/*
-(function(){
+;(function(){
   var $evaljsline_the_one, $f='evaljsline_env', $m='ok';
   EvalJsLine=function(){
-    //this.start=function(at){ 
-    //  return this.eval(new Sto().lo.getItem($f),'')+this.eval(at.slice(1).join(' '),$m); }
+    this.start=function(at){ 
+      return this.eval(new Sto().lo.getItem($f),'')+this.eval(at.slice(1).join(' '),$m); }
     this.ejl1= $evaljsline_the_one;
-    //this.eval=function(s,mOk){
-    //  try{ return [mOk,eval(s)][0]; } catch (e){return e.message+'\n'} }
+    this.eval=function(s,mOk){
+      try{ return [mOk,eval(s)][0]; } catch (e){return e.message+'\n'} }
   }
   $evaljsline_the_one=new EvalJsLine();
 })()
 pkg.EvalJsLine=EvalJsLine;
-*/
 //----
 pkg.TaApp= function(){
   var $t= this;
