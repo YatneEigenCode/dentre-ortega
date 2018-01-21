@@ -1,5 +1,5 @@
 //1-20-2018 jchoy - v1.413  troubleshooting EvalJsLine
-pkg= pkg622={ver:'CETB 1.413'}
+pkg= pkg622={ver:'CETB 1.413b'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -65,6 +65,7 @@ pkg.EvalJs= function(){
   }
 }
 //----
+/*
 (function(){
   var $evaljsline_the_one, $f='evaljsline_env', $m='ok';
   EvalJsLine=function(){
@@ -77,6 +78,7 @@ pkg.EvalJs= function(){
   $evaljsline_the_one=new EvalJsLine();
 })()
 pkg.EvalJsLine=EvalJsLine;
+*/
 //----
 pkg.TaApp= function(){
   var $t= this;
