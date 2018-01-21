@@ -1,5 +1,5 @@
-//1-19-2018 jchoy - v1.411 EvalJsLine
-pkg= pkg622={ver:'CETB 1.411'}
+//1-20-2018 jchoy - v1.412  $evaljsline_the_one
+pkg= pkg622={ver:'CETB 1.412'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -65,9 +65,17 @@ pkg.EvalJs= function(){
   }
 }
 //----
-pkg.EvalJsLine=function(){
-  this.start=function(at){ return ['ok',eval(at.slice(1).join(' '))][0]; }
-}
+(function(){
+  var $evaljsline_the_one, $f='evaljsline_env', $m='ok';
+  EvalJsLine=function (){
+    this.start=function(at){ 
+      return this.eval(new Sto().lo.getItem($f),'')+this.eval(at.slice(1).join(' '),$m); }
+    this.ejl1= $evaljsline_the_one;
+    this.eval=function(s,mOk){
+      try{ return [mOk,eval(s)][0]; } catch (e){return e.message+'\n'} }
+  }
+  $evaljsline_the_one=new EvalJsLine();
+})()
 //----
 pkg.TaApp= function(){
   var $t= this;
