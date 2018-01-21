@@ -1,4 +1,4 @@
-//1-17-2018 jchoy v0.114 directly parse runner
+//1-20-2018 jchoy v0.115 mak()
 DefCmdJsLine=function(){
   const fn=new Function('at','return ["ok",eval(this.sc)][0]');
   this.start=function(at){
@@ -10,11 +10,20 @@ DefCmdJsLine=function(){
     return ['ok',window[cName]= tmpce][0];
   }
 }
-const gCloak_theOne={i:0,at:[],ts:new Date(),ce:$ce};
-GCloak=function(){ this.theOne= gCloak_theOne}
+//need to replace GCloak
 
 //rm
-//dcjl foo12 (function(a,b){a.removeItem(b)})(new Sto().lo,at[1])
+//mak().lo.removeItem('foo')
+//mak().ca('runner')
 
-new CmdAutostart().init('ca').parse( new CmdEngine().ce1.ce, new Sto().lo.getItem('runner'));
+//intended for evaljsline_env
+mak= function(){ const $r={
+    lo:new Sto().lo
+    ,ce:new CmdEngine().ce1.ce
+    ,ca:function(n){new CmdAutostart().init('ca').parse( 
+      $r.ce,$r.lo.getItem(n))}
+    };
+  return $r;
+}
+
 //evaljs-ok
