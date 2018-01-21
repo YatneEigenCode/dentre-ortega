@@ -1,5 +1,5 @@
-//1-20-2018 jchoy - v1.414  anon fcn exec needs ;prefix
-pkg= pkg622={ver:'CETB 1.414'}
+//1-20-2018 jchoy - v1.415  ce1.i
+pkg= pkg622={ver:'CETB 1.415'}
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -159,7 +159,7 @@ pkg.CmdAutostart= function(){
   }
 }
 //----
-const cmdEngine_theOne= {};
+const cmdEngine_theOne= {i:0,ts:new Date(),s:''};
 pkg.CmdEngine= function(){
   var $t= this;
   this.assets= {};
