@@ -1,5 +1,4 @@
-//1-20-2018 jchoy - v1.415  ce1.i
-pkg= pkg622={ver:'CETB 1.415'}
+pkg= pkg622={ver:'CETB 1.417'} //autostart via cgi 1-21-2018 jchoy
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -231,7 +230,8 @@ pkg.CurlyStarter= function(){
     this.addEl('textarea').cols= 40;
     this._.onkeypress= this.doTa;
     document.title=['CETB', $t.addEl('br')][0]; 
-    setTimeout( function(){ new CmdAutostart().start($t.ce) }, 400 );
+    const autoName= this.cgi('ca','autostart',location);
+    setTimeout( function(){ new CmdAutostart().init(autoName).start($t.ce) }, 400 );
   }
   this.enterFcn= function(ta){
     var s=ta.value.split('\n').pop().toLowerCase();
