@@ -1,13 +1,13 @@
-//1-23-2018 jchoy Foo
+//1-25-2018 jchoy r113 loadjs ts/text/jslab.js
 Foo=function(){
   this.start=function(at){
-    alert(foo);
+    alert('foo');
   }
 }
 //chrome does not allow load local
 Foo_BootData=function(){
   this.start=function(){
-    var rs= ['loadjs file:///Users/jchoy/Documents/dev2018/guptinal-i/cetbjs/Foo.js'
+    var rs= ['loadjs ts/text/jslab.js'
     ,'defcmd foo Foo'
     ,'hashcmd'
     ,'sleep 1'
