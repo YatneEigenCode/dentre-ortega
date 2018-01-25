@@ -1,4 +1,4 @@
-//1-25-2018 jchoy r113 loadjs ts/text/jslab.js
+//1-25-2018 jchoy r114 DefCmdRun
 Foo=function(){
   this.start=function(at){
     alert('foo');
@@ -14,6 +14,25 @@ Foo_BootData=function(){
     ,'foo'].join('\n');
     new Sto().lo.setItem('foo_startup',rs);
     new CmdEngine().parse('link ?js=619&ca=foo_startup&');
+    if (confirm('restart?')) location='?js=619&ca=foo_startup&';
     return 'ok';
   }
 }
+/* usage:
+loadjs ts/text/jslab.js
+defcmd fooboot Foo_BootData
+fooboot
+#click on generated link
+*/
+
+DefCmdRun=function(){
+  this.start=function(at){
+    const ce=new CmdEngine().ce1.ce;
+    ce.parse('defcmd dcrtmp '+at[1]);
+    ce.parse('dcrtmp');
+  }
+}
+/* usage:
+loadjs ts/text/jslab.js
+defcmdrun Foo_BootData
+*/
