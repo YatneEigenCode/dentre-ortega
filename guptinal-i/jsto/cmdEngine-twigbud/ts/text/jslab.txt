@@ -1,4 +1,4 @@
-//1-25-2018 jchoy r114 DefCmdRun
+//1-25-2018 jchoy r115 jslab.txt
 Foo=function(){
   this.start=function(at){
     alert('foo');
@@ -7,7 +7,7 @@ Foo=function(){
 //chrome does not allow load local
 Foo_BootData=function(){
   this.start=function(){
-    var rs= ['loadjs ts/text/jslab.js'
+    var rs= ['loadjs ts/text/jslab.txt'
     ,'defcmd foo Foo'
     ,'hashcmd'
     ,'sleep 1'
@@ -19,7 +19,7 @@ Foo_BootData=function(){
   }
 }
 /* usage:
-loadjs ts/text/jslab.js
+loadjs ts/text/jslab.txt
 defcmd fooboot Foo_BootData
 fooboot
 #click on generated link
@@ -33,6 +33,6 @@ DefCmdRun=function(){
   }
 }
 /* usage:
-loadjs ts/text/jslab.js
+loadjs ts/text/jslab.txt
 defcmdrun Foo_BootData
 */
