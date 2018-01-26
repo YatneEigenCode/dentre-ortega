@@ -1,4 +1,4 @@
-pkg= pkg622={ver:'CETB 1.417'} //autostart via cgi 1-21-2018 jchoy
+pkg= pkg622={ver:'CETB 1.418'} //defcmd * * /run 1-25-2018 jchoy
 //----
 pkg.HashCmd=function (){
   this.start=function(){
@@ -185,6 +185,7 @@ pkg.CmdEngine= function(){
       if (at.length < 3) return 'syntax: defcmd name class';
       var $cn= at[2];
       $t.ce1.ce.assets[at[1]]= function(at){ return new window[$cn]().start(at) }
+      if ((at.length>3) && (at[3]=='/run') $t.ce1.ce.parse(at[1]);
       return 'ok';
     }
     this.addCmd( 'help', function(at){ 
