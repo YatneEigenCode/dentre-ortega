@@ -2,6 +2,7 @@
 //3-21-08  JKC v0.52 src in DxpSimple.js
 //3-22-08  JKC v0.53 progId; delay hideDetail; TimeTier
 //4-22-08  JKC v0.54 fix bug in PulsePanel.ClientColor
+//11-3-20  JChoy v0.61 use tsdomain
 
 function PulsePanel( url, cell ){
 	this.origText = (cell)? cell.innerHTML : "";
@@ -86,7 +87,7 @@ function PulsePanel( url, cell ){
 			new TextExtractor( new this.ClientDetailWriter(this) )
 		  )
 		  this.dxp = new DxpSimple( this.writer );
-		  this.dxp.phpUrl = "http://rip.okdaily.com/mad/scrape2json.php";
+		  this.dxp.phpUrl = "http://tsdomain.com/mad/scrape2json.php";
 		}
 		//todo: stop updates if not acknowledged or slow if >8h
 		if (!this.isBlockWebGet) this.dxp.webGet( this.url );
@@ -160,7 +161,7 @@ function Waffle(cfg0){
 		var urltpl = this.cfg.urltemplate;
 		if (!urltpl) {
 			if (row<this.startRow) { return cell.innerHTML = "";}
-			urltpl  = "http://rip.okdaily.com/mad/textStore.php?f=text&i={0}";
+			urltpl  = "http://tsdomain.com/tspath?f=text&i={0}";
 		}
 		var url = (urltpl+"").replace(/\{0\}/g, cell.innerHTML );
 		var pp = new PulsePanel( url, cell );
