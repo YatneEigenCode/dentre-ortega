@@ -1,0 +1,21 @@
+<form>
+Given a string of decimal digits, return the number of combinations that the string can be docoded. 
+Decoding is done as 1=A, 2=B,...26=Z.
+<input name="uiv" value="123">
+<input type=button value="Go"
+ onclick="this.value=new Lab101().start([0,this.form.uiv.value])">
+</form>
+
+<script>
+//5-4-2021 JKC tested
+Lab101= function(){
+  this.tst=function(s,z){ return (parseInt(s)<=z)? 1 : 0 }
+  this.fc= function(s){
+    if (s.length<2) return 1;
+    return this.fc(s.substr(1))+this.tst(s.substr(0,2),26)*this.fc(s.substr(2));
+  }
+  this.start=function(at){
+    return this.fc(at[1]);
+  }
+}
+</script>
